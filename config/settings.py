@@ -77,6 +77,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+
+'''
+
+to local server
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -89,6 +94,18 @@ DATABASES = {
             'init_command': 'SET sql_mode="STRICT_TRANS_TABLES"'}
     }
 }
+'''
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dldudcks91$baseball',
+        'USER': 'dldudcks91',
+        'PASSWORD': '3whddpdltm!',
+        'HOST': 'dldudcks91.mysql.pythonanywhere-services.com',
+    }
+}
+
 
 
 # Password validation
