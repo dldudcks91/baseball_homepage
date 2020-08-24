@@ -1,0 +1,117 @@
+
+
+
+<div id="today-game-list">
+    <ul>
+        {% for game in game_date_list %}
+        <li class="card" onclick="saveGamenum({{game.game_num_idx}});" role='button'>
+            <div class ="card-title">
+                <span>{{game.stadium}}</span>
+                
+                
+            </div>
+            <div class ="card-body">
+                <div class="away-team">
+                    <div class="emb">
+                            
+                        <img class="emb-away" id="emb-away" src= "{{game.away_url}}" alt= {{game.away_name}}>
+      
+                    </div>
+                    <span>{{game.away_name}}</span>
+                </div>
+                <span class="vs">vs</span>
+                <div class="home-team">
+
+                    <div class="emb">
+                         <img class="emb-home" id="emb-home" src= "{{game.home_url}}" alt= {{game.home_name}}>
+                    </div>
+                    <span>{{game.home_name}}</span>
+                </div>
+            
+            </div>
+        </li>
+        {% endfor %}
+
+    </ul>
+</div>
+<div id="today-game-tab" class="hidden" >
+     <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="gameinfo-tab" data-toggle="tab" href="#gameinfo-contents" role="tab" aria-controls="gameinfo-contents" aria-selected="true" >GameInFo</a>
+        </li>
+        <li class="nav-item" role="presentation">
+        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
+        </li>
+        <li class="nav-item" role="presentation">
+        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="gameinfo-contents" role="tabpanel" aria-labelledby="gameinfo-tab"></div>
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">LYC</div>
+        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">BYE</div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    
+   
+    // select card function
+
+    $('.card').on('click', function () {
+      $("#today-game-tab").removeClass('hidden')
+    })
+
+    function saveGamenum(game_num_idx){
+        $('#myTab').data("game_num_idx",game_num_idx)
+        GameInfoTab()
+    }
+    // select tab function
+
+    $('#myTab a').on('click', function (e) {
+      e.preventDefault()
+      
+    })
+
+    $('#gameinfo-tab').on('click',function(){
+     GameInfoTab()
+	})
+	
+    function GameInfoTab(){
+        var game_num_idx= $('#myTab').data("game_num_idx");
+        var date = $("#date_pick").val();
+        var set_date = moment(date).format("YYYYMMDD");
+        var set_url = 'team_game_info/' + set_date +'/' + game_num_idx;
+        getTeamGameInfoDate(set_url);
+	}
+
+    
+    
+    function getTeamGameInfoDate(set_url){
+        $.ajax({
+                    type: "GET",
+                    url: set_url,
+                    success:function(data){
+                        alert("success");
+                        $("#gameinfo-contents").html(data);
+                    },
+                    error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+
+			
+			        }
+        
+		});
+    }
+    
+
+
+
+        
+        
+        
+  
+</script>
+

@@ -1,0 +1,23 @@
+
+
+<table class="table">
+    <thead>
+        <header><B>Year: {{year}}</B></header>
+        <tr>
+            <td><B>팀</B></td>
+            <td><B>구장</B></td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for team in team_year_list %}
+        <tr>
+            
+            <td>{{team.team_name}}</td>
+            <td>{{team.stadium}}</td>
+        </tr>
+        </tbody>
+        {% endfor %}
+    </thead>
+</table>
+
+

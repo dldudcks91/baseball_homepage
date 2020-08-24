@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class= 'container'>
+    
+    <div class="year-select">
+        <select id="ddlYear">
+        <option value="2017">2017</option>
+        <option value="2018">2018</option>
+        <option value="2019">2019</option>
+        <option value="2020" selected>2020</option>
+        </select>
+    </div>
+      
+    
+
+    <div id="datazones" class ="team-info"></div>
+
+    
+</div>
+
+<script type="text/javascript">
+
+
+
+
+
+$(document).ready(function() { 
+    $.ajax({
+            type: "GET",
+            url: $("#ddlYear").val(),
+            success:function(data){
+                alert("success");
+                $("#datazones").html(data)
+            },
+            error:function(request,status,error){
+                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+
+			
+			}
+        
+		})
+    $("#ddlYear").change(function(){
+        $.ajax({
+            type: "GET",
+            url: $("#ddlYear").val(),
+            success:function(data){
+                alert("success");
+                $("#datazones").html(data)
+            },
+            error:function(request,status,error){
+                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+
+			
+			}
+        
+		})
+        
+        
+        
+    });
+});
+</script>
+{% endblock %}

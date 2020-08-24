@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+
+<div  class= "contents" >
+    <div class= "date-select">
+        <ul class= "date">
+            <li class="prev">
+                
+                
+                <span onclick="changeDate('prev');" role='button' ><i class="fas fa-angle-left fa-2x"></i></span>
+            </li>
+            <li class= "today">
+                <p><input id="date_pick" type="date" value="2017-06-20"></p>
+            </li>
+            <li class="next">
+                <span onclick="changeDate('next');" role='button'><i class="fas fa-angle-right fa-2x"></i></span>
+                
+            </li>
+        </ul>
+    </div>
+
+      
+      
+
+    
+    <div id= "today-game-zone" class="today-game-zone">
+    </div>
+
+    <div id= 'scorezone'>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    function getGameInfoDate(set_url){
+        $.ajax({
+                    type: "GET",
+                    url: set_url,
+                    success:function(data){
+                        alert("success");
+                        $("#today-game-zone").html(data);
+                    },
+                    error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+
+			
+			        }
+        
+		        })
+        }
+    
+
+
+
+    function changeDate(param){
+        var date = $("#date_pick").val();
+        if (param=='prev'){var set_date = moment(date).add('days',-1).format("YYYY-MM-DD");}
+        else if(param=="next"){var set_date = moment(date).add('days',1).format("YYYY-MM-DD");}
+
+        else{alert("Please param!!!")}
+
+        $("#date_pick").val(set_date);
+        
+        var set_url = moment(set_date).format("YYYYMMDD");
+        getGameInfoDate(set_url);
+        
+        
+	}
+
+
+    $(document).ready(function() {
+        var set_date = $("#date_pick").val();
+        
+        var set_url = moment(set_date).format("YYYYMMDD");
+        getGameInfoDate(set_url);
+
+        $("#date_pick").change(function(){
+            var set_date = $("#date_pick").val();
+            
+            var set_url = moment(set_date).format("YYYYMMDD");
+            getGameInfoDate(set_url)
+        
+        
+        
+        });
+    });
+</script>
+{% endblock %}

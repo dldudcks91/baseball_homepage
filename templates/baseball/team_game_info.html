@@ -1,0 +1,289 @@
+<div>
+	<div class= "box-score-area">
+		<h class="box-score-title">- Box Score Record</h>
+		<table class="tbl-box-score table">
+			<thead>
+				<tr>
+					<th>Team</th>
+					<th>Result</th>
+					<th>1</th>
+					<th>2</th>
+					<th>3</th>
+					<th>4</th>
+					<th>5</th>
+					<th>6</th>
+					<th>7</th>
+					<th>8</th>
+					<th>9</th>
+					<th>10</th>
+					<th>11</th>
+					<th>12</th>
+					<th>R</th>
+					<th>H</th>
+					<th>E</th>
+					<th>B</th>
+				</tr>
+			</thead>
+			<tbody>
+				
+				<tr>
+					{% for score in away_score %}
+						<td>{{team_name.away}}</td>
+						<td>{{score.result}}</td>
+						<td>{{score.x1}}</td>
+						<td>{{score.x2}}</td>
+						<td>{{score.x3}}</td>
+						<td>{{score.x4}}</td>
+						<td>{{score.x5}}</td>
+						<td>{{score.x6}}</td>
+						<td>{{score.x7}}</td>
+						<td>{{score.x8}}</td>
+						<td>{{score.x9}}</td>
+						<td>{{score.x10}}</td>
+						<td>{{score.x11}}</td>
+						<td>{{score.x12}}</td>
+						<td>{{score.r}}</td>
+						<td>{{score.h}}</td>
+						<td>{{score.e}}</td>
+						<td>{{score.b}}</td>
+					{% endfor %}
+				</tr>
+			</tbody>
+			<tbody>
+				
+				<tr>
+					{% for score in home_score %}
+						<td>{{team_name.home}}</td>
+						<td>{{score.result}}</td>
+						<td>{{score.x1}}</td>
+						<td>{{score.x2}}</td>
+						<td>{{score.x3}}</td>
+						<td>{{score.x4}}</td>
+						<td>{{score.x5}}</td>
+						<td>{{score.x6}}</td>
+						<td>{{score.x7}}</td>
+						<td>{{score.x8}}</td>
+						<td>{{score.x9}}</td>
+						<td>{{score.x10}}</td>
+						<td>{{score.x11}}</td>
+						<td>{{score.x12}}</td>
+						<td>{{score.r}}</td>
+						<td>{{score.h}}</td>
+						<td>{{score.e}}</td>
+						<td>{{score.b}}</td>
+					{% endfor %}
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="batter-record-area">
+		<div class="batter-record-away">
+			<h class="batter-title" id="batter-title-away">- {{team_name.away}} Batter Record</h>
+			<table class="tbl-away-batter table">
+				<thead>
+					<tr>
+						<th>bo</th>
+						<th>name</th>
+						<th>b1</th>
+						<th>b2</th>
+						<th>b3</th>
+						<th>hr</th>
+						<th>bb</th>
+						<th>hbp</th>
+						<th>ibb</th>
+						<th>sac</th>
+						<th>sf</th>
+						<th>so</th>
+						<th>go</th>
+						<th>fo</th>
+						<th>gidp</th>
+						<th>etc</th>
+						<th>H</th>
+						<th>TBB</th>
+						<th>AB</th>
+						<th>PA</th>
+						<th>XR</th>
+
+					</tr>
+				</thead>
+				<tbody>
+				{% for batter in away_batter %}
+					<tr>
+			
+						<td>{{batter.bo}}</td>
+						<td>{{batter.name}}</td>
+						<td>{{batter.b1}}</td>
+						<td>{{batter.b2}}</td>
+						<td>{{batter.b3}}</td>
+						<td>{{batter.hr}}</td>
+						<td>{{batter.bb}}</td>
+						<td>{{batter.hbp}}</td>
+						<td>{{batter.ibb}}</td>
+						<td>{{batter.sac}}</td>
+						<td>{{batter.sf}}</td>
+						<td>{{batter.so}}</td>
+						<td>{{batter.go}}</td>
+						<td>{{batter.fo}}</td>
+						<td>{{batter.gidp}}</td>
+						<td>{{batter.etc}}</td>
+						<td>{{batter.h}}</td>
+						<td>{{batter.tbb}}</td>
+						<td>{{batter.ab}}</td>
+						<td>{{batter.pa}}</td>
+						<td>{{batter.xr}}</td>
+					</tr>
+				{% endfor %}			
+				
+				</tbody>
+		
+		
+			</table>
+		</div>
+		<div class="batter-record-away">
+			<h class="batter-title" id="batter-title-away">- {{team_name.home}} Batter Record</h>
+			<table class="tbl-home-batter table">
+				<thead>
+					<tr>
+						<th>bo</th>
+						<th>name</th>
+						<th>b1</th>
+						<th>b2</th>
+						<th>b3</th>
+						<th>hr</th>
+						<th>bb</th>
+						<th>hbp</th>
+						<th>ibb</th>
+						<th>sac</th>
+						<th>sf</th>
+						<th>so</th>
+						<th>go</th>
+						<th>fo</th>
+						<th>gidp</th>
+						<th>etc</th>
+						<th>H</th>
+						<th>TBB</th>
+						<th>AB</th>
+						<th>PA</th>
+						<th>XR</th>
+
+					</tr>
+				</thead>
+				<tbody>
+				{% for batter in home_batter %}
+					<tr>
+						<td>{{batter.bo}}</td>
+						<td>{{batter.name}}</td>
+						<td>{{batter.b1}}</td>
+						<td>{{batter.b2}}</td>
+						<td>{{batter.b3}}</td>
+						<td>{{batter.hr}}</td>
+						<td>{{batter.bb}}</td>
+						<td>{{batter.hbp}}</td>
+						<td>{{batter.ibb}}</td>
+						<td>{{batter.sac}}</td>
+						<td>{{batter.sf}}</td>
+						<td>{{batter.so}}</td>
+						<td>{{batter.go}}</td>
+						<td>{{batter.fo}}</td>
+						<td>{{batter.gidp}}</td>
+						<td>{{batter.etc}}</td>
+						<td>{{batter.h}}</td>
+						<td>{{batter.tbb}}</td>
+						<td>{{batter.ab}}</td>
+						<td>{{batter.pa}}</td>
+						<td>{{batter.xr}}</td>
+					</tr>
+				{% endfor %}			
+				
+				</tbody>
+		
+		
+			</table>
+		</div>
+	</div>
+
+	<div class="pitcher-record-area">
+		<div class="pitcher-record-away">
+			<h class="pitcher-title" id="pitcher-title-away">- {{team_name.away}} Pitcher Record</h>
+			<table class="tbl-away-pitcher table">
+				<thead>
+					<tr>
+						<th>name</th>
+						<th>po</th>
+						<th>inn</th>
+						<th>tbf</th>
+						<th>np</th>
+						<th>ab</th>
+						<th>h</th>
+						<th>hr</th>
+						<th>tbb</th>
+						<th>so</th>
+						<th>r</th>
+						<th>er</th>
+					
+					</tr>
+				</thead>
+				<tbody>
+				{% for pitcher in away_pitcher %}
+					<tr>
+						<td>{{pitcher.name}}</td>
+						<td>{{pitcher.po}}</td>
+						<td>{{pitcher.inn}}</td>
+						<td>{{pitcher.tbf}}</td>
+						<td>{{pitcher.np}}</td>
+						<td>{{pitcher.ab}}</td>
+						<td>{{pitcher.h}}</td>
+						<td>{{pitcher.hr}}</td>
+						<td>{{pitcher.tbb}}</td>
+						<td>{{pitcher.so}}</td>
+						<td>{{pitcher.r}}</td>
+						<td>{{pitcher.er}}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="pitcher-record-home">
+			<h class="pitcher-title" id="pitcher-title-home">- {{team_name.home}} Pitcher Record</h>
+			<table class="tbl-home-pitcher table">
+				<thead>
+					<tr>
+						<th>name</th>
+						<th>po</th>
+						<th>inn</th>
+						<th>tbf</th>
+						<th>np</th>
+						<th>ab</th>
+						<th>h</th>
+						<th>hr</th>
+						<th>tbb</th>
+						<th>so</th>
+						<th>r</th>
+						<th>er</th>
+					
+					</tr>
+				</thead>
+				<tbody>
+				{% for pitcher in home_pitcher %}
+					<tr>
+						<td>{{pitcher.name}}</td>
+						<td>{{pitcher.po}}</td>
+						<td>{{pitcher.inn}}</td>
+						<td>{{pitcher.tbf}}</td>
+						<td>{{pitcher.np}}</td>
+						<td>{{pitcher.ab}}</td>
+						<td>{{pitcher.h}}</td>
+						<td>{{pitcher.hr}}</td>
+						<td>{{pitcher.tbb}}</td>
+						<td>{{pitcher.so}}</td>
+						<td>{{pitcher.r}}</td>
+						<td>{{pitcher.er}}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	
+</div>

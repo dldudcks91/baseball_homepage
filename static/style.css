@@ -1,0 +1,176 @@
+
+
+
+
+/* base.html */
+@font-face {
+  font-family: CookieRunRegular;
+  src: url('./fonts/CookieRunRegular.ttf');
+}
+* {
+	font-family : CookieRunRegular;
+}
+html{
+	width:100%;
+	height:100%;
+}
+body{
+	width:100%;
+	height:100%;
+	overflow:auto;
+	
+}
+
+
+.wrap-container{
+	position: relative;
+	width:100%;
+	height:100%;
+	
+	}
+.contents{
+	position: relative;
+
+	top: 0px;
+	left: 0px;
+	margin:0px;
+	padding:5px;
+	
+}
+
+
+/* main.html*/
+.carousel-control-next{
+	width:100%;
+	height:100%;
+}
+
+/*team_info.html*/
+
+.team-info{
+	position: relative;
+	top:100px;
+	left: 100px;
+}
+
+
+
+
+/*game_info.html*/
+#date_pick{
+	border:none;
+	width: 150px;
+}
+
+.date-select{
+	position: relative;
+
+	width: 100%;
+	height: 60px;
+	margin-top:50px;
+}
+.date-select ul li{
+	position:relative;
+	margin:5px;
+	padding: 5px;
+	list-style-type: none;
+	}
+
+.date-select ul{
+	text-align:center;
+	padding-left:0px;
+}
+.date-select li{
+	display:inline-block;
+}
+.today {
+	vertical-align:5px;
+}
+.today-game-zone{
+	position: relative;
+	
+	}
+
+
+
+
+
+#today-game-list{
+	position:relative;
+	width:1500px;
+	height:300px;
+
+}
+
+
+#today-game-list ul{
+	text-align:center;
+	padding-left:0px;
+}
+
+#today-game-list li{
+	display:inline-block;
+}
+
+#today-game-tab{
+	position: relative;
+}
+
+.card{
+	width:200px;
+	height:200px;
+	margin:10px;
+}
+.card-title{
+	background-color:black;
+	color:white;
+}
+
+.card-body{
+	padding-right:0px;
+	padding-left:0px;
+}
+
+.card-body>div{
+	display:inline-block;
+}
+
+.vs {
+    font-family: Tahoma;
+    font-size: 16px;
+    font-weight: 700;
+    color: #cfcfcf;
+	vertical-align: 20px;
+	margin-left:10px;
+	margin-right:10px;
+}
+
+
+
+#gameinfo-contents{
+	position: relative;
+}
+.hidden{
+	display:none;
+}
+
+
+
+/* team_game_info.html*/
+
+.box-score-area{
+	position: relative;
+	width:1200px;
+	margin:50px 50px 0px 10px;
+}
+.batter-record-area{
+	position: relative;
+	width:1200px;
+	margin:50px 50px 0px 10px;
+	
+}
+.pitcher-record-area{
+	position: relative;
+	width:1200px;
+	margin:50px 50px 0px 10px;
+}
