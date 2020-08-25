@@ -25,7 +25,7 @@ SECRET_KEY = 'ejydq(anfdr1sekb#d+30*f8rv8u_ye8b@dnfteu_-dq2ah&i-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -78,9 +78,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 
-'''
 
-to local server
+
+# to local server
 
 DATABASES = {
     'default': {
@@ -105,8 +105,7 @@ DATABASES = {
         'HOST': 'dldudcks91.mysql.pythonanywhere-services.com',
     }
 }
-
-
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
