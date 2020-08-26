@@ -98,7 +98,7 @@ DATABASES = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aws-database',
+        'NAME': 'dbmaster',
         'USER': 'dbmasteruser',
         'PASSWORD': 'baseball91',
         'HOST': 'ls-e5052632e84bb7bb34101d2f591e09739c713d34.cbzf8i3wofev.ap-northeast-2.rds.amazonaws.com',
