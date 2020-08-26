@@ -1,0 +1,48 @@
+[33mcommit 181c068b8505f7c83d8137f6373a64c12bf5c5d7[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Merge: 2b39b59 336d086
+Author: LYC <dldudcks91@gmail.com>
+Date:   Wed Aug 26 21:08:43 2020 +0900
+
+    Merge branch 'master' of https://github.com/dldudcks91/baseball into master
+
+[33mcommit 336d08683df580a84ba38a0eb3c5be94e7a5ee44[m[33m ([m[1;31morigin/master[m[33m)[m
+Author: dldudcks91 <54015080+dldudcks91@users.noreply.github.com>
+Date:   Wed Aug 26 21:01:25 2020 +0900
+
+    Delete mysqlclient-1.4.6-cp36-cp36m-win32.whl
+
+[33mcommit 2b39b59a5c776ea856470d5a5583cf1e0bfb4e83[m
+Author: LYC <dldudcks91@gmail.com>
+Date:   Wed Aug 26 21:00:21 2020 +0900
+
+    change mysql
+
+[33mcommit 3b75ccd7a0a28dc41ffb720e8c695522066f312f[m
+Author: dldudcks91 <54015080+dldudcks91@users.noreply.github.com>
+Date:   Wed Aug 26 01:11:54 2020 +0900
+
+    Add files via upload
+
+[33mcommit 1f8c12bed190a54df4d7624690fefecf6ebbb14f[m
+Author: LYC <dldudcks91@gmail.com>
+Date:   Tue Aug 25 20:23:55 2020 +0900
+
+    version 1.0.1
+
+[33mcommit 681966c53c40656ea679acf9bc3f22456b805971[m
+Author: LYC <dldudcks91@gmail.com>
+Date:   Mon Aug 24 21:41:56 2020 +0900
+
+    version 1.0.0
+
+[33mcommit 7b4ff272b566a53bfef233bc3f22d8c72c7cd768[m
+Author: LYC <dldudcks91@gmail.com>
+Date:   Mon Aug 24 20:48:57 2020 +0900
+
+    first commit
+
+[33mcommit 36fc6edcc794647842fb2763c18da95ee968dd55[m
+Author: dldudcks91 <54015080+dldudcks91@users.noreply.github.com>
+Date:   Mon Aug 24 19:18:53 2020 +0900
+
+    Initial commit
