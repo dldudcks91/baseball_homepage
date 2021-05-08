@@ -210,11 +210,14 @@ class ScoreRecord(models.Model):
 
 
 class TeamGameInfo(models.Model):
-
-    game_idx = models.ForeignKey(GameInfo, models.DO_NOTHING, db_column='game_idx', blank=True, null=True)
+    game_idx = models.CharField(max_length=14)
+    #game_idx = models.ForeignKey(GameInfo, models.DO_NOTHING, db_column='game_idx', blank=True, null=True)
     team_game_idx = models.CharField(primary_key=True, max_length=9)
-    year = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='year', blank=True, null=True)
-    team_num = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='team_num', blank=True, null=True,related_name='teamgameinfo_team_num_set')
+    #year = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='year', blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True)
+    
+    #team_num = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='team_num', blank=True, null=True,related_name='teamgameinfo_team_num_set')
+    team_num = models.IntegerField(blank=True, null=True)
     foe_num = models.IntegerField(blank=True, null=True)
     game_num = models.IntegerField(blank=True, null=True)
     home_away = models.CharField(max_length=4, blank=True, null=True)
@@ -239,3 +242,47 @@ class TeamInfo(models.Model):
         managed = False
         db_table = 'team_info'
         unique_together = (('year', 'team_num'),)
+        
+        
+class TodayGameInfo(models.Model):
+    game_idx = models.CharField(primary_key=True, max_length=14)
+    home_name = models.CharField(max_length=3, blank=True, null=True)
+    away_name = models.CharField(max_length=3, blank=True, null=True)
+    stadium = models.CharField(max_length=2, blank=True, null=True)
+    end = models.CharField(max_length=100,blank=True, null=True)
+    etc = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'today_game_info'
+        
+class TodayTeamGameInfo(models.Model):
+    game_idx = models.CharField(max_length=14)
+    #game_idx = models.ForeignKey(GameInfo, models.DO_NOTHING, db_column='game_idx', blank=True, null=True)
+    team_game_idx = models.CharField(primary_key=True, max_length=9)
+    #year = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='year', blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True)
+    
+    #team_num = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='team_num', blank=True, null=True,related_name='teamgameinfo_team_num_set')
+    team_num = models.IntegerField(blank=True, null=True)
+    foe_num = models.IntegerField(blank=True, null=True)
+    game_num = models.IntegerField(blank=True, null=True)
+    home_away = models.CharField(max_length=4, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'today_team_game_info'
+class GraphData(models.Model):
+    
+    team_game_idx = models.CharField(primary_key=True, max_length=9)
+    #year = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='year', blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True)
+    #team_num = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='team_num', blank=True, null=True,related_name='graph_data_team_num_set')
+    team_num = models.IntegerField(blank=True, null=True)
+    game_num = models.IntegerField(blank=True, null=True)
+    run_5 = models.FloatField(blank=True, null=True)
+    run_20 = models.FloatField(blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'graph_data'
+        

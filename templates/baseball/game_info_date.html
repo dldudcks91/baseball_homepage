@@ -1,112 +1,189 @@
 
 
-
 <div id="today-game-list">
-    <ul>
-        {% for game in game_date_list %}
-        <li class="card" onclick="saveGamenum({{game.game_num_idx}});" role='button'>
+    {% if game_date_dic %}
+    <ul >
+
+        {% for game in game_date_dic %}
+        <li class="card" onclick="saveGamenum({{game.game_num_idx}});setPreview()" role='button'>
             <div class ="card-title">
                 <span>{{game.stadium}}</span>
-                
+                <span> | </span>
+                <span>{{game.end}}</span>
                 
             </div>
             <div class ="card-body">
-                <div class="away-team">
-                    <div class="emb">
-                            
-                        <img class="emb-away" id="emb-away" src= "{{game.away_url}}" alt= {{game.away_name}}>
-      
+                <div class="game-info">
+                    <div class="game-info-away">
+                        <div class= "game-info-basic" id="info-basic-away">
+                            <div class="emb"><img class="emb-away" id="emb-away" src= "{{game.away_url}}" alt= {{game.away_name}}></div>
+                            <div><span>{{game.away_name}}</span></div>
+                        </div>
+                        <div class="game-info-record" id="info-record-away">
+                            <div><span>{{game.away_score}}</span></div>
+                            <div><span>{{game.away_pitcher}}</span></div>
+                        </div>
                     </div>
-                    <span>{{game.away_name}}</span>
-                </div>
-                <span class="vs">vs</span>
-                <div class="home-team">
 
-                    <div class="emb">
-                         <img class="emb-home" id="emb-home" src= "{{game.home_url}}" alt= {{game.home_name}}>
+                    <span id="game-info-vs">vs</span>
+
+
+
+                    <div class="game-info-home">
+                        <div class="game-info-basic" id="info-basic-home">
+                            <div class="emb"><img class="emb-home" id="emb-home" src= "{{game.home_url}}" alt= {{game.home_name}}></div>
+                            <div><span>{{game.home_name}}</span></div>
+                        </div>
+                        <div class="game-info-record" id="info-record-home">
+                            <div><span>{{game.home_score}}</span></div>
+                            <div><span>{{game.home_pitcher}}</span></div>
+                        </div>
                     </div>
-                    <span>{{game.home_name}}</span>
                 </div>
-            
+
+
+
             </div>
         </li>
         {% endfor %}
 
     </ul>
+    {% else %}<span>경기가 없는 날입니다.</span>
+    {% endif %}
 </div>
 <div id="today-game-tab" class="hidden" >
+
+
      <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-        <a class="nav-link active" id="gameinfo-tab" data-toggle="tab" href="#gameinfo-contents" role="tab" aria-controls="gameinfo-contents" aria-selected="true" >GameInFo</a>
+        <a class="nav-link active" id="preview-tab" data-toggle="tab" href="#preview-contents" role="tab" aria-controls="preview-contents" aria-selected="true">Preview</a>
         </li>
         <li class="nav-item" role="presentation">
-        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
+            {% if is_end %}
+                <a class="nav-link" id="boxscore-tab" data-toggle="tab" href="#boxscore-contents" role="tab" aria-controls="boxscore-contents" aria-selected="false" >BoxScore</a>
+            {% else %}
+                <a class="nav-link" id="boxscore-tab" data-toggle="tab" href="#boxscore-contents" role="tab" aria-controls="boxscore-contents" aria-selected="false" >LineUp</a>
+            {% endif %}
         </li>
         <li class="nav-item" role="presentation">
-        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
+        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact-contents" role="tab" aria-controls="contact-contents" aria-selected="false">Contact</a>
         </li>
     </ul>
     <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="gameinfo-contents" role="tabpanel" aria-labelledby="gameinfo-tab"></div>
-        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">LYC</div>
-        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">BYE</div>
+        <div class="tab-pane fade show active" id="preview-contents" role="tabpanel" aria-labelledby="preview-tab"></div>
+        <div class="tab-pane fade" id="boxscore-contents" role="tabpanel" aria-labelledby="boxscore-tab"></div>
+        <div class="tab-pane fade" id="contact-contents" role="tabpanel" aria-labelledby="contact-tab">BYE</div>
     </div>
+
+
 </div>
 
 
 
 <script type="text/javascript">
-    
-   
+   $(document).ready(function() {
+
+        });
+
     // select card function
 
     $('.card').on('click', function () {
       $("#today-game-tab").removeClass('hidden')
+
     })
 
     function saveGamenum(game_num_idx){
         $('#myTab').data("game_num_idx",game_num_idx)
-        GameInfoTab()
+
     }
+    function setPreview(is_end){
+        document.getElementById("preview-tab").setAttribute("class","nav-link active")
+        document.getElementById("preview-contents").setAttribute("class","tab-pane fade show active")
+
+        document.getElementById("contact-tab").setAttribute("class","nav-link")
+        document.getElementById("contact-contents").setAttribute("class","tab-pane fade")
+
+
+        document.getElementById("boxscore-tab").setAttribute("class","nav-link")
+        document.getElementById("boxscore-contents").setAttribute("class","tab-pane fade")
+
+        PreviewTab()
+        }
+    
+    
     // select tab function
 
     $('#myTab a').on('click', function (e) {
       e.preventDefault()
       
     })
-
-    $('#gameinfo-tab').on('click',function(){
-     GameInfoTab()
+    
+    $('#preview-tab').on('click',function(){
+     PreviewTab()
 	})
 	
+    $('#boxscore-tab').on('click',function(){
+
+        GameInfoTab()
+
+	})
+	
+	
+	function PreviewTab(){
+    	var game_num_idx = $('#myTab').data("game_num_idx");
+    	var date = $("#date_pick").val();
+    	var set_date = moment(date).format("YYYYMMDD");
+        var set_url = 'preview/' + set_date +'/' + game_num_idx;
+        getPreview(set_url);
+    }
+    	
+    	
     function GameInfoTab(){
-        var game_num_idx= $('#myTab').data("game_num_idx");
+        var game_num_idx = $('#myTab').data("game_num_idx");
         var date = $("#date_pick").val();
         var set_date = moment(date).format("YYYYMMDD");
-        var set_url = 'team_game_info/' + set_date +'/' + game_num_idx;
-        getTeamGameInfoDate(set_url);
+        var set_url = 'boxscore/' + set_date +'/' + game_num_idx;
+        getBoxscore(set_url);
 	}
 
-    
-    
-    function getTeamGameInfoDate(set_url){
+
+
+    function getPreview(set_url){
         $.ajax({
                     type: "GET",
                     url: set_url,
                     success:function(data){
-                        alert("success");
-                        $("#gameinfo-contents").html(data);
+
+                        $("#preview-contents").html(data);
                     },
                     error:function(request,status,error){
                         alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
 
-			
+
 			        }
         
 		});
     }
     
+    
+    function getBoxscore(set_url){
+        $.ajax({
+                    type: "GET",
+                    url: set_url,
+                    success:function(data){
 
+                        $("#boxscore-contents").html(data);
+                    },
+                    error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+
+
+			        }
+        
+		});
+    }
+    
+    
 
 
         

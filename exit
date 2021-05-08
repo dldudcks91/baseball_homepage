@@ -1,11 +1,23 @@
-[33mcommit 181c068b8505f7c83d8137f6373a64c12bf5c5d7[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+[33mcommit f1eca51d8a77cf45ce0191269eb8cce858f08d3d[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: LYC <dldudcks91@gmail.com>
+Date:   Wed Aug 26 21:24:25 2020 +0900
+
+    change mysql address
+
+[33mcommit 238b42586b9bbd13efc42b3f0d1e1965938e17d0[m
+Author: LYC <dldudcks91@gmail.com>
+Date:   Wed Aug 26 21:11:21 2020 +0900
+
+    change mysql address
+
+[33mcommit 181c068b8505f7c83d8137f6373a64c12bf5c5d7[m
 Merge: 2b39b59 336d086
 Author: LYC <dldudcks91@gmail.com>
 Date:   Wed Aug 26 21:08:43 2020 +0900
 
     Merge branch 'master' of https://github.com/dldudcks91/baseball into master
 
-[33mcommit 336d08683df580a84ba38a0eb3c5be94e7a5ee44[m[33m ([m[1;31morigin/master[m[33m)[m
+[33mcommit 336d08683df580a84ba38a0eb3c5be94e7a5ee44[m
 Author: dldudcks91 <54015080+dldudcks91@users.noreply.github.com>
 Date:   Wed Aug 26 21:01:25 2020 +0900
 

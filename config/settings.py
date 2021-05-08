@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # to local server
-'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -104,7 +104,7 @@ DATABASES = {
         'HOST': 'ls-e5052632e84bb7bb34101d2f591e09739c713d34.cbzf8i3wofev.ap-northeast-2.rds.amazonaws.com',
     }
 }
-
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

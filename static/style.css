@@ -4,11 +4,11 @@
 
 /* base.html */
 @font-face {
-  font-family: CookieRunRegular;
-  src: url('./fonts/CookieRunRegular.ttf');
+  font-family: BlackHanSans-Regular;
+  src: url('./fonts/BlackHanSans-Regular.ttf');
 }
 * {
-	font-family : CookieRunRegular;
+	font-family: BlackHanSans-Regular;
 }
 html{
 	width:100%;
@@ -28,9 +28,16 @@ body{
 	height:100%;
 	
 	}
+
+.container{
+	min-height:800px;
+	margin: 0 auto;
+	padding: 50px 0;
+}
 .contents{
 	position: relative;
-
+	float: left;
+	width: 1200px;
 	top: 0px;
 	left: 0px;
 	margin:0px;
@@ -57,6 +64,7 @@ body{
 
 
 /*game_info.html*/
+
 #date_pick{
 	border:none;
 	width: 150px;
@@ -86,30 +94,32 @@ body{
 .today {
 	vertical-align:5px;
 }
+
+
 .today-game-zone{
 	position: relative;
-	
-	}
 
-
-
+	max-width: 1200px;
+}
 
 
 #today-game-list{
-	position:relative;
-	width:1500px;
-	height:300px;
+	position: relative;
 
+	height:300px;
 }
 
 
 #today-game-list ul{
+
 	text-align:center;
 	padding-left:0px;
 }
 
 #today-game-list li{
+	
 	display:inline-block;
+	
 }
 
 #today-game-tab{
@@ -135,15 +145,37 @@ body{
 	display:inline-block;
 }
 
-.vs {
+.game-info{
+    position:relative;
+    float:top;
+    width:180px;
+    height:80px;
+    }
+
+
+.game-info-away{
+    position:relative;
+    float:left;
+    }
+.game-info-home{
+    position:relative;
+    float:right;
+    }
+
+
+.game-info-basic{
+    margin-bottom:10px;
+
+}
+#game-info-vs {
     font-family: Tahoma;
     font-size: 16px;
     font-weight: 700;
     color: #cfcfcf;
-	vertical-align: 20px;
-	margin-left:10px;
-	margin-right:10px;
-}
+    position:relative;
+    top:20px;
+    margin:10px;
+    }
 
 
 
@@ -161,16 +193,38 @@ body{
 .box-score-area{
 	position: relative;
 	width:1200px;
-	margin:50px 50px 0px 10px;
+	margin:50px 50px 0px 0px;
 }
 .batter-record-area{
 	position: relative;
 	width:1200px;
-	margin:50px 50px 0px 10px;
+	margin:50px 50px 0px 0px;
 	
 }
 .pitcher-record-area{
 	position: relative;
 	width:1200px;
-	margin:50px 50px 0px 10px;
+	margin:50px 50px 0px 0px;
+}
+
+/*preview.html*/
+
+.preview-box{
+
+	width:550px;
+	height:1000px;
+}
+
+.run-graph{
+
+	width:500px;
+	height:300px;
+}
+
+#preview-away{
+	float: left;
+}
+
+#preview-home{
+	float: right;
 }

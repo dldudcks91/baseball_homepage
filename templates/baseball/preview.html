@@ -1,0 +1,113 @@
+<div>Hello Preview
+</div>
+<div>
+    <span>
+      {{name}}{{date}}{{today_game_num}}
+    </span>
+</div>
+<div>
+    <div class="preview-box" id="preview-away">
+        <span class="run-graph" id="run-graph-away"></span>
+    </div>
+    <div class="preview-box" id="preview-home">
+        <span class="run-graph" id="run-graph-home"></span>    
+        
+    </div>
+</div>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+ 
+<script type="text/javascript">
+    $(document).ready(function() {
+        RunGraph()
+        });   
+   
+   function RunGraph(){
+        
+        var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
+        
+        getRunGraphAway(set_url)
+        getRunGraphHome(set_url)
+        
+       }    
+    function getRunGraphAway(set_url){
+        $.ajax({
+            url: set_url,
+            dataType:'json',
+            success: function(data){
+                Highcharts.chart('run-graph-away', {
+            
+                    title: {
+                        text: 'Mean of Run - ' + data.away_name
+                    },
+                
+                    subtitle: {
+                        text: data.year
+                    },
+                    
+                    yAxis: {
+                        
+                        title: {
+                            text: 'Mean of Run'
+                            
+                        },
+                        min: 0,
+                        max: 10,
+                    },
+                    
+                    series: [{
+                        name: '5-games',
+                        data: data.away_run_5
+                    },
+                    {
+                        name: '20-games',
+                        data: data.away_run_20
+                    }]
+                });
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+    }
+    function getRunGraphHome(set_url){
+        $.ajax({
+            url: set_url,
+            dataType:'json',
+            success: function(data){
+                Highcharts.chart('run-graph-home', {
+            
+                    title: {
+                        text: 'Mean of Run - ' + data.home_name
+                    },
+                
+                    subtitle: {
+                        text: data.year
+                    },
+                    
+                    yAxis: {
+                        
+                        title: {
+                            text: 'Mean of Run'
+                            
+                        },
+                        min: 0,
+                        max: 10,
+                    },
+                    
+                    series: [{
+                        name: '5-games',
+                        data: data.home_run_5
+                    },
+                    {
+                        name: '20-games',
+                        data: data.home_run_20
+                    }]
+                });
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+    }
+</script>

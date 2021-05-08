@@ -18,6 +18,9 @@ urlpatterns = [
     path('game_info/', views.game_info, name='game_info'),
     path('game_info/<int:date>', views.game_info_date, name='game_info_date'),
     
-    path('game_info/team_game_info/<int:date>/<int:game_num>', views.team_game_info, name='team_game_info'),]
+    path('game_info/boxscore/<int:date>/<int:today_game_num>', views.boxscore, name='boxscore'),
+    path('game_info/preview/<int:date>/<int:today_game_num>', views.preview, name='preview'),
+    path('game_info/run_graph/<int:date>/<int:today_game_num>', views.RunGraphView.as_view(), name='run_graph'),]
+    
         
     
