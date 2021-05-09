@@ -87,7 +87,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'baseball',
-        'USER': 'aws-baseball-database',
+        'USER': 'LYC',
         'PASSWORD': '3whddpdltm!',
         'HOST': 'aws-baseball-database.cgh18xdnf8rj.ap-northeast-2.rds.amazonaws.com',
         
