@@ -86,8 +86,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aws-baseball-database',
-        'USER': 'LYC',
+        'NAME': 'baseball',
+        'USER': 'aws-baseball-database',
         'PASSWORD': '3whddpdltm!',
         'HOST': 'aws-baseball-database.cgh18xdnf8rj.ap-northeast-2.rds.amazonaws.com',
         
