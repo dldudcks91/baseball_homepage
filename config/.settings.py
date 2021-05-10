@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # to aws server
 
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -91,6 +91,17 @@ DATABASES = {
         'PASSWORD': '3whddpdltm!',
         'HOST': 'lyc-baseball.cgh18xdnf8rj.ap-northeast-2.rds.amazonaws.com',
         
+    }
+}
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'baseball',
+        'USER': 'root',
+        'PASSWORD': 'dudrn1',
+        'HOST': 'localhost:8000',
+
     }
 }
 
