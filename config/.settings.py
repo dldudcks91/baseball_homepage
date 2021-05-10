@@ -82,18 +82,28 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # to aws server
 
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aws-baseball-database',
-        'USER': 'LYC',
+        'NAME': 'baseball',
+        'USER': 'aws-baseball-database',
         'PASSWORD': '3whddpdltm!',
         'HOST': 'aws-baseball-database.cgh18xdnf8rj.ap-northeast-2.rds.amazonaws.com',
         
     }
 }
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'baseball',
+        'USER': 'root',
+        'PASSWORD': 'dudrn1',
+        'HOST': 'localhost',
 
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
