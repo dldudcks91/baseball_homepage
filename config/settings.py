@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': 'baseball',
         'USER': 'LYC',
         'PASSWORD': '3whddpdltm!',
-        'HOST': 'aws-baseball-database.cgh18xdnf8rj.ap-northeast-2.rds.amazonaws.com',
+        'HOST': 'lyc-baseball.cgh18xdnf8rj.ap-northeast-2.rds.amazonaws.com',
         
     }
 }
