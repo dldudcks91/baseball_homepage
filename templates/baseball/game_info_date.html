@@ -1,11 +1,17 @@
 
 
-<div id="today-game-list">
+
+
+
+<div  id="today-game-wrap" >
+    <input class="hidden" id="today-game-input" value="{{data_length}}">
+    <div id="today-game-button">
+    </div>
     {% if game_date_dic %}
-    <ul >
+    <ul id="today-game-list" >
 
         {% for game in game_date_dic %}
-        <li class="card" onclick="saveGamenum({{game.game_num_idx}});setPreview()" role='button'>
+        <li class="card" id="card{{game.game_num_idx}}" onclick="saveGamenum({{game.game_num_idx}});setPreview()" role='button'>
             <div class ="card-title">
                 <span>{{game.stadium}}</span>
                 <span> | </span>
@@ -47,62 +53,104 @@
         </li>
         {% endfor %}
 
+
     </ul>
     {% else %}<span>경기가 없는 날입니다.</span>
     {% endif %}
 </div>
-<div id="today-game-tab" class="hidden" >
+<div id="today-game-contents">
+    <div id="today-game-tab" class="hidden" >
 
-
-     <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-        <a class="nav-link active" id="preview-tab" data-toggle="tab" href="#preview-contents" role="tab" aria-controls="preview-contents" aria-selected="true">Preview</a>
-        </li>
-        <li class="nav-item" role="presentation">
-            {% if is_end %}
+         <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" id="nav-item-pre" role="presentation">
+                <a class="nav-link active" id="preview-tab" data-toggle="tab" href="#preview-contents" role="tab" aria-controls="preview-contents" aria-selected="true">Preview</a>
+            </li>
+            <li class="nav-item" id="nav-item-lineup" role="presentation">
+                <a class="nav-link" id="lineup-tab" data-toggle="tab" href="#lineup-contents" role="tab" aria-controls="lineup-contents" aria-selected="false">Lineup</a>
+            </li>
+            <li class="nav-item" id="nav-item-boxscore" role="presentation">
                 <a class="nav-link" id="boxscore-tab" data-toggle="tab" href="#boxscore-contents" role="tab" aria-controls="boxscore-contents" aria-selected="false" >BoxScore</a>
-            {% else %}
-                <a class="nav-link" id="boxscore-tab" data-toggle="tab" href="#boxscore-contents" role="tab" aria-controls="boxscore-contents" aria-selected="false" >LineUp</a>
-            {% endif %}
-        </li>
-        <li class="nav-item" role="presentation">
-        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact-contents" role="tab" aria-controls="contact-contents" aria-selected="false">Contact</a>
-        </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="preview-contents" role="tabpanel" aria-labelledby="preview-tab"></div>
-        <div class="tab-pane fade" id="boxscore-contents" role="tabpanel" aria-labelledby="boxscore-tab"></div>
-        <div class="tab-pane fade" id="contact-contents" role="tabpanel" aria-labelledby="contact-tab">BYE</div>
+            </li>
+
+        </ul>
+
+
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="preview-contents" role="tabpanel" aria-labelledby="preview-tab"></div>
+            <div class="tab-pane fade" id="lineup-contents" role="tabpanel" aria-labelledby="lineup-tab"></div>
+            <div class="tab-pane fade" id="boxscore-contents" role="tabpanel" aria-labelledby="boxscore-tab"></div>
+        </div>
+
+
     </div>
-
-
 </div>
 
 
 
 <script type="text/javascript">
+
+
    $(document).ready(function() {
 
-        });
+
+
+        setIsend()
+
+    });
+
+    game_len = $("#today-game-input").val()
+
+    if (game_len> 5) {
+
+        var left_html = '<a><img class="dir-button" id="left-button" role="button" src="/static/images/button/left_gray_button.png" alt="left_button"></a>'
+        var right_html = '<a><img class="dir-button" id="right-button" role="button" src="/static/images/button/right_button.png" alt="right_button"></a>'
+        $('#today-game-button').append(left_html)
+        $('#today-game-button').append(right_html)
+
+        hide_idx = 1
+        }
+
+    $('#left-button').on('click',function () {
+
+        $('#card'+ hide_idx).css("display","inline-block")
+        $('#right-button').attr("src","/static/images/button/right_button.png")
+        if (hide_idx == 1) {$('#left-button').attr("src","/static/images/button/left_gray_button.png") }
+
+        if (hide_idx > 1){ hide_idx-=1}
+
+
+
+
+
+    })
+    $('#right-button').on('click',function () {
+
+        $('#card'+ hide_idx).css("display","none")
+        $('#left-button').attr("src","/static/images/button/left_button.png")
+
+        if (game_len - hide_idx == 5){ $('#right-button').attr("src","/static/images/button/right_gray_button.png") }
+        if (game_len - hide_idx > 5 ){ hide_idx+=1}
+
+
+
+    })
 
     // select card function
 
     $('.card').on('click', function () {
       $("#today-game-tab").removeClass('hidden')
-
+      PreviewTab()
     })
-
     function saveGamenum(game_num_idx){
         $('#myTab').data("game_num_idx",game_num_idx)
 
     }
-    function setPreview(is_end){
+    function setPreview(){
         document.getElementById("preview-tab").setAttribute("class","nav-link active")
         document.getElementById("preview-contents").setAttribute("class","tab-pane fade show active")
 
-        document.getElementById("contact-tab").setAttribute("class","nav-link")
-        document.getElementById("contact-contents").setAttribute("class","tab-pane fade")
-
+        document.getElementById("lineup-tab").setAttribute("class","nav-link")
+        document.getElementById("lineup-contents").setAttribute("class","tab-pane fade")
 
         document.getElementById("boxscore-tab").setAttribute("class","nav-link")
         document.getElementById("boxscore-contents").setAttribute("class","tab-pane fade")
@@ -124,10 +172,27 @@
 	
     $('#boxscore-tab').on('click',function(){
 
-        GameInfoTab()
+        BoxscoreTab()
 
 	})
-	
+
+	$('#lineup-tab').on('click',function(){
+
+        LineupTab()
+
+	})
+
+	function setIsend(){
+        var is_end = "{{is_end}}"
+        if (is_end=="True"){
+            $("#nav-item-lineup").addClass('hidden')
+            $("#nav-item-boxscore").removeClass('hidden')
+        }
+        else {
+            $("#nav-item-lineup").removeClass('hidden')
+            $("#nav-item-boxscore").addClass('hidden')
+        }
+    }
 	
 	function PreviewTab(){
     	var game_num_idx = $('#myTab').data("game_num_idx");
@@ -138,7 +203,7 @@
     }
     	
     	
-    function GameInfoTab(){
+    function BoxscoreTab(){
         var game_num_idx = $('#myTab').data("game_num_idx");
         var date = $("#date_pick").val();
         var set_date = moment(date).format("YYYYMMDD");
@@ -146,6 +211,13 @@
         getBoxscore(set_url);
 	}
 
+    function LineupTab(){
+        var game_num_idx = $('#myTab').data("game_num_idx");
+        var date = $("#date_pick").val();
+        var set_date = moment(date).format("YYYYMMDD");
+        var set_url = 'lineup/' + set_date +'/' + game_num_idx;
+        getLineup(set_url);
+	}
 
 
     function getPreview(set_url){
@@ -180,6 +252,23 @@
 
 			        }
         
+		});
+    }
+
+    function getLineup(set_url){
+        $.ajax({
+                    type: "GET",
+                    url: set_url,
+                    success:function(data){
+
+                        $("#lineup-contents").html(data);
+                    },
+                    error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+
+
+			        }
+
 		});
     }
     

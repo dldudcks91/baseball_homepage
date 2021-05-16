@@ -278,6 +278,19 @@ class TodayTeamGameInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'today_team_game_info'
+        
+class TodayLineUp(models.Model):
+    
+    team_game_idx = models.CharField(primary_key=True, max_length=9)
+    bo = models.CharField(max_length=10,blank=True,null=True)
+    
+    po = models.CharField(max_length=10, blank=True, null=True)
+    name = models.CharField(max_length=10, blank=True, null=True)
+    
+    class Meta:
+        managed = False
+        db_table = 'today_lineup'
+        
 class GraphData(models.Model):
     
     team_game_idx = models.CharField(primary_key=True, max_length=9)

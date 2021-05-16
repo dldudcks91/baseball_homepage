@@ -1,0 +1,59 @@
+<div>
+    <div class= "lineup-area" id="lineup-away">
+
+        <div class="lineup-title" >
+            <img class="emb" id="emb-away" src= "{{team_name.away_url}}" alt= "{{team_name.away_name}}" ><span class="emb-name"> {{team_name.away}}</span>
+        </div>
+        <table class="tbl-lineup table">
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Position</th>
+                    <th>Name</th>
+                    <th>FIP/XR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in away %}
+
+                    <tr>
+                        <td>{{a.bo}}</td>
+                        <td>{{a.po}}</td>
+                        <td>{{a.name}}</td>
+                        <td></td>
+                    </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+    <div class= "lineup-area" id="lineup-home">
+        <div class="lineup-title" >
+            <img class="emb" id="emb-home" src= "{{team_name.home_url}}" alt= "{{team_name.home_name}}" ><span class="emb-name"> {{team_name.home}}</span>
+        </div>
+        <table class="tbl-lineup table">
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Position</th>
+                    <th>Name</th>
+                    <th>FIP/XR</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for a in home %}
+
+                    <tr>
+                        <td>{{a.bo}}</td>
+                        <td>{{a.po}}</td>
+                        <td>{{a.name}}</td>
+                        <td></td>
+                    </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+

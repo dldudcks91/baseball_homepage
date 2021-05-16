@@ -100,7 +100,7 @@ DATABASES = {
         'NAME': 'baseball',
         'USER': 'root',
         'PASSWORD': 'dudrn1',
-        'HOST': 'localhost:8000',
+        'HOST': 'localhost',
 
     }
 }

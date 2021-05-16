@@ -3,7 +3,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import TeamInfo,GameInfo,TeamGameInfo,ScoreRecord,BatterRecord,PitcherRecord,TodayGameInfo,TodayTeamGameInfo,GraphData
+from .models import TeamInfo,GameInfo,TeamGameInfo,ScoreRecord,BatterRecord,PitcherRecord,TodayGameInfo,TodayTeamGameInfo,TodayLineUp,GraphData
 from django.db.models import Q
 # 그래프용 패키지
 from rest_framework.response import Response
@@ -39,23 +39,29 @@ def game_info(request):
     month = str(local_time[1]).zfill(2)
     day = str(local_time[2]).zfill(2)
     today = year + "-" + month + "-" + day
-    context = {'today':today}
+    date = year+month+day
+    game_date_dic = TodayGameInfo.objects.values()
+    craw_time = list(game_date_dic.values('etc')[0].values())[0]
+    
+    context = {'today':today,'craw_time':craw_time}
+    
+    
     return render(request,'baseball/game_info.html',context)
     
 def game_info_date(request,date):
-    if TodayGameInfo.objects.filter(game_idx__contains = str(date)).values():
+    
+    game_date_dic = GameInfo.objects.filter(game_idx__contains = str(date)).values()
+    game_date_idx = game_date_dic.values('game_idx')
+    team_game_dic = TeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
+    team_game_idx = team_game_dic.values("team_game_idx","home_away")
+    is_end = True
+    if len(game_date_dic) == 0:
         game_date_dic = TodayGameInfo.objects.filter(game_idx__contains = str(date)).values()
         game_date_idx = game_date_dic.values('game_idx')
         team_game_dic = TodayTeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
         team_game_idx = team_game_dic.values("team_game_idx","home_away")
         is_end = False
-    
-    else:
-        game_date_dic = GameInfo.objects.filter(game_idx__contains = str(date)).values()
-        game_date_idx = game_date_dic.values('game_idx')
-        team_game_dic = TeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
-        team_game_idx = team_game_dic.values("team_game_idx","home_away")
-        is_end = True
+        
         
     for game_num_idx, game_date in enumerate(game_date_dic):
         
@@ -85,9 +91,18 @@ def game_info_date(request,date):
             game_date['home_pitcher'] = home_pitcher
             game_date['away_pitcher'] = away_pitcher
         else:
+            try:
+                home_pitcher = TodayLineUp.objects.filter(team_game_idx = home_idx).values()[0]['name']
+                away_pitcher = TodayLineUp.objects.filter(team_game_idx = away_idx).values()[0]['name']
+                game_date['home_pitcher'] = home_pitcher
+                game_date['away_pitcher'] = away_pitcher
+            except:
+                pass
             pass
-
-    context = {'game_date_dic':game_date_dic,'is_end':is_end}
+    
+    data_length = len(game_date_dic)
+    
+    context = {'game_date_dic':game_date_dic,'is_end':is_end, 'data_length':data_length}
     return render(request,'baseball/game_info_date.html',context)
 
 def boxscore(request,date,today_game_num):
@@ -202,3 +217,39 @@ def preview(request,date,today_game_num):
     context ={'date':date,'today_game_num':today_game_num,'name':away_name}
     return render(request,'baseball/preview.html',context)
 
+def lineup(request,date,today_game_num):
+    today_game_num_idx_min = (2*today_game_num)-2
+    today_game_num_idx_max = (2*today_game_num)
+    
+    game_date_dic = TodayGameInfo.objects.filter(game_idx__contains = str(date)).values()
+    game_date_idx = game_date_dic.values("game_idx")
+    team_game_dic = TodayTeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
+    
+    team_game_idx = team_game_dic.values("team_game_idx","home_away")[today_game_num_idx_min:today_game_num_idx_max]
+    
+    if team_game_idx[0]['home_away'] == 'home':
+        home_idx = team_game_idx[0]['team_game_idx']
+        away_idx = team_game_idx[1]['team_game_idx']
+        
+    else:
+        home_idx = team_game_idx[1]['team_game_idx']
+        away_idx = team_game_idx[0]['team_game_idx']
+        
+    team_name = game_date_dic.values('away_name','home_name')[today_game_num-1]
+    home_name = team_name['home_name']
+    away_name = team_name['away_name']
+    
+    
+    team_name = {'home':home_name,'away':away_name}
+    team_name['away_url'] = "/static/images/emblem/emblem_" + away_name + ".png"
+    team_name['home_url'] = "/static/images/emblem/emblem_" + home_name + ".png"
+    
+    home_lineup = TodayLineUp.objects.filter(team_game_idx = home_idx).values()
+    away_lineup = TodayLineUp.objects.filter(team_game_idx = away_idx).values()
+    
+    
+    
+    context ={'team_name':team_name, 'home':home_lineup, 'away': away_lineup}
+    
+    
+    return render(request,'baseball/lineup.html',context)

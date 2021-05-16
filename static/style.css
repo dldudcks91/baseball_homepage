@@ -45,7 +45,9 @@ body{
 	
 }
 
-
+.hidden{
+	display:none;
+}
 /* main.html*/
 .carousel-control-next{
 	width:100%;
@@ -74,7 +76,7 @@ body{
 	position: relative;
 
 	width: 100%;
-	height: 60px;
+	height: 40px;
 	margin-top:50px;
 }
 .date-select ul li{
@@ -87,6 +89,7 @@ body{
 .date-select ul{
 	text-align:center;
 	padding-left:0px;
+	height: 60px;
 }
 .date-select li{
 	display:inline-block;
@@ -95,55 +98,15 @@ body{
 	vertical-align:5px;
 }
 
+#update-time{
+    position:relative;
+    float: right;
 
-.today-game-zone{
-	position: relative;
-
-	max-width: 1200px;
 }
 
 
-#today-game-list{
-	position: relative;
-
-	height:300px;
-}
 
 
-#today-game-list ul{
-
-	text-align:center;
-	padding-left:0px;
-}
-
-#today-game-list li{
-	
-	display:inline-block;
-	
-}
-
-#today-game-tab{
-	position: relative;
-}
-
-.card{
-	width:200px;
-	height:200px;
-	margin:10px;
-}
-.card-title{
-	background-color:black;
-	color:white;
-}
-
-.card-body{
-	padding-right:0px;
-	padding-left:0px;
-}
-
-.card-body>div{
-	display:inline-block;
-}
 
 .game-info{
     position:relative;
@@ -177,17 +140,88 @@ body{
     margin:10px;
     }
 
+.today-game-zone{
+	position: relative;
+
+	max-width: 1200px;
+}
 
 
-#gameinfo-contents{
+#today-game-wrap{
+	position: relative;
+    vertical-align: middle;
+    overflow: hidden;
+    margin-left:40px;
+    margin-right:40px;
+}
+
+#today-game-wrap ul{
+
+	text-align: center;
+	padding-left:0px;
+    white-space: nowrap;
+    left: 20px;
+}
+
+
+
+#today-game-wrap li{
+
+	display:inline-block;
+
+}
+
+
+
+#today-game-contents{
+	position: relative;
+	margin-top:100px;
+
+}
+
+#today-game-tab{
 	position: relative;
 }
-.hidden{
-	display:none;
+
+
+
+.card{
+	width:200px;
+	height:200px;
+	margin:10px;
+}
+.card-title{
+	background-color:black;
+	color:white;
 }
 
+.card-body{
+	padding-right:0px;
+	padding-left:0px;
+}
 
+.card-body>div{
+	display:inline-block;
+}
+#today-game-button{
+    height: 15px;
+}
 
+.dir-button{
+    position: absolute;
+
+    width:15px;
+    height:15px;
+
+}
+#left-button{
+    left:1050px;
+    border: red;
+}
+#right-button{
+    left:1080px;
+
+}
 /* team_game_info.html*/
 
 .box-score-area{
@@ -227,4 +261,31 @@ body{
 
 #preview-home{
 	float: right;
+}
+
+/*lineup.html*/
+
+.lineup-title{
+    margin-bottom:10px;
+}
+
+.lineup-area{
+    width: 500px;
+    margin-top:50px;
+}
+
+#lineup-away{
+    float:left;
+    }
+
+#lineup-home{
+    float:right;
+    }
+.emb-name{
+    font-size: 20px;
+    vertical-align: middle;
+    }
+
+.tbl-lineup{
+    text-align: center;
 }
