@@ -249,14 +249,19 @@ body{
     margin-top:100px;
 }
 
-.sp-box li {
+.sp-box ul{
+    padding: 0px;
+    white-space: nowrap;
+}
+
+.sp-box li{
     display:inline-block;
     vertical-align: top;
     height: 400px;
 }
 
 .sp-card{
-    width:280px;
+    width:300px;
     height:400px;
 }
 

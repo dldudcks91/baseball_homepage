@@ -46,10 +46,11 @@
  
 <script type="text/javascript">
     $(document).ready(function() {
-        RunGraph()
 
+    RunGraph()
 
     });
+
     SpPicture()
 
 
@@ -283,7 +284,7 @@
                     },
 
                     title: {
-                        text: '득점분포도'
+                        text: '투수비교'
                     },
 
                     subtitle: {
@@ -295,7 +296,7 @@
                     xAxis: [{
                         reversed: false,
 
-                        categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+                        categories: ['승리','패배','ERA','FIP','P-ERA','상대-ERA'].reverse(),
                         labels: {
                             step: 1
                         },
@@ -308,7 +309,7 @@
                         opposite: true,
                         reversed: false,
 
-                        categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+                        categories: ['승리','패배','ERA','FIP','P-ERA','상대-ERA'].reverse(),
 
                         linkedTo: 0,
                         labels: {
@@ -328,11 +329,11 @@
                         },
                         labels: {
                             formatter: function () {
-                                return Math.abs(this.value) + '%';
+                                return Math.abs(this.value);
                             }
                         },
-                        min: -50,
-                        max: 50
+                        min: -10,
+                        max: 10
 
                     },
 
@@ -345,17 +346,17 @@
 
                     tooltip: {
                         formatter: function () {
-                            return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
-                                'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
+                            return '<b>' + this.point.category +': ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '</b>';
+
                         }
                     },
                     series: [{
                         name: data.away_name,
-                        data: data.away_run_dist
+                        data: [5,3,3.5,4.2,4.5,4.3].reverse()
                     },
                     {
                         name: data.home_name,
-                        data: data.home_run_dist
+                        data: [-4,-4,-4.5,-6.2,-5.5,-2.3].reverse()
                     }]
                 });
             },
