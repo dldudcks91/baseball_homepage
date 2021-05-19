@@ -9,7 +9,10 @@
 <div class="preview-wrap">
     <hr>
     <div class= "preview-box" id="preview-pitcher">
+
         <h3> -투수관련정보</h3>
+        <input id="btn-pit-1" type="button" name="btn-pit-1" value="선발투수정보">
+        <input id="btn-pit-2" type="button" name="btn-pit-1" value="중간계투정보">
         <div class="sp-box">
             <ul>
                 <li class="sp-card" id="sp-away">
@@ -26,21 +29,21 @@
     <div class= "preview-box" id="preview-run">
 
         <h3> -득점관련정보</h3>
-        <div class="compare-box">
+        <input id="btn-run-1" type="button" name="btn-run-1" value="득점분포도">
+        <input id="btn-run-2" type="button" name="btn-run-2" value="최근득점추이">
+        <div class="run-box" id="compare-box">
+
             <ul>
                 <li class="compare-card" id="compare-away">{{away_dic.name}}</li>
                 <li class="compare-graph" id="compare-graph"></li>
                 <li class="compare-card" id="compare-home">{{home_dic.name}}</li>
             </ul>
         </div>
-        <div class="run-graph-wrap">
 
-            <div class="run-graph-box" id="graph-box-away">
-                <span class="run-graph" id="run-graph-away"></span>
-            </div>
-            <div class="run-graph-box" id="graph-box-home">
-                <span class="run-graph" id="run-graph-home"></span>
-            </div>
+
+        <div class="run-box hidden" id="run-graph-box">
+            <div class="run-graph" id="run-graph-away"></div>
+            <div class="run-graph" id="run-graph-home"></div>
 
         </div>
     </div>
@@ -49,15 +52,30 @@
  
 <script type="text/javascript">
     $(document).ready(function() {
-    setTimeout(function() {
-        RunGraph();
-    }, 100);
+        setTimeout(function() {
+            SpGraph();
+            CompareGraph();
+        }, 300);
 
 
     });
 
     SpPicture()
 
+    $("#btn-run-1").on('click', function(){
+
+        CompareGraph();
+        $("#compare-box").removeClass('hidden')
+        $("#run-graph-box").addClass('hidden')
+
+    });
+    $("#btn-run-2").on('click', function(){
+
+        RunGraph();
+        $("#run-graph-box").removeClass('hidden')
+        $("#compare-box").addClass('hidden')
+
+    });
 
     function SpPicture(){
 
@@ -81,14 +99,24 @@
         $('#sp-home').append(getHtml(home_name,home_sp,"home"))
 
     }
+
+    function SpGraph(){
+       var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
+       getSpGraph(set_url)
+    }
+
+    function CompareGraph(){
+        var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
+        getCompareGraph(set_url)
+    }
     function RunGraph(){
         
+
         var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
-        
         getRunGraphAway(set_url)
         getRunGraphHome(set_url)
-        getCompareGraph(set_url)
-        getSpGraph(set_url)
+
+
     }
 
 
@@ -101,8 +129,8 @@
             success: function(data){
                 Highcharts.chart('run-graph-away', {
                     chart: {
-                        width: 540,
-                        height: 360
+                        width: 600,
+                        height: 400
                     },
 
                     title: {
@@ -146,8 +174,8 @@
                 Highcharts.chart('run-graph-home', {
 
                     chart: {
-                        width: 540,
-                        height: 360
+                        width: 600,
+                        height: 400
                     },
 
                     title: {

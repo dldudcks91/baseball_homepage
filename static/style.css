@@ -247,6 +247,7 @@ body{
 
 .preview-box{
     margin-top:30px;
+    margin-bottom:30px;
 }
 
 .sp-box ul{
@@ -283,15 +284,18 @@ body{
 }
 
 
-.compare-box{
-    margin-top:50px;
+.run-box{
+    margin-top: 30px;
+    margin-bottom: 30px;
+    width: 1200px;
+    height: 400px;
 }
 
-.compare-box ul{
+#compare-box ul{
     padding: 0px;
     white-space: nowrap;
 }
-.compare-box li {
+#compare-box li {
     display:inline-block;
     vertical-align: top;
     height: 400px;
@@ -299,49 +303,33 @@ body{
 .compare-card{
     text-align:center;
     width: 300px;
-
-
 }
 
 
 .compare-graph{
 
     width:600px;
-
-}
-
-.run-graph-wrap{
-    margin-top: 50px;
-    width: 1200px;
-    height: 1000px;
 }
 
 
 
-.run-graph-wrap div{
-    display:inline-block;
-}
-
-.run-graph-box{
+.run-graph{
     width:600px;
-    height:1000px;
+    height:400px;
 }
 
-#graph-box-away{
+#run-graph-away{
     float:left;
 }
 
-
-
-#run-graph-away{
-	float: left;
-}
-
 #run-graph-home{
-	float: right;
+    float:right;
 }
 
+.run-graph div{
+    display:inline-block;
 
+}
 /*lineup.html*/
 
 .lineup-title{
