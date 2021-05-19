@@ -291,7 +291,7 @@ class TodayLineUp(models.Model):
         managed = False
         db_table = 'today_lineup'
         
-class GraphData(models.Model):
+class RunGraphData(models.Model):
     
     team_game_idx = models.CharField(primary_key=True, max_length=9)
     #year = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='year', blank=True, null=True)
@@ -299,9 +299,10 @@ class GraphData(models.Model):
     #team_num = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='team_num', blank=True, null=True,related_name='graph_data_team_num_set')
     team_num = models.IntegerField(blank=True, null=True)
     game_num = models.IntegerField(blank=True, null=True)
+    run_1 = models.FloatField(blank=True, null=True)
     run_5 = models.FloatField(blank=True, null=True)
     run_20 = models.FloatField(blank=True, null=True)
     class Meta:
         managed = False
-        db_table = 'graph_data'
+        db_table = 'run_graph_data'
         

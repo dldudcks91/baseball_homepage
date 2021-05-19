@@ -241,12 +241,20 @@ body{
 	margin:50px 50px 0px 0px;
 }
 
+
+
 /*preview.html*/
 
-.preview-box{
+.compare-box{
+    text-align: center;
+}
+.compare-graph{
+    display:inline-block;
 
-	width:550px;
-	height:1000px;
+}
+.graph-box{
+    width:550px;
+    height:1000px;
 }
 
 .run-graph{
@@ -255,11 +263,11 @@ body{
 	height:300px;
 }
 
-#preview-away{
+#graph-box-away{
 	float: left;
 }
 
-#preview-home{
+#graph-box-home{
 	float: right;
 }
 

@@ -90,7 +90,7 @@
 <script type="text/javascript">
 
 
-   $(document).ready(function() {
+    $(document).ready(function() {
 
 
 
@@ -99,6 +99,7 @@
     });
 
     game_len = $("#today-game-input").val()
+
 
     if (game_len> 5) {
 
@@ -118,10 +119,6 @@
 
         if (hide_idx > 1){ hide_idx-=1}
 
-
-
-
-
     })
     $('#right-button').on('click',function () {
 
@@ -138,6 +135,7 @@
     // select card function
 
     $('.card').on('click', function () {
+
       $("#today-game-tab").removeClass('hidden')
       PreviewTab()
     })

@@ -3,7 +3,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import TeamInfo,GameInfo,TeamGameInfo,ScoreRecord,BatterRecord,PitcherRecord,TodayGameInfo,TodayTeamGameInfo,TodayLineUp,GraphData
+from .models import TeamInfo,GameInfo,TeamGameInfo,ScoreRecord,BatterRecord,PitcherRecord,TodayGameInfo,TodayTeamGameInfo,TodayLineUp,RunGraphData
 from django.db.models import Q
 # 그래프용 패키지
 from rest_framework.response import Response
@@ -14,6 +14,7 @@ from django.views.generic import View
 
 # 데이터용 패키지
 import time
+import numpy as np
 # ---------------------------------------------------------------------------------------- #
 
 def index(request):
@@ -155,6 +156,107 @@ class RunGraphView(APIView):
             game_date_idx = game_date_list.values("game_idx")
             
             
+            team_game_list = TodayTeamGameInfo.objects.filter(game_idx__in = game_date_idx).values().order_by('game_idx','team_game_idx')
+            team_game_idx = team_game_list.values()[today_game_num_idx_min:today_game_num_idx_max]
+        else:
+            game_date_list = GameInfo.objects.filter(game_idx__contains = str(date)).values()
+            game_date_idx = game_date_list.values("game_idx")
+            
+            
+            team_game_list = TeamGameInfo.objects.filter(game_idx__in = game_date_idx).values().order_by('game_idx','team_game_idx')
+            team_game_idx = team_game_list.values()[today_game_num_idx_min:today_game_num_idx_max]
+        
+        
+        if team_game_idx[0]['home_away'] == 'home':
+            i = 0 
+            j = 1
+            
+        else:
+            i = 1
+            j = 0
+        
+        year = int(str(date)[:4])
+        
+        home_team_num = team_game_idx[i]['team_num']
+        away_team_num = team_game_idx[j]['team_num']
+        
+        home_name = TeamInfo.objects.filter(year__contains = year, team_num = home_team_num).values('team_name')[0]['team_name']
+        away_name = TeamInfo.objects.filter(year__contains = year, team_num = away_team_num).values('team_name')[0]['team_name']
+        
+        home_game_num = team_game_idx[i]['game_num']
+        away_game_num = team_game_idx[j]['game_num']
+            
+        
+        
+        
+        home_team_dic= RunGraphData.objects.filter(year = year , team_num = home_team_num, game_num__lt = home_game_num).values()
+        away_team_dic = RunGraphData.objects.filter(year = year , team_num = away_team_num, game_num__lt = away_game_num).values()
+        
+        home_run_list = home_team_dic.values('run_1')
+        away_run_list = away_team_dic.values('run_1')
+        def get_run_list(run_list):
+            r_list = [0 for i in range(16)]
+            length= len(run_list)
+            for r in run_list:
+                r = round(r['run_1'])
+                
+                if r >=15:
+                    r_list[-1]+=1
+                else:
+                    r_list[r]+=1
+                    
+            
+            result_list= list()
+            count = 0
+            r_sum = 0
+            for r in r_list:
+                
+                r_sum+=r
+                count+=1
+                if count == 2:                    
+                    result_list.append(r_sum / length*100)
+                    count = 0
+                    r_sum = 0 
+                
+            return result_list
+        
+        home_run_dist= get_run_list(home_run_list)
+        away_run_dist = list(-np.array(get_run_list(away_run_list)))
+        
+        home_run_5 = list()
+        home_run_20 = list()
+        
+        away_run_5 = list()
+        away_run_20 = list()
+        
+        for run in home_team_dic:
+            
+            home_run_5.append([run['game_num'],run['run_5']])
+            home_run_20.append([run['game_num'],run['run_20']])
+            
+        for run in away_team_dic:
+            away_run_5.append([run['game_num'],run['run_5']])
+            away_run_20.append([run['game_num'],run['run_20']])
+          
+        
+        result_data = {'year':year, 'home_name': home_name, 'away_name':away_name, 'home_run_dist': home_run_dist, 'away_run_dist': away_run_dist, 
+                       'home_run_5':home_run_5, 'home_run_20':home_run_20,'away_run_5':away_run_5, 'away_run_20':away_run_20}
+        
+        
+        return Response(result_data)
+
+class CompareGraphView(APIView):
+    
+    def get(self,request,date,today_game_num):
+        
+        today_game_num_idx_min = (2*today_game_num)-2
+        today_game_num_idx_max = (2*today_game_num)
+        
+        if TodayGameInfo.objects.filter(game_idx__contains = str(date)).values():
+            game_date_list = TodayGameInfo.objects.filter(game_idx__contains = str(date)).values()
+            game_date_idx = game_date_list.values("game_idx")
+            
+            
             team_game_list = TodayTeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
             team_game_idx = team_game_list.values()[today_game_num_idx_min:today_game_num_idx_max]
         else:
@@ -187,31 +289,14 @@ class RunGraphView(APIView):
             
         
         
-        
-        home_team_dic= GraphData.objects.filter(year = year , team_num = home_team_num, game_num__lt = home_game_num).values()
-        away_team_dic = GraphData.objects.filter(year = year , team_num = away_team_num, game_num__lt = away_game_num).values()
-        
-        home_run_5 = list()
-        home_run_20 = list()
-        
-        away_run_5 = list()
-        away_run_20 = list()
-        
-        for run in home_team_dic:
-            home_run_5.append([run['game_num'],run['run_5']])
-            home_run_20.append([run['game_num'],run['run_20']])
-            
-        for run in away_team_dic:
-            away_run_5.append([run['game_num'],run['run_5']])
-            away_run_20.append([run['game_num'],run['run_20']])
           
         
-        result_data = {'home_run_5':home_run_5, 'home_run_20':home_run_20,'away_run_5':away_run_5, 'away_run_20':away_run_20,'year':year,
-                       'home_name': home_name, 'away_name':away_name}
+        result_data = {'year':year, 'home_name': home_name, 'away_name':away_name}
+                       
         
         
         return Response(result_data)
-        
+
 def preview(request,date,today_game_num):
     away_name = TeamInfo.objects.filter(year__contains = 2021, team_num = 1).values('team_name')[0]['team_name']
     context ={'date':date,'today_game_num':today_game_num,'name':away_name}
