@@ -7,6 +7,7 @@
 </div>
 
 <div class="preview-wrap">
+    <hr>
     <div class= "preview-box" id="preview-pitcher">
         <h3> -투수관련정보</h3>
         <div class="sp-box">
@@ -21,7 +22,9 @@
             </ul>
         </div>
     </div>
+    <hr>
     <div class= "preview-box" id="preview-run">
+
         <h3> -득점관련정보</h3>
         <div class="compare-box">
             <ul>
@@ -46,8 +49,10 @@
  
 <script type="text/javascript">
     $(document).ready(function() {
+    setTimeout(function() {
+        RunGraph();
+    }, 100);
 
-    RunGraph()
 
     });
 
