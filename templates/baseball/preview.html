@@ -5,35 +5,76 @@
       {{name}}{{date}}{{today_game_num}}
     </span>
 </div>
-<div id="preview-total">
-    <div class="compare-box">
-        <span class="compare-graph" id="compare-graph"></span>
+
+<div class="preview-wrap">
+    <div class= "preview-box" id="preview-pitcher">
+        <h3> -투수관련정보</h3>
+        <div class="sp-box">
+            <ul>
+                <li class="sp-card" id="sp-away">
+                    <div>{{away_dic.sp}}</div>
+                </li>
+                <li class="sp-graph" id="sp-graph"></li>
+                <li class="sp-card" id="sp-home">
+                    <div>{{home_dic.sp}}</div>
+                </li>
+            </ul>
+        </div>
     </div>
-    <div class="graph-box" id="graph-box-away">
-        <span class="run-graph" id="run-graph-away"></span>
-    </div>
-    <div class="graph-box" id="graph-box-home">
-        <span class="run-graph" id="run-graph-home"></span>    
-        
+    <div class= "preview-box" id="preview-run">
+        <h3> -득점관련정보</h3>
+        <div class="compare-box">
+            <ul>
+                <li class="compare-card" id="compare-away">{{away_dic.name}}</li>
+                <li class="compare-graph" id="compare-graph"></li>
+                <li class="compare-card" id="compare-home">{{home_dic.name}}</li>
+            </ul>
+        </div>
+        <div class="run-graph-wrap">
+
+            <div class="run-graph-box" id="graph-box-away">
+                <span class="run-graph" id="run-graph-away"></span>
+            </div>
+            <div class="run-graph-box" id="graph-box-home">
+                <span class="run-graph" id="run-graph-home"></span>
+            </div>
+
+        </div>
     </div>
 </div>
-
 <script src="https://code.highcharts.com/highcharts.js"></script>
  
 <script type="text/javascript">
     $(document).ready(function() {
-    RunGraph()
+
 
     });
+    RunGraph()
+    SpPicture()
 
 
-    function CompareGraph(){
+    function SpPicture(){
 
-        var set_url = 'compare_graph/' + {{date}} +'/' + {{today_game_num}};
+        var home_name = "{{home_dic.name}}"
+        var home_sp = "{{home_dic.sp}}"
 
-        getCompareGraph(set_url)
+
+        var away_name = "{{away_dic.name}}"
+        var away_sp = "{{away_dic.sp}}"
+
+        function getHtml(team,name,home_away){
+            var team = team
+            var name = name
+            var html = '<div><img class="img-sp"' +' id="img-sp-' + home_away +'"'+' src="/static/images/pitcher_300x400/' + team + '_' + name +'.jpg"' + 'onerror="this.src=' + "'/static/images/pitcher_300x400/기본사진.jpg'" +'"' +'></div>'
+
+            return html
+        }
+
+        $('#sp-away').append(getHtml(away_name,away_sp,"away"))
+
+        $('#sp-home').append(getHtml(home_name,home_sp,"home"))
+
     }
-
     function RunGraph(){
         
         var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
@@ -41,6 +82,7 @@
         getRunGraphAway(set_url)
         getRunGraphHome(set_url)
         getCompareGraph(set_url)
+        getSpGraph(set_url)
     }
 
 
@@ -52,9 +94,13 @@
             dataType:'json',
             success: function(data){
                 Highcharts.chart('run-graph-away', {
-            
+                    chart: {
+                        width: 540,
+                        height: 360
+                    },
+
                     title: {
-                        text: '최근득점추이 - ' + data.away_name
+                        text: '  최근득점추이 - ' + data.away_name
                     },
                 
                     subtitle: {
@@ -92,9 +138,14 @@
             dataType:'json',
             success: function(data){
                 Highcharts.chart('run-graph-home', {
-            
+
+                    chart: {
+                        width: 540,
+                        height: 360
+                    },
+
                     title: {
-                        text: '최근득점추이 - ' + data.home_name
+                        text: '  최근득점추이 - ' + data.home_name
                     },
                 
                     subtitle: {
@@ -133,6 +184,99 @@
             dataType:'json',
             success: function(data){
                 Highcharts.chart('compare-graph', {
+
+                    chart: {
+                        type:'bar'
+                    },
+
+                    title: {
+                        text: '득점분포도'
+                    },
+
+                    subtitle: {
+                        text: null
+                    },
+
+
+
+                    xAxis: [{
+                        reversed: false,
+
+                        categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+                        labels: {
+                            step: 1
+                        },
+                        accessibility: {
+                            description: data.away_name
+                        },
+
+
+                    }, {
+                        opposite: true,
+                        reversed: false,
+
+                        categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+
+                        linkedTo: 0,
+                        labels: {
+                            step: 1
+                        },
+                        accessibility: {
+                            description: data.home_name
+                        },
+
+
+                    }],
+
+                    yAxis: {
+
+                        title: {
+                        text: null
+                        },
+                        labels: {
+                            formatter: function () {
+                                return Math.abs(this.value) + '%';
+                            }
+                        },
+                        min: -50,
+                        max: 50
+
+                    },
+
+
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
+                                'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
+                        }
+                    },
+                    series: [{
+                        name: data.away_name,
+                        data: data.away_run_dist
+                    },
+                    {
+                        name: data.home_name,
+                        data: data.home_run_dist
+                    }]
+                });
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+    }
+    function getSpGraph(set_url){
+        $.ajax({
+            url: set_url,
+            dataType:'json',
+            success: function(data){
+                Highcharts.chart('sp-graph', {
 
                     chart: {
                         type:'bar'

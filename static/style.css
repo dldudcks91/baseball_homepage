@@ -41,7 +41,7 @@ body{
 	top: 0px;
 	left: 0px;
 	margin:0px;
-	padding:5px;
+	padding:0px;
 	
 }
 
@@ -222,7 +222,7 @@ body{
     left:1080px;
 
 }
-/* team_game_info.html*/
+/* boxscore.html*/
 
 .box-score-area{
 	position: relative;
@@ -245,31 +245,97 @@ body{
 
 /*preview.html*/
 
-.compare-box{
-    text-align: center;
+.preview-box{
+    margin-top:100px;
 }
-.compare-graph{
+
+.sp-box li {
     display:inline-block;
+    vertical-align: top;
+    height: 400px;
+}
+
+.sp-card{
+    width:280px;
+    height:400px;
+}
+
+#sp-away{
+    float:left;
+}
+#sp-home{
+    float:right;
+    text-align:right;
+}
+
+.img-sp{
+    width:240px;
+    height:320px;
+}
+
+#img-sp-home{
+    float:right;
+}
+
+
+.compare-box{
+    margin-top:50px;
+}
+
+.compare-box ul{
+    padding: 0px;
+    white-space: nowrap;
+}
+.compare-box li {
+    display:inline-block;
+    vertical-align: top;
+    height: 400px;
+}
+.compare-card{
+    text-align:center;
+    width: 300px;
+
 
 }
-.graph-box{
-    width:550px;
+
+
+.compare-graph{
+
+    width:600px;
+
+}
+
+.run-graph-wrap{
+    margin-top: 50px;
+    width: 1200px;
+    height: 1000px;
+}
+
+
+
+.run-graph-wrap div{
+    display:inline-block;
+}
+
+.run-graph-box{
+    width:600px;
     height:1000px;
 }
 
-.run-graph{
-
-	width:500px;
-	height:300px;
+#graph-box-away{
+    float:left;
 }
 
-#graph-box-away{
+
+
+#run-graph-away{
 	float: left;
 }
 
-#graph-box-home{
+#run-graph-home{
 	float: right;
 }
+
 
 /*lineup.html*/
 
