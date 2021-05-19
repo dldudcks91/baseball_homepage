@@ -91,49 +91,53 @@
 
 
     $(document).ready(function() {
+        setIsend()
 
+        game_len = $("#today-game-input").val()
+
+
+        if (game_len> 5) {
+
+            var left_html = '<a><img class="dir-button" id="left-button" role="button" src="/static/images/button/left_gray_button.png" alt="left_button"></a>'
+            var right_html = '<a><img class="dir-button" id="right-button" role="button" src="/static/images/button/right_button.png" alt="right_button"></a>'
+            $('#today-game-button').append(left_html)
+            $('#today-game-button').append(right_html)
+
+            hide_idx = 1
+            }
+
+        $('#left-button').on('click',function () {
+
+            $('#card'+ hide_idx).css("display","inline-block")
+            $('#right-button').attr("src","/static/images/button/right_button.png")
+            if (hide_idx == 1) {$('#left-button').attr("src","/static/images/button/left_gray_button.png") }
+
+            if (hide_idx > 1){ hide_idx-=1}
+
+        })
+        $('#right-button').on('click',function () {
+
+            $('#card'+ hide_idx).css("display","none")
+            $('#left-button').attr("src","/static/images/button/left_button.png")
+
+            if (game_len - hide_idx == 5){ $('#right-button').attr("src","/static/images/button/right_gray_button.png") }
+            if (game_len - hide_idx > 5 ){ hide_idx+=1}
+
+
+
+        })
     });
-    setIsend()
-    game_len = $("#today-game-input").val()
-
-
-    if (game_len> 5) {
-
-        var left_html = '<a><img class="dir-button" id="left-button" role="button" src="/static/images/button/left_gray_button.png" alt="left_button"></a>'
-        var right_html = '<a><img class="dir-button" id="right-button" role="button" src="/static/images/button/right_button.png" alt="right_button"></a>'
-        $('#today-game-button').append(left_html)
-        $('#today-game-button').append(right_html)
-
-        hide_idx = 1
-        }
-
-    $('#left-button').on('click',function () {
-
-        $('#card'+ hide_idx).css("display","inline-block")
-        $('#right-button').attr("src","/static/images/button/right_button.png")
-        if (hide_idx == 1) {$('#left-button').attr("src","/static/images/button/left_gray_button.png") }
-
-        if (hide_idx > 1){ hide_idx-=1}
-
-    })
-    $('#right-button').on('click',function () {
-
-        $('#card'+ hide_idx).css("display","none")
-        $('#left-button').attr("src","/static/images/button/left_button.png")
-
-        if (game_len - hide_idx == 5){ $('#right-button').attr("src","/static/images/button/right_gray_button.png") }
-        if (game_len - hide_idx > 5 ){ hide_idx+=1}
 
 
 
-    })
+
 
     // select card function
 
     $('.card').on('click', function () {
 
       $("#today-game-tab").removeClass('hidden')
-      PreviewTab()
+
     })
     function saveGamenum(game_num_idx){
         $('#myTab').data("game_num_idx",game_num_idx)
@@ -157,13 +161,10 @@
 
     $('#myTab a').on('click', function (e) {
       e.preventDefault()
-      
+
     })
-    
-    $('#preview-tab').on('click',function(){
-     PreviewTab()
-	})
-	
+
+
     $('#boxscore-tab').on('click',function(){
 
         BoxscoreTab()
