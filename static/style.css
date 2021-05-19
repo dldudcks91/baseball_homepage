@@ -285,7 +285,7 @@ body{
 }
 
 
-.run-box{
+.box-contents{
     margin-top: 30px;
     margin-bottom: 30px;
     width: 1200px;
@@ -314,6 +314,7 @@ body{
 
 
 
+
 .run-graph{
     width:600px;
     height:400px;
@@ -330,6 +331,14 @@ body{
 .run-graph div{
     display:inline-block;
 
+}
+
+.btn-pit{
+    vertical-align:top;
+}
+
+.btn-run{
+    vertical-align:top;
 }
 /*lineup.html*/
 

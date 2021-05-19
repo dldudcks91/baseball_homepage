@@ -9,43 +9,50 @@
 <div class="preview-wrap">
     <hr>
     <div class= "preview-box" id="preview-pitcher">
-
-        <h3> -투수관련정보</h3>
-        <input id="btn-pit-1" type="button" name="btn-pit-1" value="선발투수정보">
-        <input id="btn-pit-2" type="button" name="btn-pit-1" value="중간계투정보">
-        <div class="sp-box">
-            <ul>
-                <li class="sp-card" id="sp-away">
-                    <div>{{away_dic.sp}}</div>
-                </li>
-                <li class="sp-graph" id="sp-graph"></li>
-                <li class="sp-card" id="sp-home">
-                    <div>{{home_dic.sp}}</div>
-                </li>
-            </ul>
+        <div class="box-title">
+            <span class="h3"> -투수관련정보</span>
+            <span><input class="btn-pit" id="btn-pit-1" type="button" name="btn-pit-1" value="선발투수정보"></span>
+            <span><input class="btn-pit" id="btn-pit-2" type="button" name="btn-pit-1" value="중간계투정보"></span>
+        </div>
+        <div class="box-contents">
+            <div class="sp-box">
+                <ul>
+                    <li class="sp-card" id="sp-away">
+                        <div>{{away_dic.sp}}</div>
+                    </li>
+                    <li class="sp-graph" id="sp-graph"></li>
+                    <li class="sp-card" id="sp-home">
+                        <div>{{home_dic.sp}}</div>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
     <hr>
     <div class= "preview-box" id="preview-run">
 
-        <h3> -득점관련정보</h3>
-        <input id="btn-run-1" type="button" name="btn-run-1" value="득점분포도">
-        <input id="btn-run-2" type="button" name="btn-run-2" value="최근득점추이">
-        <div class="run-box" id="compare-box">
+        <h3> -득점관련정보 </h3>
+        <span><input class="btn-run" id="btn-run-1" type="button" name="btn-run-1" value="득점분포도"></span>
+        <span><input class="btn-run" id="btn-run-2" type="button" name="btn-run-2" value="최근득점추이"></span>
 
-            <ul>
-                <li class="compare-card" id="compare-away">{{away_dic.name}}</li>
-                <li class="compare-graph" id="compare-graph"></li>
-                <li class="compare-card" id="compare-home">{{home_dic.name}}</li>
-            </ul>
+        <div class="box-contents">
+            <div class="run-box" id="compare-box">
+
+                <ul>
+                    <li class="compare-card" id="compare-away">{{away_dic.name}}</li>
+                    <li class="compare-graph" id="compare-graph"></li>
+                    <li class="compare-card" id="compare-home">{{home_dic.name}}</li>
+                </ul>
+            </div>
+
+
+            <div class="run-box hidden" id="run-graph-box">
+                <div class="run-graph" id="run-graph-away"></div>
+                <div class="run-graph" id="run-graph-home"></div>
+
+            </div>
         </div>
-
-
-        <div class="run-box hidden" id="run-graph-box">
-            <div class="run-graph" id="run-graph-away"></div>
-            <div class="run-graph" id="run-graph-home"></div>
-
-        </div>
+    <hr>
     </div>
 </div>
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -54,9 +61,8 @@
     $(document).ready(function() {
         setTimeout(function() {
             SpGraph();
-            CompareGraph();
-        }, 300);
-
+            CompareGraph();  ;
+        }, 200);
 
     });
 

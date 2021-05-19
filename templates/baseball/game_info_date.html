@@ -11,7 +11,7 @@
     <ul id="today-game-list" >
 
         {% for game in game_date_dic %}
-        <li class="card" id="card{{game.game_num_idx}}" onclick="saveGamenum({{game.game_num_idx}});setPreview()" role='button'>
+        <li class="card" id="card{{game.game_num_idx}}" onclick="saveGamenum({{game.game_num_idx}})" role='button'>
             <div class ="card-title">
                 <span>{{game.stadium}}</span>
                 <span> | </span>
@@ -135,8 +135,8 @@
     // select card function
 
     $('.card').on('click', function () {
-
-      $("#today-game-tab").removeClass('hidden')
+        setPreview()
+        $("#today-game-tab").removeClass('hidden')
 
     })
     function saveGamenum(game_num_idx){
