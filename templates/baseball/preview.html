@@ -8,47 +8,70 @@
 
 <div class="preview-wrap">
     <hr>
-    <div class= "preview-box" id="preview-pitcher">
+    <div class= "preview-box" id="preview-team">
         <div class="box-title">
-            <span class="h3"> -투수관련정보</span>
-            <span><input class="btn-pit" id="btn-pit-1" type="button" name="btn-pit-1" value="선발투수정보"></span>
-            <span><input class="btn-pit" id="btn-pit-2" type="button" name="btn-pit-1" value="중간계투정보"></span>
+            <span class="h3"> - Information of Team </span>
+            <span><input class="btn-team" id="btn-team-1" type="button" name="btn-pit-1" value="선발투수정보"></span>
+            <span><input class="btn-team" id="btn-team-2" type="button" name="btn-pit-1" value="중간계투정보"></span>
         </div>
         <div class="box-contents">
-            <div class="sp-box">
+            <div class="dist-box" id="team-dist-box">
+
                 <ul>
-                    <li class="sp-card" id="sp-away">
-                        <div>{{away_dic.sp}}</div>
-                    </li>
-                    <li class="sp-graph" id="sp-graph"></li>
-                    <li class="sp-card" id="sp-home">
-                        <div>{{home_dic.sp}}</div>
-                    </li>
+                    <li class="dist-card dist-card-away" id="team-dist-away">{{away_dic.sp}}</li>
+                    <li class="dist-graph" id="team-dist-graph"></li>
+                    <li class="dist-card dist-card-home" id="team-dist-home">{{home_dic.sp}}</li>
                 </ul>
             </div>
         </div>
     </div>
     <hr>
+    <div class= "preview-box" id="preview-pitcher">
+        <div class="box-title">
+            <span class="h3"> - Information of Pitcher </span>
+            <span><input class="btn-pit" id="btn-pit-1" type="button" name="btn-pit-1" value="선발투수정보"></span>
+            <span><input class="btn-pit" id="btn-pit-2" type="button" name="btn-pit-1" value="중간계투정보"></span>
+        </div>
+        <div class="box-contents">
+            <div class="dist-box" id="sp-dist-box">
+
+                <ul>
+                    <li class="dist-card dist-card-away" id="sp-dist-away">{{away_dic.sp}}</li>
+                    <li class="dist-graph" id="sp-dist-graph"></li>
+                    <li class="dist-card dist-card-home" id="sp-dist-home">{{home_dic.sp}}</li>
+                </ul>
+            </div>
+
+            <div class="run-box hidden" id="rp-graph-box">
+                <div class="run-graph run-graph-away" id="rp-graph-away"></div>
+                <div class="run-graph run-graph-home" id="rp-graph-home"></div>
+
+            </div>
+
+
+        </div>
+    </div>
+    <hr>
     <div class= "preview-box" id="preview-run">
 
-        <h3> -득점관련정보 </h3>
+        <span class="h3"> - Information of Run</span>
         <span><input class="btn-run" id="btn-run-1" type="button" name="btn-run-1" value="득점분포도"></span>
         <span><input class="btn-run" id="btn-run-2" type="button" name="btn-run-2" value="최근득점추이"></span>
 
         <div class="box-contents">
-            <div class="run-box" id="compare-box">
+            <div class="dist-box" id="run-dist-box">
 
                 <ul>
-                    <li class="compare-card" id="compare-away">{{away_dic.name}}</li>
-                    <li class="compare-graph" id="compare-graph"></li>
-                    <li class="compare-card" id="compare-home">{{home_dic.name}}</li>
+                    <li class="dist-card dist-card-away" id="run-dist-away">{{away_dic.name}}</li>
+                    <li class="dist-graph" id="run-dist-graph"></li>
+                    <li class="dist-card dist-card-home" id="run-dist-home">{{home_dic.name}}</li>
                 </ul>
             </div>
 
 
             <div class="run-box hidden" id="run-graph-box">
-                <div class="run-graph" id="run-graph-away"></div>
-                <div class="run-graph" id="run-graph-home"></div>
+                <div class="run-graph run-graph-away" id="run-graph-away"></div>
+                <div class="run-graph run-graph-home" id="run-graph-home"></div>
 
             </div>
         </div>
@@ -59,10 +82,12 @@
  
 <script type="text/javascript">
     $(document).ready(function() {
-        setTimeout(function() {
-            SpGraph();
-            CompareGraph();  ;
-        }, 300);
+
+        SpGraph();
+        RunDistGraph();
+        TeamGraph()
+
+
 
     });
 
@@ -70,8 +95,8 @@
 
     $("#btn-run-1").on('click', function(){
 
-        CompareGraph();
-        $("#compare-box").removeClass('hidden')
+        RunDistGraph();
+        $("#run-dist-box").removeClass('hidden')
         $("#run-graph-box").addClass('hidden')
 
     });
@@ -79,9 +104,29 @@
 
         RunGraph();
         $("#run-graph-box").removeClass('hidden')
-        $("#compare-box").addClass('hidden')
+        $("#run-dist-box").addClass('hidden')
 
     });
+
+    $("#btn-pit-1").on('click', function(){
+
+        SpGraph()
+        $("#sp-dist-box").removeClass('hidden')
+        $("#rp-graph-box").addClass('hidden')
+
+    });
+    $("#btn-pit-2").on('click', function(){
+
+        RpGraph()
+        $("#rp-graph-box").removeClass('hidden')
+        $("#sp-dist-box").addClass('hidden')
+
+    });
+
+    function TeamGraph(){
+       var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
+       getTeamGraph(set_url)
+    }
 
     function SpPicture(){
 
@@ -100,33 +145,317 @@
             return html
         }
 
-        $('#sp-away').append(getHtml(away_name,away_sp,"away"))
+        $('#sp-dist-away').append(getHtml(away_name,away_sp,"away"))
 
-        $('#sp-home').append(getHtml(home_name,home_sp,"home"))
+        $('#sp-dist-home').append(getHtml(home_name,home_sp,"home"))
 
     }
 
     function SpGraph(){
-       var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
+       var set_url = 'sp_graph/' + {{date}} +'/' + {{today_game_num}};
        getSpGraph(set_url)
     }
 
-    function CompareGraph(){
-        var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
-        getCompareGraph(set_url)
-    }
-    function RunGraph(){
-        
+
+
+    function RpGraph(){
 
         var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
+        getRpGraphAway(set_url)
+        getRpGraphHome(set_url)
+    }
+
+
+    function RunDistGraph(){
+        var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
+        getRunDistGraph(set_url)
+    }
+    function RunGraph(){
+
+
+        var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
+
         getRunGraphAway(set_url)
         getRunGraphHome(set_url)
 
 
     }
+    function getTeamGraph(set_url){
+        $.ajax({
+            url: set_url,
+            dataType:'json',
+            success: function(data){
+                Highcharts.chart('team-dist-graph', {
+
+                    chart: {
+                        type:'bar'
+                    },
+
+                    title: {
+                        text: '팀비교'
+                    },
+
+                    subtitle: {
+                        text: null
+                    },
 
 
 
+                    xAxis: [{
+                        reversed: false,
+
+                        categories: ['승리','패배','ERA','FIP','P-ERA','상대-ERA'].reverse(),
+                        labels: {
+                            step: 1
+                        },
+                        accessibility: {
+                            description: data.away_name
+                        },
+
+
+                    }, {
+                        opposite: true,
+                        reversed: false,
+
+                        categories: ['승리','패배','ERA','FIP','P-ERA','상대-ERA'].reverse(),
+
+                        linkedTo: 0,
+                        labels: {
+                            step: 1
+                        },
+                        accessibility: {
+                            description: data.home_name
+                        },
+
+
+                    }],
+
+                    yAxis: {
+
+                        title: {
+                        text: null
+                        },
+                        labels: {
+                            formatter: function () {
+                                return Math.abs(this.value);
+                            }
+                        },
+                        min: -10,
+                        max: 10
+
+                    },
+
+
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.point.category +': ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '</b>';
+
+                        }
+                    },
+                    series: [{
+                        name: data.away_name,
+                        data: [-5,-3,-3.5,-4.2,-4.5,-4.3].reverse()
+                    },
+                    {
+                        name: data.home_name,
+                        data: [4,4,4.5,6.2,5.5,2.3].reverse()
+                    }]
+                });
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+    }
+
+    function getSpGraph(set_url){
+        $.ajax({
+            url: set_url,
+            dataType:'json',
+            success: function(data){
+                Highcharts.chart('sp-dist-graph', {
+
+                    chart: {
+                        type:'bar'
+                    },
+
+                    title: {
+                        text: '투수비교'
+                    },
+
+                    subtitle: {
+                        text: null
+                    },
+
+
+
+                    xAxis: [{
+                        reversed: false,
+
+                        categories: ['ERA','???','P-ERA','상대-ERA','FIP','평균이닝'],
+                        labels: {
+                            step: 1
+                        },
+                        accessibility: {
+                            description: data.away_name
+                        },
+
+
+                    }, {
+                        opposite: true,
+                        reversed: false,
+
+                        categories: ['ERA','???','P-ERA','상대-ERA','FIP','평균이닝'],
+
+                        linkedTo: 0,
+                        labels: {
+                            step: 1
+                        },
+                        accessibility: {
+                            description: data.home_name
+                        },
+
+
+                    }],
+
+                    yAxis: {
+
+                        title: {
+                        text: null
+                        },
+                        labels: {
+                            formatter: function () {
+                                return Math.abs(this.value);
+                            }
+                        },
+                        min: -10,
+                        max: 10
+
+                    },
+
+
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.point.category +': ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '</b>';
+
+                        }
+                    },
+                    series: [{
+                        name: data.away_dic.fip,
+                        data: [-5,-3,-3.5,-4.2,-data.away_dic.fip,-data.away_dic.inn]
+                    },
+                    {
+                        name: data.home_dic.fip,
+                        data: [4,4,4.5,6.2,data.home_dic.fip,data.home_dic.inn]
+                    }]
+                });
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+    }
+    function getRpGraphAway(set_url){
+        $.ajax({
+            url: set_url,
+            dataType:'json',
+            success: function(data){
+                Highcharts.chart('rp-graph-away', {
+                    chart: {
+                        width: 600,
+                        height: 400
+                    },
+
+                    title: {
+                        text: '  최근실점추이 - ' + data.away_name
+                    },
+
+                    subtitle: {
+                        text: null
+                    },
+
+                    yAxis: {
+
+                        title: {
+                            text: 'Mean of FIP'
+
+                        },
+                        min: 0,
+                        max: 10,
+                    },
+
+                    series: [{
+                        name: '5-fip',
+                        data: data.away_rp_5
+                    },
+                    {
+                        name: '20-fip',
+                        data: data.away_rp_20
+                    }]
+                });
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+    }
+
+    function getRpGraphHome(set_url){
+        $.ajax({
+            url: set_url,
+            dataType:'json',
+            success: function(data){
+                Highcharts.chart('rp-graph-home', {
+                    chart: {
+                        width: 600,
+                        height: 400
+                    },
+
+                    title: {
+                        text: '  최근실점추이 - ' + data.home_name
+                    },
+
+                    subtitle: {
+                        text: null
+                    },
+
+                    yAxis: {
+
+                        title: {
+                            text: 'Mean of FIP'
+
+                        },
+                        min: 0,
+                        max: 10,
+                    },
+
+                    series: [{
+                        name: '5-fip',
+                        data: data.home_rp_5
+                    },
+                    {
+                        name: '20-fip',
+                        data: data.home_rp_20
+                    }]
+                });
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+    }
 
     function getRunGraphAway(set_url){
         $.ajax({
@@ -218,12 +547,12 @@
         });
     }
 
-    function getCompareGraph(set_url){
+    function getRunDistGraph(set_url){
         $.ajax({
             url: set_url,
             dataType:'json',
             success: function(data){
-                Highcharts.chart('compare-graph', {
+                Highcharts.chart('run-dist-graph', {
 
                     chart: {
                         type:'bar'
@@ -311,98 +640,6 @@
             }
         });
     }
-    function getSpGraph(set_url){
-        $.ajax({
-            url: set_url,
-            dataType:'json',
-            success: function(data){
-                Highcharts.chart('sp-graph', {
 
-                    chart: {
-                        type:'bar'
-                    },
-
-                    title: {
-                        text: '투수비교'
-                    },
-
-                    subtitle: {
-                        text: null
-                    },
-
-
-
-                    xAxis: [{
-                        reversed: false,
-
-                        categories: ['승리','패배','ERA','FIP','P-ERA','상대-ERA'].reverse(),
-                        labels: {
-                            step: 1
-                        },
-                        accessibility: {
-                            description: data.away_name
-                        },
-
-
-                    }, {
-                        opposite: true,
-                        reversed: false,
-
-                        categories: ['승리','패배','ERA','FIP','P-ERA','상대-ERA'].reverse(),
-
-                        linkedTo: 0,
-                        labels: {
-                            step: 1
-                        },
-                        accessibility: {
-                            description: data.home_name
-                        },
-
-
-                    }],
-
-                    yAxis: {
-
-                        title: {
-                        text: null
-                        },
-                        labels: {
-                            formatter: function () {
-                                return Math.abs(this.value);
-                            }
-                        },
-                        min: -10,
-                        max: 10
-
-                    },
-
-
-                    plotOptions: {
-                        series: {
-                            stacking: 'normal'
-                        }
-                    },
-
-                    tooltip: {
-                        formatter: function () {
-                            return '<b>' + this.point.category +': ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '</b>';
-
-                        }
-                    },
-                    series: [{
-                        name: data.away_name,
-                        data: [5,3,3.5,4.2,4.5,4.3].reverse()
-                    },
-                    {
-                        name: data.home_name,
-                        data: [-4,-4,-4.5,-6.2,-5.5,-2.3].reverse()
-                    }]
-                });
-            },
-            error:function(request,status,error){
-                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            }
-        });
-    }
 
 </script>

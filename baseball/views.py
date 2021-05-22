@@ -152,22 +152,24 @@ class RunGraphView(APIView):
         today_game_num_idx_max = (2*today_game_num)
         
         if TodayGameInfo.objects.filter(game_idx__contains = str(date)).values():
-            game_date_list = TodayGameInfo.objects.filter(game_idx__contains = str(date)).values()
-            game_date_idx = game_date_list.values("game_idx")
             
+            TGI = TodayTeamGameInfo
+            GI = TodayGameInfo
             
-            team_game_list = TodayTeamGameInfo.objects.filter(game_idx__in = game_date_idx).values().order_by('game_idx','team_game_idx')
-            team_game_idx = team_game_list.values()[today_game_num_idx_min:today_game_num_idx_max]
         else:
-            game_date_list = GameInfo.objects.filter(game_idx__contains = str(date)).values()
-            game_date_idx = game_date_list.values("game_idx")
             
+            TGI = TeamGameInfo
+            GI = GameInfo
             
-            team_game_list = TeamGameInfo.objects.filter(game_idx__in = game_date_idx).values().order_by('game_idx','team_game_idx')
-            team_game_idx = team_game_list.values()[today_game_num_idx_min:today_game_num_idx_max]
+        
+        game_date_set = GI.objects.filter(game_idx__contains = str(date)).values()
+        today_game_idx = game_date_set.values("game_idx")
+        
+        team_game_set = TGI.objects.filter(game_idx__in = today_game_idx).values().order_by('game_idx','team_game_idx')
+        today_game_set = team_game_set.values()[today_game_num_idx_min:today_game_num_idx_max]
         
         
-        if team_game_idx[0]['home_away'] == 'home':
+        if today_game_set[0]['home_away'] == 'home':
             i = 0 
             j = 1
             
@@ -177,14 +179,14 @@ class RunGraphView(APIView):
         
         year = int(str(date)[:4])
         
-        home_team_num = team_game_idx[i]['team_num']
-        away_team_num = team_game_idx[j]['team_num']
+        home_team_num = today_game_set[i]['team_num']
+        away_team_num = today_game_set[j]['team_num']
         
         home_name = TeamInfo.objects.filter(year__contains = year, team_num = home_team_num).values('team_name')[0]['team_name']
         away_name = TeamInfo.objects.filter(year__contains = year, team_num = away_team_num).values('team_name')[0]['team_name']
         
-        home_game_num = team_game_idx[i]['game_num']
-        away_game_num = team_game_idx[j]['game_num']
+        home_game_num = today_game_set[i]['game_num']
+        away_game_num = today_game_set[j]['game_num']
               
         home_team_dic= RunGraphData.objects.filter(year = year , team_num = home_team_num, game_num__lt = home_game_num).values()
         away_team_dic = RunGraphData.objects.filter(year = year , team_num = away_team_num, game_num__lt = away_game_num).values()
@@ -222,27 +224,34 @@ class RunGraphView(APIView):
         
         home_run_5 = list()
         home_run_20 = list()
+        home_rp_5 = list()
+        home_rp_20 = list()
         
         away_run_5 = list()
         away_run_20 = list()
-        
+        away_rp_5 = list()
+        away_rp_20 = list()
         for run in home_team_dic:
-            
+        
             home_run_5.append([run['game_num'],run['run_5']])
             home_run_20.append([run['game_num'],run['run_20']])
-            
+            home_rp_5.append([run['game_num'],run['rp_fip_5']])
+            home_rp_20.append([run['game_num'],run['rp_fip_20']])
         for run in away_team_dic:
             away_run_5.append([run['game_num'],run['run_5']])
             away_run_20.append([run['game_num'],run['run_20']])
+            away_rp_5.append([run['game_num'],run['rp_fip_5']])
+            away_rp_20.append([run['game_num'],run['rp_fip_20']])
           
         
         result_data = {'year':year, 'home_name': home_name, 'away_name':away_name, 'home_run_dist': home_run_dist, 'away_run_dist': away_run_dist, 
-                       'home_run_5':home_run_5, 'home_run_20':home_run_20,'away_run_5':away_run_5, 'away_run_20':away_run_20}
+                       'home_run_5':home_run_5, 'home_run_20':home_run_20,'away_run_5':away_run_5, 'away_run_20':away_run_20,
+                       'home_rp_5':home_rp_5, 'home_rp_20':home_rp_20,'away_rp_5':away_rp_5,'away_rp_20':away_rp_20}
         
         
         return Response(result_data)
 
-class CompareGraphView(APIView):
+class SpGraphView(APIView):
     
     def get(self,request,date,today_game_num):
         
@@ -250,22 +259,24 @@ class CompareGraphView(APIView):
         today_game_num_idx_max = (2*today_game_num)
         
         if TodayGameInfo.objects.filter(game_idx__contains = str(date)).values():
-            game_date_list = TodayGameInfo.objects.filter(game_idx__contains = str(date)).values()
-            game_date_idx = game_date_list.values("game_idx")
             
-            
-            team_game_list = TodayTeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
-            team_game_idx = team_game_list.values()[today_game_num_idx_min:today_game_num_idx_max]
+            TGI = TodayTeamGameInfo
+            GI = TodayGameInfo
+            is_end = False
         else:
-            game_date_list = GameInfo.objects.filter(game_idx__contains = str(date)).values()
-            game_date_idx = game_date_list.values("game_idx")
             
-            
-            team_game_list = TeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
-            team_game_idx = team_game_list.values()[today_game_num_idx_min:today_game_num_idx_max]
+            TGI = TeamGameInfo
+            GI = GameInfo
+            is_end = True
+        
+        game_date_set = GI.objects.filter(game_idx__contains = str(date)).values()
+        today_game_idx = game_date_set.values("game_idx")
+        
+        team_game_set = TGI.objects.filter(game_idx__in = today_game_idx).values().order_by('game_idx','team_game_idx')
+        today_game_set = team_game_set.values()[today_game_num_idx_min:today_game_num_idx_max]
         
         
-        if team_game_idx[0]['home_away'] == 'home':
+        if today_game_set[0]['home_away'] == 'home':
             i = 0 
             j = 1
             
@@ -274,48 +285,119 @@ class CompareGraphView(APIView):
             j = 0
         
         year = int(str(date)[:4])
+        park_factor_total = {'잠실': 0.854,'사직': 1.099,'광주':1.003, '대구': 1.153, '대전': 0.977,'문학':1.046,'고척':0.931,'창원':1.051,'수원':1.032}
+        home_dic = dict()
+        away_dic = dict()
         
-        home_team_num = team_game_idx[i]['team_num']
-        away_team_num = team_game_idx[j]['team_num']
+        
+        home_team_num = today_game_set[i]['team_num']
+        away_team_num = today_game_set[j]['team_num']
         
         home_name = TeamInfo.objects.filter(year__contains = year, team_num = home_team_num).values('team_name')[0]['team_name']
         away_name = TeamInfo.objects.filter(year__contains = year, team_num = away_team_num).values('team_name')[0]['team_name']
         
-        home_game_num = team_game_idx[i]['game_num']
-        away_game_num = team_game_idx[j]['game_num']
+        home_dic['name'] = home_name
+        away_dic['name'] = away_name
+        
+        
+        home_game_idx = today_game_set[i]['team_game_idx']
+        away_game_idx = today_game_set[j]['team_game_idx']
+    
+        
+        if is_end:
+            home_sp = PitcherRecord.objects.filter(team_game_idx = home_game_idx).values()[0]['name']
+            away_sp = PitcherRecord.objects.filter(team_game_idx = away_game_idx).values()[0]['name']
+        else:
+            home_sp = TodayLineUp.objects.filter(team_game_idx=home_game_idx).values()[0]['name']
+            away_sp = TodayLineUp.objects.filter(team_game_idx=away_game_idx).values()[0]['name']
+        
+        home_dic['sp'] = home_sp
+        away_dic['sp'] = away_sp
+        
+        home_start_idx = home_game_idx[:6] + '001'
+        away_start_idx = away_game_idx[:6] + '001'
+        
+        
+        
+        home_sp_set = PitcherRecord.objects.filter(team_game_idx__gte = home_start_idx, team_game_idx__lt=home_game_idx, name = home_sp, po = 1).values()
+        away_sp_set = PitcherRecord.objects.filter(team_game_idx__gte = away_start_idx, team_game_idx__lt=away_game_idx, name = away_sp, po = 1).values()
+        
+        
+        def get_sp(data_set):
+            if data_set.exists():
+                count = data_set.count()
+                fip_sum = 0
+                for data in data_set:
+                    team_game_idx = data['team_game_idx_id']
+                    game_idx = TeamGameInfo.objects.filter(team_game_idx = team_game_idx).values('game_idx')
+                    stadium = GameInfo.objects.filter(game_idx = game_idx).values('stadium')
+                    park_factor = park_factor_total.get(stadium)
+                    if park_factor ==None: park_factor = 1
+                    
+                    fip = int(data['fip'])/park_factor
+                    fip_sum+=fip
+                    
+                    
+                    
+                
+                inn_sum = sum(data_set.values_list('inn',flat=True))
+                if inn_sum < 3: inn_sum = 3
+                fip = (fip_sum / inn_sum) + 3.2
+            else:
+                fip = 0
+                inn_sum = 0
+                count = 1
+                
+            return [count, inn_sum,fip]
+        hsp = get_sp(home_sp_set)
+        asp = get_sp(away_sp_set)
+        
+        home_dic['fip'] = round(hsp[2],2)
+        home_dic['inn'] = round(hsp[1] / hsp[0],1)
+        
+        away_dic['fip'] = round(asp[2],2)
+        away_dic['inn'] = round(asp[1] / asp[0],1)
             
         
         
-          
+      
+                
+            
         
-        result_data = {'year':year, 'home_name': home_name, 'away_name':away_name}
-                       
         
         
+        result_data = {'year':year, 'home_dic':home_dic,'away_dic':away_dic}
+
         return Response(result_data)
+    
+
 
 def preview(request,date,today_game_num):
+    
+    
+    
     today_game_num_idx_min = (2*today_game_num)-2
     today_game_num_idx_max = (2*today_game_num)
     
     if TodayGameInfo.objects.filter(game_idx__contains = str(date)).values():
-        game_date_list = TodayGameInfo.objects.filter(game_idx__contains = str(date)).values()
-        game_date_idx = game_date_list.values("game_idx")
         
-        
-        team_game_list = TodayTeamGameInfo.objects.filter(game_idx__in = game_date_idx).values().order_by('game_idx','team_game_idx')
-        team_game_idx = team_game_list.values()[today_game_num_idx_min:today_game_num_idx_max]
+        TGI = TodayTeamGameInfo
+        GI = TodayGameInfo
         is_end = False
     else:
-        game_date_list = GameInfo.objects.filter(game_idx__contains = str(date)).values()
-        game_date_idx = game_date_list.values("game_idx")
         
-        
-        team_game_list = TeamGameInfo.objects.filter(game_idx__in = game_date_idx).values().order_by('game_idx','team_game_idx')
-        team_game_idx = team_game_list.values()[today_game_num_idx_min:today_game_num_idx_max]
+        TGI = TeamGameInfo
+        GI = GameInfo
         is_end = True
     
-    if team_game_idx[0]['home_away'] == 'home':
+    game_date_set = GI.objects.filter(game_idx__contains = str(date)).values()
+    today_game_idx = game_date_set.values("game_idx")
+    
+    
+    team_game_set = TGI.objects.filter(game_idx__in = today_game_idx).values().order_by('game_idx','team_game_idx')
+    today_game_set= team_game_set.values()[today_game_num_idx_min:today_game_num_idx_max]
+    
+    if today_game_set[0]['home_away'] == 'home':
         i = 0 
         j = 1
         
@@ -330,29 +412,39 @@ def preview(request,date,today_game_num):
     away_dic = dict()
     
     year = int(str(date)[:4])
-    home_team_num = team_game_idx[i]['team_num']
-    away_team_num = team_game_idx[j]['team_num']
+    
+    home_team_num = today_game_set[i]['team_num']
+    away_team_num = today_game_set[j]['team_num']
     
     
     home_dic['name'] = TeamInfo.objects.filter(year__contains = year, team_num = home_team_num).values('team_name')[0]['team_name']
     away_dic['name'] = TeamInfo.objects.filter(year__contains = year, team_num = away_team_num).values('team_name')[0]['team_name']
     
     
-    home_idx = team_game_idx[i]['team_game_idx']
-    away_idx = team_game_idx[j]['team_game_idx']
+    home_game_idx = today_game_set[i]['team_game_idx']
+    away_game_idx = today_game_set[j]['team_game_idx']
+    
+    
+    
+    
+    
+    
+
     
     if is_end:
-        home_pitcher = PitcherRecord.objects.filter(team_game_idx = home_idx).values()[0]['name']
-        away_pitcher = PitcherRecord.objects.filter(team_game_idx = away_idx).values()[0]['name']
+        home_pitcher = PitcherRecord.objects.filter(team_game_idx = home_game_idx).values()[0]['name']
+        away_pitcher = PitcherRecord.objects.filter(team_game_idx = away_game_idx).values()[0]['name']
     else:
-        home_pitcher = TodayLineUp.objects.filter(team_game_idx=home_idx).values()[0]['name']
-        away_pitcher = TodayLineUp.objects.filter(team_game_idx=away_idx).values()[0]['name']
+        home_pitcher = TodayLineUp.objects.filter(team_game_idx=home_game_idx).values()[0]['name']
+        away_pitcher = TodayLineUp.objects.filter(team_game_idx=away_game_idx).values()[0]['name']
     
     home_dic['sp'] = home_pitcher
     away_dic['sp'] = away_pitcher
     
+
     
-    context ={'date':date,'today_game_num':today_game_num,'home_dic':home_dic,'away_dic':away_dic}
+    
+    context ={'date':date,'today_game_num':today_game_num,'home_dic':home_dic,'away_dic':away_dic,}
     return render(request,'baseball/preview.html',context)
 
 def lineup(request,date,today_game_num):
@@ -391,3 +483,4 @@ def lineup(request,date,today_game_num):
     
     
     return render(request,'baseball/lineup.html',context)
+

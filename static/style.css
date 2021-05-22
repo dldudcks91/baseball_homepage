@@ -251,35 +251,15 @@ body{
     margin-bottom:30px;
 }
 
-.sp-box ul{
-    padding: 0px;
-    white-space: nowrap;
-}
 
-.sp-box li{
-    display:inline-block;
-    vertical-align: top;
-    height: 400px;
-}
-
-.sp-card{
-    width:300px;
-    height:400px;
-}
-
-#sp-away{
-    float:left;
-}
-#sp-home{
-    float:right;
-    text-align:right;
-}
 
 .img-sp{
     width:240px;
     height:320px;
 }
-
+#img-sp-away{
+    float:left;
+}
 #img-sp-home{
     float:right;
 }
@@ -292,22 +272,24 @@ body{
     height: 400px;
 }
 
-#compare-box ul{
+.dist-box ul{
     padding: 0px;
     white-space: nowrap;
 }
-#compare-box li {
+.dist-box li {
     display:inline-block;
     vertical-align: top;
     height: 400px;
 }
-.compare-card{
-    text-align:center;
+.dist-card{
+
     width: 300px;
 }
 
-
-.compare-graph{
+.dist-card-home{
+    text-align:right;
+}
+.run-dist-graph{
 
     width:600px;
 }
@@ -320,11 +302,11 @@ body{
     height:400px;
 }
 
-#run-graph-away{
+.run-graph-away{
     float:left;
 }
 
-#run-graph-home{
+.run-graph-home{
     float:right;
 }
 

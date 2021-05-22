@@ -302,6 +302,8 @@ class RunGraphData(models.Model):
     run_1 = models.FloatField(blank=True, null=True)
     run_5 = models.FloatField(blank=True, null=True)
     run_20 = models.FloatField(blank=True, null=True)
+    rp_fip_5 = models.FloatField(blank=True, null=True)
+    rp_fip_20 = models.FloatField(blank=True, null=True)
     class Meta:
         managed = False
         db_table = 'run_graph_data'
