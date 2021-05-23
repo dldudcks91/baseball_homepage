@@ -573,19 +573,35 @@ def preview(request,date,today_game_num):
                 
                 recent_game['home_name'] = TeamInfo.objects.filter(year= year, team_num = recent_game['team_num']).values('team_name')[0]['team_name']
                 recent_game['away_name'] = TeamInfo.objects.filter(year= year, team_num = recent_game['foe_num']).values('team_name')[0]['team_name']
-                recent_game['home_run'] = ScoreRecord.objects.filter(team_game_idx = recent_game['team_game_idx']).values('r')[0]['r']
-                recent_game['away_run'] = ScoreRecord.objects.filter(team_game_idx = str(foe_game_idx[game_idx]['team_game_idx'])).values('r')[0]['r']
+                home_run = ScoreRecord.objects.filter(team_game_idx = recent_game['team_game_idx']).values('r')[0]['r']
+                away_run = ScoreRecord.objects.filter(team_game_idx = str(foe_game_idx[game_idx]['team_game_idx'])).values('r')[0]['r']
+                recent_game['home_run'] = home_run
+                recent_game['away_run'] = away_run
                 recent_game['home_url'] = "/static/images/emblem/emblem_" + recent_game['home_name'] + ".png"
                 recent_game['away_url'] = "/static/images/emblem/emblem_" + recent_game['away_name'] + ".png"
-                
+                if home_run > away_run:
+                    result = '승'
+                elif home_run == away_run:
+                    result = '무'
+                else:
+                    result= '패'
+                recent_game['result'] = result
             else:
                 recent_game['away_name'] = TeamInfo.objects.filter(year= year, team_num = recent_game['team_num']).values('team_name')[0]['team_name']
                 recent_game['home_name'] = TeamInfo.objects.filter(year= year, team_num = recent_game['foe_num']).values('team_name')[0]['team_name']
-                recent_game['away_run'] = ScoreRecord.objects.filter(team_game_idx = recent_game['team_game_idx']).values('r')[0]['r']
-                recent_game['home_run'] = ScoreRecord.objects.filter(team_game_idx = str(foe_game_idx[game_idx]['team_game_idx'])).values('r')[0]['r']
+                away_run = ScoreRecord.objects.filter(team_game_idx = recent_game['team_game_idx']).values('r')[0]['r']
+                home_run = ScoreRecord.objects.filter(team_game_idx = str(foe_game_idx[game_idx]['team_game_idx'])).values('r')[0]['r']
+                recent_game['away_run'] = away_run
+                recent_game['home_run'] = home_run
                 recent_game['away_url'] = "/static/images/emblem/emblem_" + recent_game['away_name'] + ".png"
                 recent_game['home_url'] = "/static/images/emblem/emblem_" + recent_game['home_name'] + ".png"
-                
+                if home_run < away_run:
+                    result = '승'
+                elif home_run == away_run:
+                    result = '무'
+                else:
+                    result = '패'
+                recent_game['result'] = result
         return recent_game_set
     
     home_set = get_recent(home_game_num,home_game_idx,home_team_num,7)
