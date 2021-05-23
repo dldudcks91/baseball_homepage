@@ -362,39 +362,57 @@ class SpGraphView(APIView):
                     rp_inn +=new_rp_inn
                 
                 inn= sum(data_set.values_list('inn',flat=True))
-                if inn < 3: inn = 3
+                
                 er = sum(data_set.values_list('er',flat=True))
                 if rp_inn == 0:
                     rp_fip = 0
+                    
+                    
+                if inn == 0:
+                    fip = 99
+                    era = 99
+                else:
+                    fip = round(fip / inn  +3.2, 2)
+                    era = round(er / inn * 9, 2)
+                    inn = round(inn / count,1)
+                    
                 rp = rp_fip / rp_inn + 3.2
+                qs = qs_count / count * 10
+                run = round(run / count, 2)
+                
                 
                 
                 
                 
             else:
-                fip = 0
+                count = 0
                 inn = 0
-                count = 1
+                fip = 0
+                era= 0
+                run = 0
+                rp = 0
+                qs = 0
+                
             
-            return [count, inn, fip, er, run, rp,qs_count]
+            return [count, inn, fip, era, run, rp, qs]
         hsp = get_sp(home_sp_set)
         asp = get_sp(away_sp_set)
         
         home_dic['count'] = hsp[0]
-        home_dic['inn'] = round(hsp[1] / hsp[0], 1)
-        home_dic['fip'] = round(hsp[2] / hsp[1] +3.2 ,2)
-        home_dic['era'] = round(hsp[3] / hsp[1] * 9, 2)
-        home_dic['run'] = round(hsp[4] / hsp[0] ,2)
-        home_dic['rp'] = round(hsp[5]  ,2)
-        home_dic['qs'] = hsp[-1] / hsp[0] *10
+        home_dic['inn'] = hsp[1]
+        home_dic['fip'] = hsp[2]
+        home_dic['era'] = hsp[3]
+        home_dic['run'] = hsp[4]
+        home_dic['rp'] = hsp[5]
+        home_dic['qs'] = hsp[6]
         
         away_dic['count'] = asp[0]
-        away_dic['inn'] = round(asp[1] / asp[0],1)
-        away_dic['fip'] = round(asp[2] / asp[1] + 3.2,2)
-        away_dic['era'] = round(asp[3] / asp[1] * 9, 2)
-        away_dic['run'] = round(asp[4] / asp[0] ,2)
-        away_dic['rp'] = round(asp[5] ,2)    
-        away_dic['qs'] = asp[-1] / asp[0] * 10
+        away_dic['inn'] = asp[1]
+        away_dic['fip'] = asp[2]
+        away_dic['era'] = asp[3]
+        away_dic['run'] = asp[4]
+        away_dic['rp'] = asp[5]
+        away_dic['qs'] = asp[6]
         
       
                 
@@ -447,15 +465,15 @@ def preview(request,date,today_game_num):
     home_dic = dict()
     away_dic = dict()
     
-    year = int(str(date)[:4])
+    year = str(date)[:4]
     
     home_team_num = today_game_set[i]['team_num']
     away_team_num = today_game_set[j]['team_num']
     
     
     
-    home_name = TeamInfo.objects.filter(year__contains = year, team_num = home_team_num).values('team_name')[0]['team_name']
-    away_name = TeamInfo.objects.filter(year__contains = year, team_num = away_team_num).values('team_name')[0]['team_name']
+    home_name = TeamInfo.objects.filter(year = year, team_num = home_team_num).values('team_name')[0]['team_name']
+    away_name = TeamInfo.objects.filter(year = year, team_num = away_team_num).values('team_name')[0]['team_name']
     
     home_dic['name'] = home_name    
     away_dic['name'] = away_name
@@ -463,6 +481,7 @@ def preview(request,date,today_game_num):
     
     home_game_idx = today_game_set[i]['team_game_idx']
     away_game_idx = today_game_set[j]['team_game_idx']
+    
     
     
     away_dic['url'] = "/static/images/emblem_back/emblem_" + away_name + ".png"
@@ -484,24 +503,50 @@ def preview(request,date,today_game_num):
     away_dic['sp'] = away_sp
     
     
+    def get_recent_sp(game_idx, sp_name, year):
+        start_idx = game_idx[:6] + '001'
+        sp_set = PitcherRecord.objects.filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1).values()
+        
+        if sp_set.exists():
+            
+            sp_count= sp_set.count()
+            if sp_count >= 3:
+                sp_count -= 3
+            else:
+                sp_count = 0
+            recent_set = sp_set[sp_count:].values()
+
+            
+            for i, recent in enumerate(recent_set):
+                team_game_idx = recent['team_game_idx_id']
+                range_set = TeamGameInfo.objects.filter(team_game_idx = team_game_idx).values('game_idx','foe_num')    
+                game_idx = range_set[0]['game_idx']
+                
+                recent['date'] = str(game_idx)[4:8]
+                foe_name = TeamInfo.objects.filter(year = year, team_num = str(range_set[0]['foe_num'])).values('team_name')[0]['team_name']
+                recent['foe_name'] = foe_name 
+                
+                recent['foe_url'] = "/static/images/emblem/emblem_" + foe_name + ".png"
+                inn = float(recent['inn'])
+                inn_round = round(inn)
+                inn_point = (inn%1)/3
+                inn = inn_round + inn_point
+                recent['ip'] = round(inn,1)
+                
+            
+        else:
+            recent_set = sp_set
+        
+        return recent_set
+    
+    
+    home_sp_set = get_recent_sp(home_game_idx, home_sp, year)
+    away_sp_set = get_recent_sp(away_game_idx, away_sp,year)
+    
+    
     home_game_num = int(today_game_set[i]['game_num'])
     away_game_num = int(today_game_set[j]['game_num'])
-    '''
-    recent_range = 7
-    if home_game_num <= recent_range :
-        start_num = 1
-    else:
-        start_num = home_game_num - recent_range
     
-    home_game_num = str(home_game_num)
-    start_num = str(start_num).zfill(3)
-    start_idx = home_game_idx[:6] + start_num
-    
-    recent_game_set = TeamGameInfo.objects.filter(team_game_idx__gte = start_idx, team_game_idx__lt = home_game_idx).values()
-    range_game_idx = recent_game_set.values('game_idx')
-    foe_game_idx = TeamGameInfo.objects.filter(game_idx__in=range_game_idx).exclude(team_num= home_team_num).values('team_game_idx')[0]['team_game_idx']
-    
-    '''
     def get_recent(game_num,game_idx,team_num, recent_range):
         
         if game_num <= recent_range :
@@ -553,7 +598,7 @@ def preview(request,date,today_game_num):
     
     
     
-    context ={'date':date,'today_game_num':today_game_num,'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set}
+    context ={'date':date,'today_game_num':today_game_num,'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
     return render(request,'baseball/preview.html',context)
 
 def lineup(request,date,today_game_num):

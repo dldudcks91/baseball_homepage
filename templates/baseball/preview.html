@@ -10,7 +10,8 @@
     <hr>
     <div class= "preview-box" id="preview-team">
         <div class="box-title">
-            <span class="h3"> - Team </span>
+
+
             <span><input class="btn-pre" id="btn-team-2" type="button" name="btn-pit-1" value="팀추이?"></span>
             <span><input class="btn-pre" id="btn-team-1" type="button" name="btn-pit-1" value="팀"></span>
 
@@ -19,44 +20,61 @@
             <div class="dist-box" id="team-dist-box">
 
                 <ul>
-                    <li class="dist-card dist-card-away" id="team-dist-away">
+                    <li class="dist-card dist-card-away dist-team" id="team-dist-away">
+                        <div id="recent-title-away" class="recent-title">
+                            <div class="recent-title-word"> {{away_dic.name}} </div>
+                            <div class="recent-title-word">  - 최근7경기 </div>
+                            <hr style="position:absolute;width:300px;top:24px;">
+                        </div>
+
                         <div class="emb-back"><img id="emb-back-away" src= "{{away_dic.url}}" alt= {{away_dic.name}}></div>
-                        <ul>
-                            {% for set in away_set %}
+                        <div>
+                            <ul>
+                                {% for set in away_set %}
+                                    <li>
+                                        <div class="recent-games">
+                                            <div>{{set.date}}</div>
+                                            <div>{{set.stadium}}</div>
+                                            <div><img class='pre-emb' src= "{{set.away_url}}" alt= "{{set.away_name}}" ></div>
+                                            <div class="recent-run">{{set.away_run}}</div>
+                                            <div>:</div>
+                                            <div class="recent-run">{{set.home_run}}</div>
+                                            <div><img class='pre-emb' src= "{{set.home_url}}" alt= "{{set.home_name}}"></div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                    </li>
+                    <li class="dist-graph" id="team-dist-graph"></li>
+                    <li class="dist-card dist-card-home dist-team" id="team-dist-home">
+                        <div id="recent-title-home" class="recent-title">
+
+                            <div class="recent-title-word"> {{home_dic.name}} </div>
+                            <div class="recent-title-word"> - 최근7경기 </div>
+                            <hr style="position:absolute;width:300px;top:24px;right:10px;">
+                        </div>
+
+                        <div class="emb-back"><img class='pre-emb' id="emb-back-home" src= "{{home_dic.url}}" alt= {{home_dic.name}}></div>
+                        <div>
+                            <ul>
+                                {% for set in home_set %}
                                 <li>
                                     <div class="recent-games">
                                         <div>{{set.date}}</div>
                                         <div>{{set.stadium}}</div>
-                                        <div><img src= "{{set.away_url}}" alt= "{{set.away_name}}" ></div>
+                                        <div><img class='pre-emb' src= "{{set.away_url}}" alt= "{{set.away_name}}" ></div>
                                         <div class="recent-run">{{set.away_run}}</div>
                                         <div>:</div>
                                         <div class="recent-run">{{set.home_run}}</div>
-                                        <div><img src= "{{set.home_url}}" alt= "{{set.home_name}}"></div>
+                                        <div><img class='pre-emb' src= "{{set.home_url}}" alt= "{{set.home_name}}"></div>
                                     </div>
                                 </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    <li class="dist-graph" id="team-dist-graph"></li>
-                    <li class="dist-card dist-card-home" id="team-dist-home">
+                                {% endfor %}
+                            </ul>
+                        </div>
 
-                        <div class="emb-back"><img id="emb-back-home" src= "{{home_dic.url}}" alt= {{home_dic.name}}></div>
-
-                        <ul>
-                            {% for set in home_set %}
-                            <li>
-                                <div class="recent-games">
-                                    <div>{{set.date}}</div>
-                                    <div>{{set.stadium}}</div>
-                                    <div><img src= "{{set.away_url}}" alt= "{{set.away_name}}" ></div>
-                                    <div class="recent-run">{{set.away_run}}</div>
-                                    <div>:</div>
-                                    <div class="recent-run">{{set.home_run}}</div>
-                                    <div><img src= "{{set.home_url}}" alt= "{{set.home_name}}"></div>
-                                </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
                     </li>
                 </ul>
             </div>
@@ -65,7 +83,7 @@
     <hr>
     <div class= "preview-box" id="preview-pitcher">
         <div class="box-title">
-            <span class="h3"> - Pitcher </span>
+
             <span><input class="btn-pre" id="btn-pit-2" type="button" name="btn-pit-1" value="중간계투정보"></span>
             <span><input class="btn-pre" id="btn-pit-1" type="button" name="btn-pit-1" value="선발투수정보"></span>
 
@@ -74,9 +92,48 @@
             <div class="dist-box" id="sp-dist-box">
 
                 <ul>
-                    <li class="dist-card dist-card-away" id="sp-dist-away">{{away_dic.sp}}</li>
+                    <li class="dist-card dist-card-away dist-sp" id="sp-dist-away">
+                        <div id="sp-title-away" class="sp-title">{{away_dic.sp}}</div>
+                        <hr style="position:absolute;width:220px;top:6px;">
+
+                        <ul>
+                            <li>- 최근등판기록</li>
+                            {% for set in away_sp_set %}
+                            <li>
+                                <div class="recent-sp">
+                                    <span>vs</span>
+                                    <span>{{set.date}}</span>
+                                    <span><img class='pre-sp-emb' src= "{{set.foe_url}}" alt= "{{set.foe_name}}" ></span>
+
+                                    <span class="recent-run">{{set.ip}}이닝</span>
+                                    <span class="recent-run">{{set.r}}실점</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                    </li>
                     <li class="dist-graph" id="sp-dist-graph"></li>
-                    <li class="dist-card dist-card-home" id="sp-dist-home">{{home_dic.sp}}</li>
+                    <li class="dist-card dist-card-home dist-sp" id="sp-dist-home">
+                        <div id="sp-title-home" class="sp-title">{{home_dic.sp}}</div>
+                        <hr style="position:absolute;width:220px;top:6px;right:0px">
+
+                        <ul>
+                            <li>- 최근등판기록</li>
+                            {% for set in home_sp_set %}
+                            <li>
+                                <div class="recent-sp">
+                                    <span>vs</span>
+                                    <span>{{set.date}}</span>
+                                    <span><img class='pre-sp-emb' src= "{{set.foe_url}}" alt= "{{set.foe_name}}" ></span>
+
+                                    <span class="recent-run">{{set.ip}}이닝</span>
+                                    <span class="recent-run">{{set.r}}실점</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                 </ul>
             </div>
 
@@ -92,10 +149,10 @@
     <hr>
     <div class= "preview-box" id="preview-run">
 
-        <span class="h3"> - Batter </span>
-        <span><input class="btn-pre" id="btn-run-2" type="button" name="btn-run-2" value="최근득점추이"></span>
-        <span><input class="btn-pre" id="btn-run-1" type="button" name="btn-run-1" value="득점분포도"></span>
-
+        <div class="box-title">
+            <span><input class="btn-pre" id="btn-run-2" type="button" name="btn-run-2" value="최근득점추이"></span>
+            <span><input class="btn-pre" id="btn-run-1" type="button" name="btn-run-1" value="득점분포도"></span>
+        </div>
 
         <div class="box-contents">
             <div class="dist-box" id="run-dist-box">
@@ -325,7 +382,7 @@
                     },
 
                     title: {
-                        text: '투수비교'
+                        text: '선발투수비교'
                     },
 
                     subtitle: {

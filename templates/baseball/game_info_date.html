@@ -133,10 +133,19 @@
 
 
     // select card function
-
+    last_game_num_idx = 0
     $('.card').on('click', function () {
+
         setPreview()
         $("#today-game-tab").removeClass('hidden')
+        var game_num_idx = $('#myTab').data("game_num_idx")
+        card_id = "#card" + String(game_num_idx)
+        $(card_id).css("background-color","rgba(245,245,245)")
+        last_card_id = "#card" + String(last_game_num_idx)
+        $(last_card_id).css("background-color","")
+        last_game_num_idx = game_num_idx
+
+
 
     })
     function saveGamenum(game_num_idx){
