@@ -48,6 +48,9 @@ body{
 .hidden{
 	display:none;
 }
+.highcharts-title{
+    font-size:24px;
+}
 /* main.html*/
 .carousel-control-next{
 	width:100%;

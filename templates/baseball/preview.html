@@ -174,16 +174,16 @@
     <hr>
     </div>
 </div>
-<script src="https://code.highcharts.com/highcharts.js"></script>
- 
+
+
 <script type="text/javascript">
+
+
     $(document).ready(function() {
 
         SpGraph();
         RunDistGraph();
         TeamGraph()
-
-
 
     });
 
@@ -265,6 +265,7 @@
     function RunDistGraph(){
         var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
         getRunDistGraph(set_url)
+
     }
     function RunGraph(){
 
@@ -382,7 +383,9 @@
                     },
 
                     title: {
-                        text: '선발투수비교'
+                        text: '선발투수비교',
+
+
                     },
 
                     subtitle: {
@@ -449,11 +452,11 @@
                         }
                     },
                     series: [{
-                        name: data.away_dic.name,
+                        name: data.away_dic.sp,
                         data: [-data.away_dic.run,-data.away_dic.rp,-data.away_dic.era,-data.away_dic.fip,-data.away_dic.inn,-data.away_dic.qs,-data.away_dic.count]
                     },
                     {
-                        name: data.home_dic.name,
+                        name: data.home_dic.sp,
                         data: [data.home_dic.run,data.home_dic.rp,data.home_dic.era,data.home_dic.fip,data.home_dic.inn,data.home_dic.qs,data.home_dic.count]
                     }]
                 });
