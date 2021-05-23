@@ -10,17 +10,54 @@
     <hr>
     <div class= "preview-box" id="preview-team">
         <div class="box-title">
-            <span class="h3"> - Information of Team </span>
-            <span><input class="btn-team" id="btn-team-1" type="button" name="btn-pit-1" value="선발투수정보"></span>
-            <span><input class="btn-team" id="btn-team-2" type="button" name="btn-pit-1" value="중간계투정보"></span>
+            <span class="h3"> - Team </span>
+            <span><input class="btn-pre" id="btn-team-2" type="button" name="btn-pit-1" value="팀추이?"></span>
+            <span><input class="btn-pre" id="btn-team-1" type="button" name="btn-pit-1" value="팀"></span>
+
         </div>
         <div class="box-contents">
             <div class="dist-box" id="team-dist-box">
 
                 <ul>
-                    <li class="dist-card dist-card-away" id="team-dist-away">{{away_dic.sp}}</li>
+                    <li class="dist-card dist-card-away" id="team-dist-away">
+                        <div class="emb-back"><img id="emb-back-away" src= "{{away_dic.url}}" alt= {{away_dic.name}}></div>
+                        <ul>
+                            {% for set in away_set %}
+                                <li>
+                                    <div class="recent-games">
+                                        <div>{{set.date}}</div>
+                                        <div>{{set.stadium}}</div>
+                                        <div><img src= "{{set.away_url}}" alt= "{{set.away_name}}" ></div>
+                                        <div class="recent-run">{{set.away_run}}</div>
+                                        <div>:</div>
+                                        <div class="recent-run">{{set.home_run}}</div>
+                                        <div><img src= "{{set.home_url}}" alt= "{{set.home_name}}"></div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                     <li class="dist-graph" id="team-dist-graph"></li>
-                    <li class="dist-card dist-card-home" id="team-dist-home">{{home_dic.sp}}</li>
+                    <li class="dist-card dist-card-home" id="team-dist-home">
+
+                        <div class="emb-back"><img id="emb-back-home" src= "{{home_dic.url}}" alt= {{home_dic.name}}></div>
+
+                        <ul>
+                            {% for set in home_set %}
+                            <li>
+                                <div class="recent-games">
+                                    <div>{{set.date}}</div>
+                                    <div>{{set.stadium}}</div>
+                                    <div><img src= "{{set.away_url}}" alt= "{{set.away_name}}" ></div>
+                                    <div class="recent-run">{{set.away_run}}</div>
+                                    <div>:</div>
+                                    <div class="recent-run">{{set.home_run}}</div>
+                                    <div><img src= "{{set.home_url}}" alt= "{{set.home_name}}"></div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -28,9 +65,10 @@
     <hr>
     <div class= "preview-box" id="preview-pitcher">
         <div class="box-title">
-            <span class="h3"> - Information of Pitcher </span>
-            <span><input class="btn-pit" id="btn-pit-1" type="button" name="btn-pit-1" value="선발투수정보"></span>
-            <span><input class="btn-pit" id="btn-pit-2" type="button" name="btn-pit-1" value="중간계투정보"></span>
+            <span class="h3"> - Pitcher </span>
+            <span><input class="btn-pre" id="btn-pit-2" type="button" name="btn-pit-1" value="중간계투정보"></span>
+            <span><input class="btn-pre" id="btn-pit-1" type="button" name="btn-pit-1" value="선발투수정보"></span>
+
         </div>
         <div class="box-contents">
             <div class="dist-box" id="sp-dist-box">
@@ -54,9 +92,10 @@
     <hr>
     <div class= "preview-box" id="preview-run">
 
-        <span class="h3"> - Information of Run</span>
-        <span><input class="btn-run" id="btn-run-1" type="button" name="btn-run-1" value="득점분포도"></span>
-        <span><input class="btn-run" id="btn-run-2" type="button" name="btn-run-2" value="최근득점추이"></span>
+        <span class="h3"> - Batter </span>
+        <span><input class="btn-pre" id="btn-run-2" type="button" name="btn-run-2" value="최근득점추이"></span>
+        <span><input class="btn-pre" id="btn-run-1" type="button" name="btn-run-1" value="득점분포도"></span>
+
 
         <div class="box-contents">
             <div class="dist-box" id="run-dist-box">
@@ -298,7 +337,7 @@
                     xAxis: [{
                         reversed: false,
 
-                        categories: ['ERA','???','P-ERA','상대-ERA','FIP','평균이닝'],
+                        categories: ['득점지원','불펜실점','ERA','FIP','평균이닝','QS비율','선발등판'],
                         labels: {
                             step: 1
                         },
@@ -311,7 +350,7 @@
                         opposite: true,
                         reversed: false,
 
-                        categories: ['ERA','???','P-ERA','상대-ERA','FIP','평균이닝'],
+                        categories: ['득점지원','불펜실점','ERA','FIP','평균이닝','QS비율','선발등판'],
 
                         linkedTo: 0,
                         labels: {
@@ -353,12 +392,12 @@
                         }
                     },
                     series: [{
-                        name: data.away_dic.fip,
-                        data: [-5,-3,-3.5,-4.2,-data.away_dic.fip,-data.away_dic.inn]
+                        name: data.away_dic.name,
+                        data: [-data.away_dic.run,-data.away_dic.rp,-data.away_dic.era,-data.away_dic.fip,-data.away_dic.inn,-data.away_dic.qs,-data.away_dic.count]
                     },
                     {
-                        name: data.home_dic.fip,
-                        data: [4,4,4.5,6.2,data.home_dic.fip,data.home_dic.inn]
+                        name: data.home_dic.name,
+                        data: [data.home_dic.run,data.home_dic.rp,data.home_dic.era,data.home_dic.fip,data.home_dic.inn,data.home_dic.qs,data.home_dic.count]
                     }]
                 });
             },

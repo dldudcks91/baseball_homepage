@@ -7,10 +7,10 @@
     <input class="hidden" id="today-game-input" value="{{data_length}}">
     <div id="today-game-button">
     </div>
-    {% if game_date_dic %}
+    {% if game_date_set %}
     <ul id="today-game-list" >
 
-        {% for game in game_date_dic %}
+        {% for game in game_date_set %}
         <li class="card" id="card{{game.game_num_idx}}" onclick="saveGamenum({{game.game_num_idx}})" role='button'>
             <div class ="card-title">
                 <span>{{game.stadium}}</span>

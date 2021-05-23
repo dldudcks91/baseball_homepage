@@ -250,22 +250,8 @@ body{
     margin-top:30px;
     margin-bottom:30px;
 }
-
-
-
-.img-sp{
-    width:240px;
-    height:320px;
-}
-#img-sp-away{
-    float:left;
-}
-#img-sp-home{
-    float:right;
-}
-
-
 .box-contents{
+
     margin-top: 30px;
     margin-bottom: 30px;
     width: 1200px;
@@ -281,13 +267,76 @@ body{
     vertical-align: top;
     height: 400px;
 }
-.dist-card{
 
+.dist-card{
+    position: relative;
     width: 300px;
 }
+.dist-card ul{
+    position: absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
 
+}
+.dist-card li {
+    display: inline;
+
+}
 .dist-card-home{
     text-align:right;
+}
+
+.emb-back{
+    position: absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+
+}
+.emb-back img{
+    width: 300px;
+    opacity: 0.1;
+}
+
+
+.recent-games div{
+    display:inline-block;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top:5px;
+    font-size: 1rem;
+}
+.recent-games img{
+    width:50px;
+}
+
+.recent-run{
+    width:20px;
+}
+.img-sp{
+    width:240px;
+    height:320px;
+}
+#img-sp-away{
+    float:left;
+}
+#img-sp-home{
+    float:right;
+}
+
+
+
+
+
+.dist-graph{
+    width:600px;
+    height:400px;
+}
+
+.card-record-home{
+    width:210px;
+    height:210px;
 }
 .run-dist-graph{
 
@@ -314,14 +363,15 @@ body{
     display:inline-block;
 
 }
-
-.btn-pit{
+.btn-pre{
     vertical-align:top;
+    float:right;
+    margin-left:5px;
 }
 
-.btn-run{
-    vertical-align:top;
-}
+
+
+
 /*lineup.html*/
 
 .lineup-title{
