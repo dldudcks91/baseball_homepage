@@ -325,6 +325,8 @@ class SpGraphView(APIView):
         away_sp_set = PitcherRecord.objects.filter(team_game_idx__gte = away_start_idx, team_game_idx__lt=away_game_idx, name = away_sp, po = 1).values()
         
         
+        
+                
         def get_sp(data_set):
             if data_set.exists():
                 count = data_set.count()
@@ -336,7 +338,7 @@ class SpGraphView(APIView):
                 qs_count = 0
                 for data in data_set:
                     team_game_idx = data['team_game_idx_id']
-                    game_idx = TeamGameInfo.objects.filter(team_game_idx = team_game_idx).values()[0]['game_idx']
+                    game_idx = TeamGameInfo.objects.filter(team_game_idx = team_game_idx).values()[0]['game_idx_id']
                     stadium = GameInfo.objects.filter(game_idx = game_idx).values()[0]['stadium']
                     
                     park_factor = park_factor_total.get(stadium)
@@ -348,7 +350,7 @@ class SpGraphView(APIView):
                     fip += new_fip
                     er += new_er
                     
-                    if (new_inn>=6) & (new_er < 3):
+                    if (new_inn>=6) & (new_er <= 3):
                         qs_count+=1
                     
                     
@@ -451,6 +453,10 @@ def preview(request,date,today_game_num):
     team_game_set = TGI.objects.filter(game_idx__in = today_game_idx).values().order_by('game_idx','team_game_idx')
     today_game_set= team_game_set.values()[today_game_num_idx_min:today_game_num_idx_max]
     
+    
+
+    
+    
     if today_game_set[0]['home_away'] == 'home':
         i = 0 
         j = 1
@@ -505,9 +511,10 @@ def preview(request,date,today_game_num):
     away_dic['sp'] = away_sp
     
     
+    
     def get_recent_sp(game_idx, sp_name, year):
         start_idx = game_idx[:6] + '001'
-        sp_set = PitcherRecord.objects.filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1).values()
+        sp_set = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1)
         
         if sp_set.exists():
             
@@ -516,16 +523,18 @@ def preview(request,date,today_game_num):
                 sp_count -= 3
             else:
                 sp_count = 0
-            recent_set = sp_set[sp_count:].values()
-
+            recent_set = sp_set[sp_count:]
+            recent_q = recent_set.values()
             
-            for i, recent in enumerate(recent_set):
-                team_game_idx = recent['team_game_idx_id']
-                range_set = TeamGameInfo.objects.filter(team_game_idx = team_game_idx).values('game_idx','foe_num')    
-                game_idx = range_set[0]['game_idx']
+            
+            for i, recent in enumerate(recent_q):
                 
-                recent['date'] = str(game_idx)[4:8]
-                foe_name = TeamInfo.objects.filter(year = year, team_num = str(range_set[0]['foe_num'])).values('team_name')[0]['team_name']
+                
+                
+                game_idx = recent_set[i].team_game_idx.game_idx
+                foe_num = recent_set[i].team_game_idx.foe_num
+                recent['date'] = str(game_idx)[21:25]
+                foe_name = TeamInfo.objects.filter(year = year, team_num = foe_num)[0].team_name
                 recent['foe_name'] = foe_name 
                 
                 recent['foe_url'] = "/static/images/emblem/emblem_" + foe_name + ".png"
@@ -537,9 +546,9 @@ def preview(request,date,today_game_num):
                 
             
         else:
-            recent_set = sp_set
+            recent_q = sp_set.values()
         
-        return recent_set
+        return recent_q
     
     
     home_sp_set = get_recent_sp(home_game_idx, home_sp, year)
@@ -549,6 +558,32 @@ def preview(request,date,today_game_num):
     home_game_num = int(today_game_set[i]['game_num'])
     away_game_num = int(today_game_set[j]['game_num'])
     
+    
+    game_num = home_game_num
+    game_idx = home_game_idx
+    team_num = home_team_num
+    recent_range =7
+    if game_num <= recent_range :
+        start_num = 1
+    else:
+        start_num = game_num - recent_range
+        
+    year = game_idx[:4]
+    game_num = str(game_num)
+    start_num = str(start_num).zfill(3)
+    start_idx = game_idx[:6] + start_num
+    
+    recent_game_set = TeamGameInfo.objects.select_related('game_idx').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx)
+    recent_game_q = recent_game_set.values()
+    
+    range_game_idx = recent_game_q.values('game_idx')
+    foe_game_idx = TeamGameInfo.objects.filter(game_idx__in=range_game_idx).exclude(team_num= team_num).values('team_game_idx')
+    
+    
+    
+    stadium = GameInfo.objects.filter(game_idx__in= range_game_idx).values('stadium')
+    
+    
     def get_recent(game_num,game_idx,team_num, recent_range):
         
         if game_num <= recent_range :
@@ -556,67 +591,59 @@ def preview(request,date,today_game_num):
         else:
             start_num = game_num - recent_range
         
-        year = game_idx[:4]
+        
         game_num = str(game_num)
         start_num = str(start_num).zfill(3)
         start_idx = game_idx[:6] + start_num
         
-        recent_game_set = TeamGameInfo.objects.filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx).values()
-        range_game_idx = recent_game_set.values('game_idx')
-        foe_game_idx = TeamGameInfo.objects.filter(game_idx__in=range_game_idx).exclude(team_num= team_num).values('team_game_idx')
-        stadium = GameInfo.objects.filter(game_idx__in= range_game_idx).values('stadium')
+        recent_game_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx)
+        recent_game_q = recent_game_set.values()
+        
+        range_game_idx = recent_game_q.values('game_idx')
+        foe_game_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_game_idx).exclude(team_num= team_num)
+        #stadium = GameInfo.objects.filter(game_idx__in= range_game_idx).values('stadium')
         
         
-        for game_idx, recent_game in enumerate(recent_game_set):
-            recent_game['stadium'] = str(stadium[game_idx]['stadium'])
+        
+        for i, recent in enumerate(recent_game_q):
+            recent['stadium'] = recent_game_set[i].game_idx.stadium #str(stadium[game_idx]['stadium'])
+            recent['date'] = recent_game_set[i].game_idx.game_idx[4:8]
             
-            recent_game['date'] = str(range_game_idx[game_idx]['game_idx'])[4:8] 
-            if str(recent_game['home_away']) =='home':
-                
-                recent_game['home_name'] = TeamInfo.objects.filter(year= year, team_num = recent_game['team_num']).values('team_name')[0]['team_name']
-                recent_game['away_name'] = TeamInfo.objects.filter(year= year, team_num = recent_game['foe_num']).values('team_name')[0]['team_name']
-                home_run = ScoreRecord.objects.filter(team_game_idx = recent_game['team_game_idx']).values('r')[0]['r']
-                away_run = ScoreRecord.objects.filter(team_game_idx = str(foe_game_idx[game_idx]['team_game_idx'])).values('r')[0]['r']
-                recent_game['home_run'] = home_run
-                recent_game['away_run'] = away_run
-                recent_game['home_url'] = "/static/images/emblem/emblem_" + recent_game['home_name'] + ".png"
-                recent_game['away_url'] = "/static/images/emblem/emblem_" + recent_game['away_name'] + ".png"
-                if home_run > away_run:
-                    result = '승'
-                elif home_run == away_run:
-                    result = '무'
-                else:
-                    result= '패'
-                recent_game['result'] = result
+            
+            home_name = recent_game_set[i].game_idx.home_name
+            away_name = recent_game_set[i].game_idx.away_name
+            recent['home_name'] = home_name
+            recent['away_name'] = away_name
+            recent['home_url'] = "/static/images/emblem/emblem_" + home_name + ".png"
+            recent['away_url'] = "/static/images/emblem/emblem_" + away_name + ".png"
+            
+            team_run = recent_game_set[i].scorerecord.r 
+            foe_run = foe_game_set[i].scorerecord.r
+            
+            if team_run > foe_run:
+                result = '승'
+            elif team_run == team_run:
+                result = '무'
             else:
-                recent_game['away_name'] = TeamInfo.objects.filter(year= year, team_num = recent_game['team_num']).values('team_name')[0]['team_name']
-                recent_game['home_name'] = TeamInfo.objects.filter(year= year, team_num = recent_game['foe_num']).values('team_name')[0]['team_name']
-                away_run = ScoreRecord.objects.filter(team_game_idx = recent_game['team_game_idx']).values('r')[0]['r']
-                home_run = ScoreRecord.objects.filter(team_game_idx = str(foe_game_idx[game_idx]['team_game_idx'])).values('r')[0]['r']
-                recent_game['away_run'] = away_run
-                recent_game['home_run'] = home_run
-                recent_game['away_url'] = "/static/images/emblem/emblem_" + recent_game['away_name'] + ".png"
-                recent_game['home_url'] = "/static/images/emblem/emblem_" + recent_game['home_name'] + ".png"
-                if home_run < away_run:
-                    result = '승'
-                elif home_run == away_run:
-                    result = '무'
-                else:
-                    result = '패'
-                recent_game['result'] = result
-        return recent_game_set
+                result= '패'
+            recent['result'] = result
+            
+            if str(recent['home_away']) =='home':
+
+                recent['home_run'] = team_run
+                recent['away_run'] = foe_run
+                
+                
+            else:
+                recent['home_run'] = foe_run
+                recent['away_run'] = team_run
+                
+        return recent_game_q
     
     home_set = get_recent(home_game_num,home_game_idx,home_team_num,7)
     away_set = get_recent(away_game_num,away_game_idx,away_team_num,7)
-    
-    
-    
-    
-    
-    
-    
-    
-    context ={'date':date,'today_game_num':today_game_num, 'stadium':stadium, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
+        
+    context ={'date':date,'today_game_num':today_game_num, 'stadium':stadium, 'a':foe_game_idx,'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
     return render(request,'baseball/preview.html',context)
 
 def lineup(request,date,today_game_num):

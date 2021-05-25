@@ -187,7 +187,7 @@ class PitcherRecord(models.Model):
     class Meta:
         managed = False
         db_table = 'pitcher_record'
-        unique_together = (('team_game_idx', 'po'),)
+        unique_together = (('team_game_idx', 'po'))
 
 
 class ScoreRecord(models.Model):
@@ -216,8 +216,8 @@ class ScoreRecord(models.Model):
 
 
 class TeamGameInfo(models.Model):
-    game_idx = models.CharField(max_length=14)
-    #game_idx = models.ForeignKey(GameInfo, models.DO_NOTHING, db_column='game_idx', blank=True, null=True)
+    #game_idx = models.CharField(max_length=14)
+    game_idx = models.ForeignKey(GameInfo, models.DO_NOTHING, db_column='game_idx', blank=True, null=True)
     team_game_idx = models.CharField(primary_key=True, max_length=9)
     #year = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='year', blank=True, null=True)
     year = models.IntegerField(blank=True, null=True)
