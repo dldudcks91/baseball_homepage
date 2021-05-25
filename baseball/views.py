@@ -559,30 +559,6 @@ def preview(request,date,today_game_num):
     away_game_num = int(today_game_set[j]['game_num'])
     
     
-    game_num = home_game_num
-    game_idx = home_game_idx
-    team_num = home_team_num
-    recent_range =7
-    if game_num <= recent_range :
-        start_num = 1
-    else:
-        start_num = game_num - recent_range
-        
-    year = game_idx[:4]
-    game_num = str(game_num)
-    start_num = str(start_num).zfill(3)
-    start_idx = game_idx[:6] + start_num
-    
-    recent_game_set = TeamGameInfo.objects.select_related('game_idx').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx)
-    recent_game_q = recent_game_set.values()
-    
-    range_game_idx = recent_game_q.values('game_idx')
-    foe_game_idx = TeamGameInfo.objects.filter(game_idx__in=range_game_idx).exclude(team_num= team_num).values('team_game_idx')
-    
-    
-    
-    stadium = GameInfo.objects.filter(game_idx__in= range_game_idx).values('stadium')
-    
     
     def get_recent(game_num,game_idx,team_num, recent_range):
         
@@ -643,7 +619,7 @@ def preview(request,date,today_game_num):
     home_set = get_recent(home_game_num,home_game_idx,home_team_num,7)
     away_set = get_recent(away_game_num,away_game_idx,away_team_num,7)
         
-    context ={'date':date,'today_game_num':today_game_num, 'stadium':stadium, 'a':foe_game_idx,'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
+    context ={'date':date,'today_game_num':today_game_num, 'stadium':stadium,'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
     return render(request,'baseball/preview.html',context)
 
 def lineup(request,date,today_game_num):
