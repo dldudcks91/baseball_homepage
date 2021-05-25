@@ -1,19 +1,8 @@
-<div>Hello Preview
-</div>
-<div>
-    <span>
-      {{name}}{{date}}{{today_game_num}}
-    </span>
-</div>
 
 <div class="preview-wrap">
-    <hr>
+
     <div class= "preview-box" id="preview-team">
         <div class="box-title">
-
-
-            <span><input class="btn-pre" id="btn-team-2" type="button" name="btn-pit-1" value="팀추이?"></span>
-            <span><input class="btn-pre" id="btn-team-1" type="button" name="btn-pit-1" value="팀"></span>
 
         </div>
         <div class="box-contents">
@@ -48,7 +37,26 @@
                         </div>
 
                     </li>
-                    <li class="dist-graph" id="team-dist-graph"></li>
+                    <li class="game-title-box">
+                        <div id="game-title-away" class="game-title">
+                            <div class="emb-game-title"> <img id="emb-title-away" src= "{{away_dic.url}}" alt= {{away_dic.name}}></div>
+                        </div>
+                        <div id="game-title-middle" class="game-title">
+
+                            <div id="game-title-vs" class="h4">vs</div>
+                            <div class="game-title-list">
+                                <div>승리</div>
+                                <div>패배</div>
+                                <div>???</div>
+                                <div>???</div>
+                            </div>
+                        </div>
+                        <div id="game-title-home" class="game-title">
+                            <div class="emb-game-title"> <img id="emb-title-home" src= "{{home_dic.url}}" alt= {{home_dic.name}}></div>
+                        </div>
+
+
+                    </li>
                     <li class="dist-card dist-card-home dist-team" id="team-dist-home">
                         <div id="recent-title-home" class="recent-title">
 
@@ -85,9 +93,6 @@
     <hr>
     <div class= "preview-box" id="preview-pitcher">
         <div class="box-title">
-
-            <span><input class="btn-pre" id="btn-pit-2" type="button" name="btn-pit-1" value="중간계투정보"></span>
-            <span><input class="btn-pre" id="btn-pit-1" type="button" name="btn-pit-1" value="선발투수정보"></span>
 
         </div>
         <div class="box-contents">
@@ -138,8 +143,15 @@
                     </li>
                 </ul>
             </div>
+        </div>
+    </div>
+    <hr>
+    <div class= "preview-box" id="preview-rp">
+        <div class="box-title">
 
-            <div class="run-box hidden" id="rp-graph-box">
+        </div>
+        <div class="box-contents">
+            <div class="run-box" id="rp-graph-box">
                 <div class="run-graph run-graph-away" id="rp-graph-away"></div>
                 <div class="run-graph run-graph-home" id="rp-graph-home"></div>
 
@@ -149,11 +161,10 @@
         </div>
     </div>
     <hr>
-    <div class= "preview-box" id="preview-run">
+    <div class= "preview-box" id="preview-run-dist">
 
         <div class="box-title">
-            <span><input class="btn-pre" id="btn-run-2" type="button" name="btn-run-2" value="최근득점추이"></span>
-            <span><input class="btn-pre" id="btn-run-1" type="button" name="btn-run-1" value="득점분포도"></span>
+
         </div>
 
         <div class="box-contents">
@@ -165,9 +176,18 @@
                     <li class="dist-card dist-card-home" id="run-dist-home">{{home_dic.name}}</li>
                 </ul>
             </div>
+        </div>
+    </div>
+    <hr>
+    <div class= "preview-box" id="preview-run">
 
+        <div class="box-title">
 
-            <div class="run-box hidden" id="run-graph-box">
+        </div>
+
+        <div class="box-contents">
+
+            <div class="run-box" id="run-graph-box">
                 <div class="run-graph run-graph-away" id="run-graph-away"></div>
                 <div class="run-graph run-graph-home" id="run-graph-home"></div>
 
@@ -183,48 +203,32 @@
 
     $(document).ready(function() {
 
+
         SpGraph();
-        RunDistGraph();
-        TeamGraph()
-
-    });
-
-    SpPicture()
-
-    $("#btn-run-1").on('click', function(){
-
-        RunDistGraph();
-        $("#run-dist-box").removeClass('hidden')
-        $("#run-graph-box").addClass('hidden')
-
-    });
-    $("#btn-run-2").on('click', function(){
-
-        RunGraph();
-        $("#run-graph-box").removeClass('hidden')
-        $("#run-dist-box").addClass('hidden')
-
-    });
-
-    $("#btn-pit-1").on('click', function(){
-
-        SpGraph()
-        $("#sp-dist-box").removeClass('hidden')
-        $("#rp-graph-box").addClass('hidden')
-
-    });
-    $("#btn-pit-2").on('click', function(){
-
         RpGraph()
-        $("#rp-graph-box").removeClass('hidden')
-        $("#sp-dist-box").addClass('hidden')
+        RunDistGraph();
+        RunGraph()
+
+
 
     });
+    SpPicture()
+    DateStr()
 
-    function TeamGraph(){
-       var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
-       getTeamGraph(set_url)
+
+
+    function DateStr(){
+        var date = "{{date}}"
+        var year = date.substring(0,4)
+        var month = date.substring(4,6)
+        var day = date.substring(6,8)
+        var date_str = year + '년 ' + month + "월 " + day + "일 " + "{{stadium}}"
+        $('#title-date').append(date_str)
+
     }
+
+
+
 
     function SpPicture(){
 
@@ -278,99 +282,6 @@
         getRunGraphHome(set_url)
 
 
-    }
-    function getTeamGraph(set_url){
-        $.ajax({
-            url: set_url,
-            dataType:'json',
-            success: function(data){
-                Highcharts.chart('team-dist-graph', {
-
-                    chart: {
-                        type:'bar'
-                    },
-
-                    title: {
-                        text: '팀비교'
-                    },
-
-                    subtitle: {
-                        text: null
-                    },
-
-
-
-                    xAxis: [{
-                        reversed: false,
-
-                        categories: ['승리','패배','ERA','FIP','P-ERA','상대-ERA'].reverse(),
-                        labels: {
-                            step: 1
-                        },
-                        accessibility: {
-                            description: data.away_name
-                        },
-
-
-                    }, {
-                        opposite: true,
-                        reversed: false,
-
-                        categories: ['승리','패배','ERA','FIP','P-ERA','상대-ERA'].reverse(),
-
-                        linkedTo: 0,
-                        labels: {
-                            step: 1
-                        },
-                        accessibility: {
-                            description: data.home_name
-                        },
-
-
-                    }],
-
-                    yAxis: {
-
-                        title: {
-                        text: null
-                        },
-                        labels: {
-                            formatter: function () {
-                                return Math.abs(this.value);
-                            }
-                        },
-                        min: -10,
-                        max: 10
-
-                    },
-
-
-                    plotOptions: {
-                        series: {
-                            stacking: 'normal'
-                        }
-                    },
-
-                    tooltip: {
-                        formatter: function () {
-                            return '<b>' + this.point.category +': ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '</b>';
-
-                        }
-                    },
-                    series: [{
-                        name: data.away_name,
-                        data: [-5,-3,-3.5,-4.2,-4.5,-4.3].reverse()
-                    },
-                    {
-                        name: data.home_name,
-                        data: [4,4,4.5,6.2,5.5,2.3].reverse()
-                    }]
-                });
-            },
-            error:function(request,status,error){
-                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            }
-        });
     }
 
     function getSpGraph(set_url){

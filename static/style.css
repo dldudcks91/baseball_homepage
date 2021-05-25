@@ -255,7 +255,9 @@ body{
 
 .preview-box{
     margin-top:30px;
-    margin-bottom:30px;
+    margin-bottom:60px;
+    width:1200px;
+    height:500px;
 }
 
 .box-title{
@@ -266,8 +268,37 @@ body{
     margin-top: 30px;
     margin-bottom: 30px;
     width: 1200px;
-    height: 400px;
+
 }
+
+
+
+#preview-team{
+    height:400px;
+}
+.title-box ul{
+    white-space:nowrap;
+    padding:0px;
+}
+.title-box li{
+    position:relative;
+    display: inline-block;
+    height:300px;
+    width:400px;
+    vertical-align:middle;
+
+}
+.title-box li div{
+    position:relative;
+    text-align: center;
+    top:40px;
+}
+#title-word div{
+    position:relative;
+}
+
+
+
 
 .dist-box ul{
     padding: 0px;
@@ -309,8 +340,61 @@ body{
     width: 300px;
     opacity: 0.1;
 }
+.game-title-box{
+    width:600px;
+
+}
+.game-title{
+    position:relative;
+    width:240px;
+    height:400px;
+    display:inline-block;
+    vertical-align: top;
+}
+#game-title-middle{
+
+    width:120px;
+
+}
+
+.emb-game-title{
+    position:relative;
+    width:240px;
+    height:200px;
+    vertical-align:middle;
+}
+.emb-game-title img{
+    position:absolute;
+    width:180px;
+    left:40%;
+    top:50%;
+    transform: translate(-50%,-50%);
+}
+#emb-title-away{
+    left:60%;
+    top:50%;
+    transform: translate(-50%,-50%);
+}
+#emb-title-home{
+    left:40%;
+    top:50%;
+    transform: translate(-50%,-50%);
+}
+#game-title-vs{
+    position:relative;
+    top:90px;
+    width:100%;
+    height:100px;
+    text-align:center;
 
 
+}
+
+.game-title-list{
+    position:relative;
+    text-align:center;
+    top:100px;
+}
 .recent-title div{
 
 
@@ -412,11 +496,7 @@ body{
     display:inline-block;
 
 }
-.btn-pre{
-    vertical-align:top;
-    float:right;
-    margin-left:5px;
-}
+
 
 
 

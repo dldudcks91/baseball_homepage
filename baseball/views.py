@@ -466,6 +466,8 @@ def preview(request,date,today_game_num):
     away_dic = dict()
     
     year = str(date)[:4]
+    stadium = game_date_set[today_game_num-1]['stadium']
+    
     
     home_team_num = today_game_set[i]['team_num']
     away_team_num = today_game_set[j]['team_num']
@@ -614,7 +616,7 @@ def preview(request,date,today_game_num):
     
     
     
-    context ={'date':date,'today_game_num':today_game_num,'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
+    context ={'date':date,'today_game_num':today_game_num, 'stadium':stadium, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
     return render(request,'baseball/preview.html',context)
 
 def lineup(request,date,today_game_num):
