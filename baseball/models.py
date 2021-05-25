@@ -263,13 +263,13 @@ class TodayGameInfo(models.Model):
         db_table = 'today_game_info'
         
 class TodayTeamGameInfo(models.Model):
-    game_idx = models.CharField(max_length=14)
-    #game_idx = models.ForeignKey(GameInfo, models.DO_NOTHING, db_column='game_idx', blank=True, null=True)
+    #game_idx = models.CharField(max_length=14)
+    game_idx = models.ForeignKey(TodayGameInfo, models.DO_NOTHING, db_column='game_idx', blank=True, null=True)
     team_game_idx = models.CharField(primary_key=True, max_length=9)
     #year = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='year', blank=True, null=True)
     year = models.IntegerField(blank=True, null=True)
     
-    #team_num = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='team_num', blank=True, null=True,related_name='teamgameinfo_team_num_set')
+    #team_num = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='team_num', blank=True, null=True,related_name='todayteamgameinfo_team_num_set')
     team_num = models.IntegerField(blank=True, null=True)
     foe_num = models.IntegerField(blank=True, null=True)
     game_num = models.IntegerField(blank=True, null=True)
