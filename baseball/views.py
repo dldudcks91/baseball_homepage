@@ -374,9 +374,9 @@ class SpGraphView(APIView):
                     new_run = int(sp.scorerecord.r)/park_factor #int(ScoreRecord.objects.filter(team_game_idx = team_game_idx).values()[0]['r']) / park_factor
                     run += new_run
                     
-                    new_rp  = rp_set.filter(team_game_idx = team_game_idx)
-                    new_rp_fip = sum(new_rp.values_list('fip',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('fip',flat=True)[1:])
-                    new_rp_inn = sum(new_rp.values_list('inn',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('inn',flat=True)[1:])
+                    new_rp  = 1#rp_set.filter(team_game_idx = team_game_idx)
+                    new_rp_fip = 1#sum(new_rp.values_list('fip',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('fip',flat=True)[1:])
+                    new_rp_inn = 1#sum(new_rp.values_list('inn',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('inn',flat=True)[1:])
                       
                     rp_fip += new_rp_fip
                     rp_inn += new_rp_inn
