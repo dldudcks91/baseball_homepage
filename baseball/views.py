@@ -335,7 +335,7 @@ class SpGraphView(APIView):
         
         
         
-        '''
+        
         def get_sp(start_idx,end_idx,sp_name):
             
             data_set = PitcherRecord.objects.filter(team_game_idx__gte = start_idx, team_game_idx__lt= end_idx, name = sp_name, po = 1)
@@ -417,9 +417,7 @@ class SpGraphView(APIView):
             return [count, inn, fip, era, run, rp, qs]
         hsp = get_sp(home_start_idx, home_game_idx, home_sp)
         asp = get_sp(away_start_idx, away_game_idx, away_sp)
-        '''
-        hsp = [1,1,1,1,1,1,1]
-        asp = [2,2,2,2,2,2,2]
+        
         
         
         
