@@ -298,7 +298,7 @@ class SpGraphView(APIView):
         game_date_set = GI.objects.filter(game_idx__contains = str(date))
         today_game_idx = game_date_set.values("game_idx")
         
-        team_game_set = TGI.objects.filter(game_idx__in = today_game_idx).order_by('game_idx','home_away')
+        team_game_set = TGI.objects.filter(game_idx__in = today_game_idx)#.order_by('game_idx','home_away')
         today_game_set = team_game_set[today_game_num_idx_min:today_game_num_idx_max]
         
         
@@ -335,7 +335,7 @@ class SpGraphView(APIView):
         
         
         
-        
+        '''
         def get_sp(start_idx,end_idx,sp_name):
             
             data_set = PitcherRecord.objects.filter(team_game_idx__gte = start_idx, team_game_idx__lt= end_idx, name = sp_name, po = 1)
@@ -374,9 +374,9 @@ class SpGraphView(APIView):
                     new_run = int(sp.scorerecord.r)/park_factor #int(ScoreRecord.objects.filter(team_game_idx = team_game_idx).values()[0]['r']) / park_factor
                     run += new_run
                     
-                    new_rp  = 1#rp_set.filter(team_game_idx = team_game_idx)
-                    new_rp_fip = 1#sum(new_rp.values_list('fip',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('fip',flat=True)[1:])
-                    new_rp_inn = 1#sum(new_rp.values_list('inn',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('inn',flat=True)[1:])
+                    new_rp  = rp_set.filter(team_game_idx = team_game_idx)
+                    new_rp_fip = sum(new_rp.values_list('fip',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('fip',flat=True)[1:])
+                    new_rp_inn = sum(new_rp.values_list('inn',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('inn',flat=True)[1:])
                       
                     rp_fip += new_rp_fip
                     rp_inn += new_rp_inn
@@ -417,8 +417,9 @@ class SpGraphView(APIView):
             return [count, inn, fip, era, run, rp, qs]
         hsp = get_sp(home_start_idx, home_game_idx, home_sp)
         asp = get_sp(away_start_idx, away_game_idx, away_sp)
-        
-        
+        '''
+        hsp = [1,1,1,1,1,1]
+        asp = [2,2,2,2,2,2]
         
         
         

@@ -183,7 +183,7 @@ class TeamGameInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'team_game_info'
-
+        ordering = ['game_idx','home_away']
 class PitcherRecord(models.Model):
     
     team_game_idx = models.OneToOneField('TeamGameInfo', models.DO_NOTHING, db_column='team_game_idx', primary_key=True)
@@ -205,6 +205,7 @@ class PitcherRecord(models.Model):
         managed = False
         db_table = 'pitcher_record'
         unique_together = (('team_game_idx', 'po'))
+        
 
 
 class ScoreRecord(models.Model):
