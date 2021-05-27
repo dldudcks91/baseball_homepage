@@ -204,11 +204,14 @@
     $(document).ready(function() {
 
         SpGraph()
-        /*
         RpGraph()
-        RunDistGraph()
-        RunGraph()
-        */
+
+        setTimeout(function() {
+            RunDistGraph()
+            RunGraph();
+        }, 1000);
+
+        
 
 
 
