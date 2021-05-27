@@ -238,8 +238,31 @@ class RunGraphView(APIView):
             away_rp_5.append([run['game_num'],run['rp_fip_5']])
             away_rp_20.append([run['game_num'],run['rp_fip_20']])
         
+        '''
+        end_idx = today_game_set[1].team_game_idx
+        start_idx = end_idx[:6] + '001'
+        data_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = end_idx)
+        rp_set = PitcherRecord.objects.filter(team_game_idx__gte = start_idx, team_game_idx__lt = end_idx).exclude(po=1)
+        data_q= data_set.values()
+        park_factor_total = {'잠실': 0.854,'사직': 1.099,'광주':1.003, '대구': 1.153, '대전': 0.977,'문학':1.046,'고척':0.931,'창원':1.051,'수원':1.032}
         
         
+        
+        for i, data in enumerate(data_set):
+            pass
+            
+            team_game_idx = data.team_game_idx
+            
+            stadium = data.game_idx.stadium
+            data.stadium = stadium
+            park_factor = park_factor_total.get(stadium)
+            
+            if park_factor ==None: park_factor = 0
+            run = data.scorerecord.r
+            
+            rp_fip = sum(rp_set.filter(team_game_idx = team_game_idx).values_list('fip',flat=True))
+            rp_inn = sum(rp_set.filter(team_game_idx = team_game_idx).values_list('inn',flat=True))
+        '''
         
         
         
@@ -315,53 +338,52 @@ class SpGraphView(APIView):
         
         def get_sp(start_idx,end_idx,sp_name):
             
-            data_set = PitcherRecord.objects.filter(team_game_idx__gte = start_idx, team_game_idx__lt= end_idx)
-            sp_set = data_set.filter(po = 1  , name = sp_name)
-            rp_set = data_set.exclude(po = 1)
+            data_set = PitcherRecord.objects.filter(team_game_idx__gte = start_idx, team_game_idx__lt= end_idx, name = sp_name, po = 1)
             
-            sp_q = sp_set.values()
             team_game_idx = data_set.values('team_game_idx')
-            team_game_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__in= team_game_idx)
+            rp_set = PitcherRecord.objects.filter(team_game_idx__in=team_game_idx).exclude(po=1)
+            sp_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__in= team_game_idx).prefetch_related('pitcherrecord')
             
             
             if sp_set.exists():
                 count = sp_set.count()
                 fip = 0
                 er = 0
-                run = 0 
+                run = 0
                 rp_fip = 0
                 rp_inn = 0
                 qs_count = 0
-                for i, sp in enumerate(sp_q):
-                    team_game_idx = sp['team_game_idx_id']
+                for i, sp in enumerate(sp_set):
+                    team_game_idx = sp.team_game_idx #sp['team_game_idx_id']
                     #game_idx = TeamGameInfo.objects.filter(team_game_idx = team_game_idx).values()[0]['game_idx_id']
-                    stadium = team_game_set[i].game_idx.stadium#GameInfo.objects.filter(game_idx = game_idx).values()[0]['stadium']
+                    stadium = sp.game_idx.stadium#GameInfo.objects.filter(game_idx = game_idx).values()[0]['stadium']
                     
                     park_factor = park_factor_total.get(stadium)
                     if park_factor ==None: park_factor = 1
                     
-                    new_fip = int(sp['fip'])/park_factor
-                    new_er = int(sp['er'])/park_factor
-                    new_inn = int(sp['inn'])
+                    new_fip = int(sp.pitcherrecord.fip)/park_factor          #int(sp['fip']) / park_factor
+                    new_er = int(sp.pitcherrecord.er)/park_factor
+                    new_inn = int(sp.pitcherrecord.inn)
                     fip += new_fip
                     er += new_er
                     
-                    if (new_inn>=6) & (new_er <= 3):
+                    if (new_inn >= 6) & (new_er <= 3):
                         qs_count+=1
                     
                     
-                    new_run = int(team_game_set[i].scorerecord.r)/park_factor #int(ScoreRecord.objects.filter(team_game_idx = team_game_idx).values()[0]['r']) / park_factor
+                    new_run = int(sp.scorerecord.r)/park_factor #int(ScoreRecord.objects.filter(team_game_idx = team_game_idx).values()[0]['r']) / park_factor
                     run += new_run
                     
-                    new_rp_fip = sum(rp_set.filter(team_game_idx = team_game_idx).values_list('fip',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('fip',flat=True)[1:])
-                    new_rp_inn = sum(rp_set.filter(team_game_idx = team_game_idx).values_list('inn',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('inn',flat=True)[1:])
+                    new_rp  = rp_set.filter(team_game_idx = team_game_idx)
+                    new_rp_fip = sum(new_rp.values_list('fip',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('fip',flat=True)[1:])
+                    new_rp_inn = sum(new_rp.values_list('inn',flat=True)) #sum(PitcherRecord.objects.filter(team_game_idx = team_game_idx).values_list('inn',flat=True)[1:])
                       
                     rp_fip += new_rp_fip
                     rp_inn += new_rp_inn
                 
-                inn= sum(sp_set.values_list('inn',flat=True))
+                inn= sum(data_set.values_list('inn',flat=True))
                 
-                er = sum(sp_set.values_list('er',flat=True))
+                er = sum(data_set.values_list('er',flat=True))
                 if rp_inn == 0:
                     rp_fip = 0
                     
@@ -508,7 +530,7 @@ def preview(request,date,today_game_num):
     
     def get_recent_sp(game_idx, sp_name, year):
         start_idx = game_idx[:6] + '001'
-        sp_set = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1)
+        sp_set = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1).all()
         
         if sp_set.exists():
             
@@ -518,31 +540,31 @@ def preview(request,date,today_game_num):
             else:
                 sp_count = 0
             recent_set = sp_set[sp_count:]
-            recent_q = recent_set.values()
             
             
-            for i, recent in enumerate(recent_q):
+            
+            for i, recent in enumerate(recent_set):
                 
                 
                 
-                game_idx = recent_set[i].team_game_idx.game_idx
-                foe_num = recent_set[i].team_game_idx.foe_num
-                recent['date'] = str(game_idx)[21:25]
+                game_idx = recent.team_game_idx.game_idx
+                foe_num = recent.team_game_idx.foe_num
+                recent.date = str(game_idx)[21:25]
                 foe_name = TeamInfo.objects.filter(year = year, team_num = foe_num)[0].team_name
-                recent['foe_name'] = foe_name 
+                recent.foe_name = foe_name 
                 
-                recent['foe_url'] = "/static/images/emblem/emblem_" + foe_name + ".png"
-                inn = float(recent['inn'])
+                recent.foe_url = "/static/images/emblem/emblem_" + foe_name + ".png"
+                inn = float(recent.inn)
                 inn_round = round(inn)
                 inn_point = (inn%1)/3
                 inn = inn_round + inn_point
-                recent['ip'] = round(inn,1)
+                recent.ip = round(inn,1)
                 
             
         else:
-            recent_q = sp_set.values()
+            recent_set = sp_set
         
-        return recent_q
+        return recent_set
     
     
     home_sp_set = get_recent_sp(home_game_idx, home_sp, year)
@@ -568,56 +590,58 @@ def preview(request,date,today_game_num):
         start_num = str(start_num).zfill(3)
         start_idx = game_idx[:6] + start_num
         
-        recent_game_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx)
-        recent_game_q = recent_game_set.values()
-        
-        range_game_idx = recent_game_q.values('game_idx')
-        foe_game_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_game_idx).exclude(team_num= team_num)
+        recent_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx)
         
         
+        range_idx = recent_set.values('game_idx')
+        foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
         
         
-        for i, recent in enumerate(recent_game_q):
-            recent['stadium'] = recent_game_set[i].game_idx.stadium 
-            recent['date'] = recent_game_set[i].game_idx.game_idx[4:8]
+        
+        
+        for i, recent in enumerate(recent_set):
+            recent.stadium = recent.game_idx.stadium 
+            recent.date = recent.game_idx.game_idx[4:8]
             
             
-            home_name = recent_game_set[i].game_idx.home_name
-            away_name = recent_game_set[i].game_idx.away_name
-            recent['home_name'] = home_name
-            recent['away_name'] = away_name
-            recent['home_url'] = "/static/images/emblem/emblem_" + home_name + ".png"
-            recent['away_url'] = "/static/images/emblem/emblem_" + away_name + ".png"
+            home_name = recent.game_idx.home_name
+            away_name = recent.game_idx.away_name
+            recent.home_name = home_name
+            recent.away_name = away_name
+            recent.home_url = "/static/images/emblem/emblem_" + home_name + ".png"
+            recent.away_url = "/static/images/emblem/emblem_" + away_name + ".png"
             
-            team_run = recent_game_set[i].scorerecord.r 
-            foe_run = foe_game_set[i].scorerecord.r
+            team_run = recent.scorerecord.r 
+            foe_run = foe_set[i].scorerecord.r
             
             if team_run > foe_run:
                 result = '승'
-            elif team_run == team_run:
+            elif team_run == foe_run:
                 result = '무'
             else:
                 result= '패'
-            recent['result'] = result
+            recent.result = result
             
-            if str(recent['home_away']) =='home':
+            if str(recent.home_away) =='home':
 
-                recent['home_run'] = team_run
-                recent['away_run'] = foe_run
+                recent.home_run = team_run
+                recent.away_run = foe_run
                 
                 
             else:
-                recent['home_run'] = foe_run
-                recent['away_run'] = team_run
+                recent.home_run = foe_run
+                recent.away_run = team_run
                 
-        return recent_game_q
+        return recent_set
     
     home_set = get_recent(home_game_num,home_game_idx,home_team_num,7)
     away_set = get_recent(away_game_num,away_game_idx,away_team_num,7)
     
     
     
-    context ={'date':date,'today_game_num':today_game_num, 'stadium':stadium, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
+    
+    
+    context ={'date':date,'today_game_num':today_game_num,'stadium':stadium, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
     return render(request,'baseball/preview.html',context)
 
 def lineup(request,date,today_game_num):

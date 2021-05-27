@@ -166,11 +166,28 @@ class GameInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'game_info'
+        
+class TeamGameInfo(models.Model):
+    #game_idx = models.CharField(max_length=14)
+    game_idx = models.ForeignKey(GameInfo, models.CASCADE, db_column='game_idx', blank=True, null=True)
+    team_game_idx = models.CharField( max_length=9, primary_key = True)
+    #year = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='year', blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True)
+    
+    #team_num = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='team_num', blank=True, null=True,related_name='teamgameinfo_team_num_set')
+    team_num = models.IntegerField(blank=True, null=True)
+    foe_num = models.IntegerField(blank=True, null=True)
+    game_num = models.IntegerField(blank=True, null=True)
+    home_away = models.CharField(max_length=4, blank=True, null=True)
 
+    class Meta:
+        managed = False
+        db_table = 'team_game_info'
 
 class PitcherRecord(models.Model):
+    
     team_game_idx = models.OneToOneField('TeamGameInfo', models.DO_NOTHING, db_column='team_game_idx', primary_key=True)
-    name = models.CharField(max_length=5, blank=True, null=True)
+    name = models.CharField(max_length=5)
     po = models.IntegerField()
     inn = models.FloatField(blank=True, null=True)
     tbf = models.IntegerField(blank=True, null=True)
@@ -215,22 +232,7 @@ class ScoreRecord(models.Model):
         db_table = 'score_record'
 
 
-class TeamGameInfo(models.Model):
-    #game_idx = models.CharField(max_length=14)
-    game_idx = models.ForeignKey(GameInfo, models.DO_NOTHING, db_column='game_idx', blank=True, null=True)
-    team_game_idx = models.CharField(primary_key=True, max_length=9)
-    #year = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='year', blank=True, null=True)
-    year = models.IntegerField(blank=True, null=True)
-    
-    #team_num = models.ForeignKey('TeamInfo', models.DO_NOTHING, db_column='team_num', blank=True, null=True,related_name='teamgameinfo_team_num_set')
-    team_num = models.IntegerField(blank=True, null=True)
-    foe_num = models.IntegerField(blank=True, null=True)
-    game_num = models.IntegerField(blank=True, null=True)
-    home_away = models.CharField(max_length=4, blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'team_game_info'
 
 
 class TeamInfo(models.Model):
