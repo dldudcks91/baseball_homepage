@@ -264,7 +264,7 @@ class TodayGameInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'today_game_info'
-        
+                
 class TodayTeamGameInfo(models.Model):
     #game_idx = models.CharField(max_length=14)
     game_idx = models.ForeignKey(TodayGameInfo, models.DO_NOTHING, db_column='game_idx', blank=True, null=True)
@@ -281,7 +281,7 @@ class TodayTeamGameInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'today_team_game_info'
-        
+        ordering = ['game_idx','home_away']
 class TodayLineUp(models.Model):
     
     team_game_idx = models.CharField(primary_key=True, max_length=9)

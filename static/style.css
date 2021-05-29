@@ -466,7 +466,14 @@ body{
     width:600px;
     height:400px;
 }
-
+.dist-graph-away{
+    width:260px;
+    height:300px;
+}
+.dist-graph-home{
+    width:340px;
+    height:300px;
+}
 .card-record-home{
     width:210px;
     height:210px;

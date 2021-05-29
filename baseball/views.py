@@ -167,7 +167,7 @@ class RunGraphView(APIView):
         game_date_set = GI.objects.filter(game_idx__contains = str(date))
         today_game_idx = game_date_set.values("game_idx")
         
-        team_game_set = TGI.objects.filter(game_idx__in = today_game_idx).order_by('game_idx','home_away')
+        team_game_set = TGI.objects.filter(game_idx__in = today_game_idx)
         today_game_set = team_game_set[today_game_num_idx_min:today_game_num_idx_max]
         
         
@@ -183,16 +183,15 @@ class RunGraphView(APIView):
         home_game_num = today_game_set[1].game_num
         away_game_num = today_game_set[0].game_num
               
-        home_team_dic= RunGraphData.objects.filter(year = year , team_num = home_team_num, game_num__lt = home_game_num).values()
-        away_team_dic = RunGraphData.objects.filter(year = year , team_num = away_team_num, game_num__lt = away_game_num).values()
+        home_set= RunGraphData.objects.filter(year = year , team_num = home_team_num, game_num__lt = home_game_num)
+        away_set = RunGraphData.objects.filter(year = year , team_num = away_team_num, game_num__lt = away_game_num)
         
-        home_run_list = home_team_dic.values('run_1')
-        away_run_list = away_team_dic.values('run_1')
-        def get_run_list(run_list):
+        
+        def get_run_dist(data_set):
             r_list = [0 for i in range(16)]
-            length= len(run_list)
-            for r in run_list:
-                r = round(r['run_1'])
+            length= data_set.count()    
+            for data in data_set:
+                r = round(data.run_1)
                 
                 if r >=15:
                     r_list[-1]+=1
@@ -214,65 +213,32 @@ class RunGraphView(APIView):
                 
             return result_list
         
-        home_run_dist= get_run_list(home_run_list)
-        away_run_dist = list(-np.array(get_run_list(away_run_list)))
         
-        home_run_5 = list()
-        home_run_20 = list()
-        home_rp_5 = list()
-        home_rp_20 = list()
-        
-        away_run_5 = list()
-        away_run_20 = list()
-        away_rp_5 = list()
-        away_rp_20 = list()
-        for run in home_team_dic:
-        
-            home_run_5.append([run['game_num'],run['run_5']])
-            home_run_20.append([run['game_num'],run['run_20']])
-            home_rp_5.append([run['game_num'],run['rp_fip_5']])
-            home_rp_20.append([run['game_num'],run['rp_fip_20']])
-        for run in away_team_dic:
-            away_run_5.append([run['game_num'],run['run_5']])
-            away_run_20.append([run['game_num'],run['run_20']])
-            away_rp_5.append([run['game_num'],run['rp_fip_5']])
-            away_rp_20.append([run['game_num'],run['rp_fip_20']])
-        
-        '''
-        end_idx = today_game_set[1].team_game_idx
-        start_idx = end_idx[:6] + '001'
-        data_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = end_idx)
-        rp_set = PitcherRecord.objects.filter(team_game_idx__gte = start_idx, team_game_idx__lt = end_idx).exclude(po=1)
-        data_q= data_set.values()
-        park_factor_total = {'잠실': 0.854,'사직': 1.099,'광주':1.003, '대구': 1.153, '대전': 0.977,'문학':1.046,'고척':0.931,'창원':1.051,'수원':1.032}
+        def get_run_list(data_set,column_name):
+            game_num = data_set.values_list('game_num',flat=True)
+            run = data_set.values_list(column_name,flat=True)
+            result = list()
+            for g,r in zip(game_num,run):
+                result.append([g,r])
+            return result
         
         
-        
-        for i, data in enumerate(data_set):
-            pass
-            
-            team_game_idx = data.team_game_idx
-            
-            stadium = data.game_idx.stadium
-            data.stadium = stadium
-            park_factor = park_factor_total.get(stadium)
-            
-            if park_factor ==None: park_factor = 0
-            run = data.scorerecord.r
-            
-            rp_fip = sum(rp_set.filter(team_game_idx = team_game_idx).values_list('fip',flat=True))
-            rp_inn = sum(rp_set.filter(team_game_idx = team_game_idx).values_list('inn',flat=True))
-        '''
+        def set_dic(data_set):
+            dic = dict()
+            dic['r5'] = get_run_list(data_set,'run_5')
+            dic['r20'] = get_run_list(data_set,'run_20')
+            dic['f5'] = get_run_list(data_set,'rp_fip_5')
+            dic['f20'] = get_run_list(data_set,'rp_fip_20')
+            dic['dist'] = get_run_dist(data_set)
+            return dic
         
         
+        home_dic = set_dic(home_set)
+        home_dic['name'] = home_name
+        away_dic = set_dic(away_set)
+        away_dic['name'] = away_name
         
-        
-        
-        
-        
-        result_data = {'year':year, 'home_name': home_name, 'away_name':away_name, 'home_run_dist': home_run_dist, 'away_run_dist': away_run_dist, 
-                       'home_run_5':home_run_5, 'home_run_20':home_run_20,'away_run_5':away_run_5, 'away_run_20':away_run_20,
-                       'home_rp_5':home_rp_5, 'home_rp_20':home_rp_20,'away_rp_5':away_rp_5,'away_rp_20':away_rp_20}
+        result_data = {'year':year, 'home_dic':home_dic,'away_dic':away_dic}
         
         
         return Response(result_data)

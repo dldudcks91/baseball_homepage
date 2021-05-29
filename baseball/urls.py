@@ -22,8 +22,8 @@ urlpatterns = [
     path('game_info/preview/<int:date>/<int:today_game_num>', views.preview, name='preview'),
     path('game_info/lineup/<int:date>/<int:today_game_num>', views.lineup, name='lineup'),
     path('game_info/boxscore/<int:date>/<int:today_game_num>', views.boxscore, name='boxscore'),
-    
+    path('game_info/sp_graph/<int:date>/<int:today_game_num>', views.SpGraphView.as_view(), name='sp_graph'),
     path('game_info/run_graph/<int:date>/<int:today_game_num>', views.RunGraphView.as_view(), name='run_graph'),
-    path('game_info/sp_graph/<int:date>/<int:today_game_num>', views.SpGraphView.as_view(), name='sp_graph'),]
+    ]
         
     

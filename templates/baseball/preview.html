@@ -91,6 +91,21 @@
         </div>
     </div>
     <hr>
+    <div class= "preview-box" id="preview-rate">
+        <div class="box-title">
+            <div class="dist-box" id="rate-dist-box">
+                <ul>
+                    <li class="dist-card dist-card-away dist-sp" id="run-rate-away"></li>
+                    <li class="dist-graph-away" id="win-rate-away"></li>
+                    <li class="dist-graph-home" id="win-rate-home"></li>
+                    <li class="dist-card dist-card-home dist-sp" id="run-rate-home"></li>
+                </ul>
+            </div>
+        </div>
+        <div class="box-contents">
+        </div>
+    </div>
+    <hr>
     <div class= "preview-box" id="preview-pitcher">
         <div class="box-title">
 
@@ -199,26 +214,11 @@
 
 
 <script type="text/javascript">
+    /* 기본정보 불러오는 java-script*/
 
 
-    $(document).ready(function() {
-
-        SpGraph()
-        RpGraph()
-
-        setTimeout(function() {
-            RunDistGraph()
-            RunGraph();
-        }, 1000);
-
-        
-
-
-
-
-    });
-    SpPicture()
     DateStr()
+    SpPicture()
 
 
 
@@ -232,14 +232,10 @@
 
     }
 
-
-
-
     function SpPicture(){
 
         var home_name = "{{home_dic.name}}"
         var home_sp = "{{home_dic.sp}}"
-
 
         var away_name = "{{away_dic.name}}"
         var away_sp = "{{away_dic.sp}}"
@@ -258,38 +254,308 @@
 
     }
 
-    function SpGraph(){
+
+</script>
+<script type="text/javascript">
+
+
+</script>
+<script type="text/javascript">
+    /* 승률정보 불러오는 java-script */
+    $(document).ready(function() {
+
+            GameRateGraph()
+    });
+
+    function GameRateGraph(){
+       // var set_url = 'sp_graph/' + {{date}} +'/' + {{today_game_num}};
+       //getRateGraph()
+       ChartWinRateAway('win-rate-away')
+       ChartWinRateHome('win-rate-home')
+
+       ChartRunRateAway('run-rate-away')
+       ChartRunRateHome('run-rate-home')
+    }
+    function ChartWinRateAway(id_index){
+
+        Highcharts.chart(id_index, {
+
+            chart: {
+                type:'bar'
+            },
+
+            title: {
+                text: null
+            },
+            xAxis: {
+                title:{
+                    text:null
+                },
+                opposite: true,
+                reversed: true,
+
+                categories: ['model1','model2','model3','model4','model5'],
+                labels:{
+                    enabled:false
+                    }
+
+            },
+
+            yAxis: {
+                title:{
+                    text:null
+                },
+                labels: {
+
+                    formatter: function () {
+                        return Math.abs(this.value) + '%';
+                    }
+                },
+            min:-100
+
+            },
+
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
+                        'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
+                }
+            },
+            series: [{
+                name: '한화',
+                data: [-55,-45,-48,-47,-52],
+                dataLabels: {
+                    enabled: true,
+
+                    color: '#FFFFFF',
+                    align: 'left',
+                    formatter: function() {
+                        return Math.abs(this.point.y).toFixed(1) // one decimal
+                    },
+                    style: {
+                        fontSize: '15px',
+                    }
+                }
+            }]
+
+        });
+
+    }
+
+    function ChartWinRateHome(id_index){
+
+        Highcharts.chart(id_index, {
+
+            chart: {
+                type:'bar'
+            },
+
+            title: {
+                text: null
+            },
+            xAxis: {
+                title:{
+                    text:null
+                },
+
+                reversed: true,
+
+                categories: ['model1','model2','model3','model4','model5'],
+
+                labels:{
+                    align:'right',
+                    style:{
+                        fontSize: '15px'
+                        }
+                }
+
+            },
+
+            yAxis: {
+                title:{
+                    text:null
+                },
+                labels: {
+
+                    formatter: function () {
+                        return Math.abs(this.value) + '%';
+                    }
+                },
+            max:100
+
+            },
+
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
+                        'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
+                }
+            },
+            series: [{
+                name: '롯데',
+                data: [45,55,53,52,48],
+                color: 'rgb(67,67,72)',
+                dataLabels: {
+                    enabled: true,
+
+                    color: '#FFFFFF',
+                    align: 'right',
+                    formatter: function() {
+                        return Math.abs(this.point.y).toFixed(1) // one decimal
+                    },
+                    style: {
+                        fontSize: '15px',
+                    }
+                }
+            }]
+
+        });
+
+    }
+    function ChartRunRateAway(id_index){
+
+        Highcharts.chart(id_index, {
+
+            chart: {
+                type:'bar'
+            },
+
+            title: {
+                text: null
+            },
+            xAxis: {
+                title:{
+                    text:null
+                },
+
+                reversed: false,
+
+                categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+
+
+            },
+
+            yAxis: {
+                title:{
+                    text:null
+                },
+
+                labels: {
+
+                    formatter: function () {
+                        return Math.abs(this.value) + '%';
+                    }
+                },
+
+
+            },
+
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
+                        'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
+                }
+            },
+            series: [{
+                name: '한화',
+                data: [15,30,15,15,10,5,7,3],
+
+            }]
+
+        });
+
+    }
+    function ChartRunRateHome(id_index){
+
+        Highcharts.chart(id_index, {
+
+            chart: {
+                type:'bar'
+            },
+
+            title: {
+                text: null
+            },
+            xAxis: {
+                title:{
+                    text:null
+                },
+
+                reversed: false,
+                opposite: true,
+                categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+
+
+            },
+
+            yAxis: {
+                title:{
+                    text:null
+                },
+                labels: {
+
+                    formatter: function () {
+                        return Math.abs(this.value) + '%';
+                    }
+                },
+
+
+            },
+
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
+                        'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
+                }
+            },
+            series: [{
+                name: '롯데',
+
+
+                data: [-15,-30,-15,-15,-10,-5,-7,-3],
+                color: 'rgb(67,67,72)'
+            }]
+
+        });
+
+    }
+</script>
+<script type="text/javascript">
+    /* 선발투수기록 불러오는 java-script*/
+
+    $(document).ready(function() {
+
+        getSpGraph()
+
+    });
+
+    function getSpGraph(){
        var set_url = 'sp_graph/' + {{date}} +'/' + {{today_game_num}};
-       getSpGraph(set_url)
-    }
 
-
-
-    function RpGraph(){
-
-        var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
-        getRpGraphAway(set_url)
-        getRpGraphHome(set_url)
-    }
-
-
-    function RunDistGraph(){
-        var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
-        getRunDistGraph(set_url)
-
-    }
-    function RunGraph(){
-
-
-        var set_url = 'run_graph/' + {{date}} +'/' + {{today_game_num}};
-
-        getRunGraphAway(set_url)
-        getRunGraphHome(set_url)
-
-
-    }
-
-    function getSpGraph(set_url){
         $.ajax({
             url: set_url,
             dataType:'json',
@@ -301,7 +567,7 @@
                     },
 
                     title: {
-                        text: "선발투수비교",
+                        text: "선발투수비교"
 
 
                     },
@@ -313,29 +579,35 @@
 
 
                     xAxis: [{
+                        opposite: true,
                         reversed: false,
 
-                        categories: ['득점지원','불펜실점','ERA','FIP','평균이닝','QS비율','선발등판'],
+                        categories: ['득점지원','불펜실점','ERA','FIP','평균이닝','10경기당 QS','선발등판'],
                         labels: {
-                            step: 1
+                            step: 1,
+
+                            style:{ fontSize:'13px'}
+
                         },
                         accessibility: {
-                            description: data.away_name
+                            description: data.away_dic.sp
                         },
 
 
                     }, {
-                        opposite: true,
+
                         reversed: false,
 
-                        categories: ['득점지원','불펜실점','ERA','FIP','평균이닝','QS비율','선발등판'],
+                        categories: ['득점지원','불펜실점','ERA','FIP','평균이닝','10경기당 QS','선발등판'],
 
                         linkedTo: 0,
                         labels: {
-                            step: 1
+                            step: 1,
+
+                            style:{ fontSize:'13px'}
                         },
                         accessibility: {
-                            description: data.home_name
+                            description: data.home_dic.sp
                         },
 
 
@@ -371,284 +643,36 @@
                     },
                     series: [{
                         name: data.away_dic.sp,
-                        data: [-data.away_dic.run,-data.away_dic.rp,-data.away_dic.era,-data.away_dic.fip,-data.away_dic.inn,-data.away_dic.qs,-data.away_dic.count]
+                        data: [-data.away_dic.run,-data.away_dic.rp,-data.away_dic.era,-data.away_dic.fip,-data.away_dic.inn,-data.away_dic.qs,-data.away_dic.count],
+
+                        dataLabels: {
+                            enabled: true,
+
+                            color: '#FFFFFF',
+                            align: 'left',
+                            formatter: function() {
+                                return Math.abs(this.point.y).toFixed(1) // one decimal
+                            },
+                            style: {
+                                fontSize: '15px',
+                            }
+                        }
                     },
                     {
                         name: data.home_dic.sp,
-                        data: [data.home_dic.run,data.home_dic.rp,data.home_dic.era,data.home_dic.fip,data.home_dic.inn,data.home_dic.qs,data.home_dic.count]
-                    }]
-                });
-            },
-            error:function(request,status,error){
-                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            }
-        });
-    }
-    function getRpGraphAway(set_url){
-        $.ajax({
-            url: set_url,
-            dataType:'json',
-            success: function(data){
-                Highcharts.chart('rp-graph-away', {
-                    chart: {
-                        width: 600,
-                        height: 400
-                    },
+                        data: [data.home_dic.run,data.home_dic.rp,data.home_dic.era,data.home_dic.fip,data.home_dic.inn,data.home_dic.qs,data.home_dic.count],
+                        dataLabels: {
+                            enabled: true,
 
-                    title: {
-                        text: '  최근실점추이 - ' + data.away_name
-                    },
-
-                    subtitle: {
-                        text: null
-                    },
-
-                    yAxis: {
-
-                        title: {
-                            text: 'Mean of FIP'
-
-                        },
-                        min: 0,
-                        max: 10,
-                    },
-
-                    series: [{
-                        name: '5-fip',
-                        data: data.away_rp_5
-                    },
-                    {
-                        name: '20-fip',
-                        data: data.away_rp_20
-                    }]
-                });
-            },
-            error:function(request,status,error){
-                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            }
-        });
-    }
-
-    function getRpGraphHome(set_url){
-        $.ajax({
-            url: set_url,
-            dataType:'json',
-            success: function(data){
-                Highcharts.chart('rp-graph-home', {
-                    chart: {
-                        width: 600,
-                        height: 400
-                    },
-
-                    title: {
-                        text: '  최근실점추이 - ' + data.home_name
-                    },
-
-                    subtitle: {
-                        text: null
-                    },
-
-                    yAxis: {
-
-                        title: {
-                            text: 'Mean of FIP'
-
-                        },
-                        min: 0,
-                        max: 10,
-                    },
-
-                    series: [{
-                        name: '5-fip',
-                        data: data.home_rp_5
-                    },
-                    {
-                        name: '20-fip',
-                        data: data.home_rp_20
-                    }]
-                });
-            },
-            error:function(request,status,error){
-                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            }
-        });
-    }
-
-    function getRunGraphAway(set_url){
-        $.ajax({
-            url: set_url,
-            dataType:'json',
-            success: function(data){
-                Highcharts.chart('run-graph-away', {
-                    chart: {
-                        width: 600,
-                        height: 400
-                    },
-
-                    title: {
-                        text: '  최근득점추이 - ' + data.away_name
-                    },
-                
-                    subtitle: {
-                        text: null
-                    },
-                    
-                    yAxis: {
-                        
-                        title: {
-                            text: 'Mean of Run'
-                            
-                        },
-                        min: 0,
-                        max: 10,
-                    },
-                    
-                    series: [{
-                        name: '5-games',
-                        data: data.away_run_5
-                    },
-                    {
-                        name: '20-games',
-                        data: data.away_run_20
-                    }]
-                });
-            },
-            error:function(request,status,error){
-                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            }
-        });
-    }
-    function getRunGraphHome(set_url){
-        $.ajax({
-            url: set_url,
-            dataType:'json',
-            success: function(data){
-                Highcharts.chart('run-graph-home', {
-
-                    chart: {
-                        width: 600,
-                        height: 400
-                    },
-
-                    title: {
-                        text: '  최근득점추이 - ' + data.home_name
-                    },
-                
-                    subtitle: {
-                        text: null
-                    },
-                    
-                    yAxis: {
-                        
-                        title: {
-                            text: 'Mean of Run'
-                            
-                        },
-                        min: 0,
-                        max: 10,
-                    },
-                    
-                    series: [{
-                        name: '5-games',
-                        data: data.home_run_5
-                    },
-                    {
-                        name: '20-games',
-                        data: data.home_run_20
-                    }]
-                });
-            },
-            error:function(request,status,error){
-                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            }
-        });
-    }
-
-    function getRunDistGraph(set_url){
-        $.ajax({
-            url: set_url,
-            dataType:'json',
-            success: function(data){
-                Highcharts.chart('run-dist-graph', {
-
-                    chart: {
-                        type:'bar'
-                    },
-
-                    title: {
-                        text: '득점분포도'
-                    },
-
-                    subtitle: {
-                        text: null
-                    },
-
-
-
-                    xAxis: [{
-                        reversed: false,
-
-                        categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
-                        labels: {
-                            step: 1
-                        },
-                        accessibility: {
-                            description: data.away_name
-                        },
-
-
-                    }, {
-                        opposite: true,
-                        reversed: false,
-
-                        categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
-
-                        linkedTo: 0,
-                        labels: {
-                            step: 1
-                        },
-                        accessibility: {
-                            description: data.home_name
-                        },
-
-
-                    }],
-
-                    yAxis: {
-
-                        title: {
-                        text: null
-                        },
-                        labels: {
-                            formatter: function () {
-                                return Math.abs(this.value) + '%';
+                            color: '#FFFFFF',
+                            align: 'right',
+                            formatter: function() {
+                                return Math.abs(this.point.y).toFixed(1) // one decimal
+                            },
+                            style: {
+                                fontSize: '15px',
                             }
-                        },
-                        min: -50,
-                        max: 50
-
-                    },
-
-
-                    plotOptions: {
-                        series: {
-                            stacking: 'normal'
                         }
-                    },
-
-                    tooltip: {
-                        formatter: function () {
-                            return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
-                                'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
-                        }
-                    },
-                    series: [{
-                        name: data.away_name,
-                        data: data.away_run_dist
-                    },
-                    {
-                        name: data.home_name,
-                        data: data.home_run_dist
                     }]
                 });
             },
@@ -657,6 +681,274 @@
             }
         });
     }
+
 
 
 </script>
+
+
+<script type="text/javascript">
+    /* 타자+불펜기록 불러오는 java-script*/
+
+    $(document).ready(function() {
+
+        setTimeout(function() {
+            getRunGraph();
+        }, 1000);
+
+    });
+
+    function getRunGraph(){
+        var set_url = 'run_graph/'  + {{date}} +'/' + {{today_game_num}};
+        $.ajax({
+            url: set_url,
+            dataType:'json',
+            success: function(data){
+
+                ChartRpAway(data,'rp-graph-away')
+                ChartRpHome(data,'rp-graph-home')
+                ChartRunDist(data,'run-dist-graph')
+                ChartRunAway(data,'run-graph-away')
+                ChartRunHome(data,'run-graph-home')
+
+
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+
+
+        });
+    }
+
+    function ChartRunDist(data,id_index){
+        var away_dist_list = data.away_dic.dist
+        for(var i in away_dist_list){
+            away_dist_list[i] = -away_dist_list[i]
+        }
+
+        Highcharts.chart(id_index, {
+
+            chart: {
+                type:'bar'
+            },
+
+            title: {
+                text: '득점분포도'
+            },
+
+            subtitle: {
+                text: null
+            },
+
+            xAxis: [{
+                reversed: false,
+
+                categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+                labels: {
+                    step: 1
+                },
+                accessibility: {
+                    description: data.away_dic.name
+                },
+
+
+            }, {
+                opposite: true,
+                reversed: false,
+
+                categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+
+                linkedTo: 0,
+                labels: {
+                    step: 1
+                },
+                accessibility: {
+                    description: data.home_dic.name
+                },
+
+
+            }],
+
+            yAxis: {
+
+                title: {
+                text: null
+                },
+                labels: {
+                    formatter: function () {
+                        return Math.abs(this.value) + '%';
+                    }
+                },
+                min: -50,
+                max: 50
+
+            },
+
+
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
+                        'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
+                }
+            },
+            series: [{
+                name: data.away_dic.name,
+                data: away_dist_list
+            },
+            {
+                name: data.home_dic.name,
+                data: data.home_dic.dist
+            }]
+        });
+    }
+    function ChartRunAway(data,id_index){
+        Highcharts.chart(id_index, {
+                    chart: {
+                        width: 600,
+                        height: 400
+                    },
+
+                    title: {
+                        text: '  최근득점추이 - ' + data.away_dic.name
+                    },
+
+                    subtitle: {
+                        text: null
+                    },
+
+                    yAxis: {
+
+                        title: {
+                            text: 'Mean of Run'
+
+                        },
+                        min: 0,
+                        max: 10,
+                    },
+
+                    series: [{
+                        name: '5-games',
+                        data: data.away_dic.r5
+                    },
+                    {
+                        name: '20-games',
+                        data: data.away_dic.r20
+                    }]
+                });
+    }
+    function ChartRunHome(data,id_index){
+        Highcharts.chart(id_index, {
+
+            chart: {
+                width: 600,
+                height: 400
+            },
+
+            title: {
+                text: '  최근득점추이 - ' + data.home_dic.name
+            },
+
+            subtitle: {
+                text: null
+            },
+
+            yAxis: {
+
+                title: {
+                    text: 'Mean of Run'
+
+                },
+                min: 0,
+                max: 10,
+            },
+
+            series: [{
+                name: '5-games',
+                data: data.home_dic.r5
+            },
+            {
+                name: '20-games',
+                data: data.home_dic.r20
+            }]
+        });
+    }
+    function ChartRpAway(data,id_index){
+        Highcharts.chart(id_index, {
+            chart: {
+                width: 600,
+                height: 400
+            },
+
+            title: {
+                text: '  최근실점추이 - ' + data.away_dic.name
+            },
+
+            subtitle: {
+                text: null
+            },
+
+            yAxis: {
+
+                title: {
+                    text: 'Mean of FIP'
+
+                },
+                min: 0,
+                max: 10,
+            },
+
+            series: [{
+                name: '5-fip',
+                data: data.away_dic.f5
+            },
+            {
+                name: '20-fip',
+                data: data.away_dic.f20
+            }]
+        });
+    }
+    function ChartRpHome(data,id_index){
+        Highcharts.chart(id_index, {
+            chart: {
+                width: 600,
+                height: 400
+            },
+
+            title: {
+                text: '  최근실점추이 - ' + data.home_dic.name
+            },
+
+            subtitle: {
+                text: null
+            },
+
+            yAxis: {
+
+                title: {
+                    text: 'Mean of FIP'
+
+                },
+                min: 0,
+                max: 10,
+            },
+
+            series: [{
+                name: '5-fip',
+                data: data.home_dic.f5
+            },
+            {
+                name: '20-fip',
+                data: data.home_dic.f20
+            }]
+        });
+    }
+
+</script>
+
