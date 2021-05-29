@@ -336,7 +336,7 @@
                     color: '#FFFFFF',
                     align: 'left',
                     formatter: function() {
-                        return Math.abs(this.point.y).toFixed(1) // one decimal
+                        return Math.abs(this.point.y).toFixed(1) +'%' // one decimal
                     },
                     style: {
                         fontSize: '15px',
@@ -413,7 +413,7 @@
                     color: '#FFFFFF',
                     align: 'right',
                     formatter: function() {
-                        return Math.abs(this.point.y).toFixed(1) // one decimal
+                        return Math.abs(this.point.y).toFixed(1) + "%" // one decimal
                     },
                     style: {
                         fontSize: '15px',
@@ -694,7 +694,7 @@
 
         setTimeout(function() {
             getRunGraph();
-        }, 1000);
+        }, 2000);
 
     });
 
