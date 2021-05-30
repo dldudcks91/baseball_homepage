@@ -342,8 +342,13 @@
                         fontSize: '15px',
                     }
                 }
-            }]
-
+            }],
+            credits: {
+                enabled: false
+            },
+            legend:{
+                enabled: false
+            }
         });
 
     }
@@ -418,9 +423,15 @@
                     style: {
                         fontSize: '15px',
                     }
-                }
-            }]
+                },
 
+            }],
+            credits: {
+                enabled: false
+            },
+            legend:{
+                enabled: false
+            }
         });
 
     }
@@ -478,7 +489,13 @@
                 name: '한화',
                 data: [15,30,15,15,10,5,7,3],
 
-            }]
+            }],
+            credits: {
+                enabled: false
+            },
+            legend:{
+                enabled: false
+            }
 
         });
 
@@ -539,7 +556,13 @@
                 data: [-15,-30,-15,-15,-10,-5,-7,-3],
                 color: 'rgb(67,67,72)'
             }]
-
+            ,
+            credits: {
+                enabled: false
+            },
+            legend:{
+                enabled: false
+            }
         });
 
     }
@@ -676,7 +699,10 @@
                                 fontSize: '15px',
                             }
                         }
-                    }]
+                    }],
+                    credits: {
+                        enabled: false
+                    },
                 });
             },
             error:function(request,status,error){
@@ -808,7 +834,10 @@
             {
                 name: data.home_dic.name,
                 data: data.home_dic.dist
-            }]
+            }],
+            credits: {
+                enabled: false
+            },
         });
     }
     function ChartRunAway(data,id_index){
@@ -843,7 +872,10 @@
                     {
                         name: '20-games',
                         data: data.away_dic.r20
-                    }]
+                    }],
+                    credits: {
+                        enabled: false
+                    },
                 });
     }
     function ChartRunHome(data,id_index){
@@ -879,7 +911,10 @@
             {
                 name: '20-games',
                 data: data.home_dic.r20
-            }]
+            }],
+            credits: {
+                enabled: false
+            },
         });
     }
     function ChartRpAway(data,id_index){
@@ -914,7 +949,10 @@
             {
                 name: '20-fip',
                 data: data.away_dic.f20
-            }]
+            }],
+            credits: {
+                enabled: false
+            },
         });
     }
     function ChartRpHome(data,id_index){
@@ -949,7 +987,10 @@
             {
                 name: '20-fip',
                 data: data.home_dic.f20
-            }]
+            }],
+            credits: {
+                enabled: false
+            },
         });
     }
 
