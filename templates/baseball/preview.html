@@ -29,7 +29,7 @@
                                             <div>:</div>
                                             <div class="recent-run">{{set.home_run}}</div>
                                             <div><img class='pre-emb' src= "{{set.home_url}}" alt= "{{set.home_name}}"></div>
-                                            <div>{{set.result}}</div>
+                                            <div class="recent-result" value="{{set.result}}">{{set.result}}</div>
                                         </div>
                                     </li>
                                 {% endfor %}
@@ -40,19 +40,34 @@
                     <li class="game-title-box">
                         <div id="game-title-away" class="game-title">
                             <div class="emb-game-title"> <img id="emb-title-away" src= "{{away_dic.url}}" alt= {{away_dic.name}}></div>
+                            <div class="game-title-info">
+                                <div>{{away_dic.rank}}</div>
+                                <div>{{away_dic.win_rate}}</div>
+                                <div>{{away_dic.home_away}}</div>
+                                <div>{{away_dic.rela}}</div>
+                                <div>???</div>
+                            </div>
                         </div>
                         <div id="game-title-middle" class="game-title">
 
                             <div id="game-title-vs" class="h4">vs</div>
-                            <div class="game-title-list">
-                                <div>승리</div>
-                                <div>패배</div>
-                                <div>???</div>
+                            <div class="game-title-list game-title-info">
+                                <div>순위</div>
+                                <div>승률</div>
+                                <div>홈/원정</div>
+                                <div>상대전적</div>
                                 <div>???</div>
                             </div>
                         </div>
                         <div id="game-title-home" class="game-title">
                             <div class="emb-game-title"> <img id="emb-title-home" src= "{{home_dic.url}}" alt= {{home_dic.name}}></div>
+                            <div class="game-title-info">
+                                <div>{{home_dic.rank}}</div>
+                                <div>{{home_dic.win_rate}}</div>
+                                <div>{{home_dic.home_away}}</div>
+                                <div>{{home_dic.rela}}</div>
+                                <div>???</div>
+                            </div>
                         </div>
 
 
@@ -78,7 +93,7 @@
                                         <div>:</div>
                                         <div class="recent-run">{{set.home_run}}</div>
                                         <div><img class='pre-emb' src= "{{set.home_url}}" alt= "{{set.home_name}}"></div>
-                                        <div>{{set.result}}</div>
+                                        <div class="recent-result" value="{{set.result}}">{{set.result}}</div>
                                     </div>
                                 </li>
                                 {% endfor %}
@@ -222,7 +237,7 @@
 
     DateStr()
     SpPicture()
-
+    get_recent_color()
 
 
     function DateStr(){
@@ -257,12 +272,15 @@
 
     }
 
+    function get_recent_color(){
+        $('div[value=승]').attr("style","color: rgb(255,0,0);")
+        $('div[value=패]').attr("style","color: rgb(70,70,70);")
+        $('div[value=무]').attr("style","color: green;")
+
+    }
 
 </script>
-<script type="text/javascript">
 
-
-</script>
 <script type="text/javascript">
     /* 승률정보 불러오는 java-script */
     $(document).ready(function() {
@@ -938,7 +956,7 @@
             },
 
             title: {
-                text: '  최근실점추이 - ' + data.away_dic.name
+                text: '  불펜실점추이 - ' + data.away_dic.name
             },
 
             subtitle: {
@@ -956,11 +974,11 @@
             },
 
             series: [{
-                name: '5-fip',
+                name: '5-games',
                 data: data.away_dic.f5
             },
             {
-                name: '20-fip',
+                name: '20-games',
                 data: data.away_dic.f20
             }],
             credits: {
@@ -976,7 +994,7 @@
             },
 
             title: {
-                text: '  최근실점추이 - ' + data.home_dic.name
+                text: '  불펜실점추이 - ' + data.home_dic.name
             },
 
             subtitle: {
@@ -994,11 +1012,11 @@
             },
 
             series: [{
-                name: '5-fip',
+                name: '5-games',
                 data: data.home_dic.f5
             },
             {
-                name: '20-fip',
+                name: '20-games',
                 data: data.home_dic.f20
             }],
             credits: {

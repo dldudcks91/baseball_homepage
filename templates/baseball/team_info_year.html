@@ -4,24 +4,31 @@
     <thead>
         <header><B>Year: {{year}}</B></header>
         <tr>
+
             <th><B>팀</B></th>
+            <th><B>순위</B></th>
             <th><B>구장</B></th>
             <th><B>경기</B></th>
             <th><B>승리</B></th>
             <th><B>패배</B></th>
             <th><B>무승부</B></th>
+            <th><B>승률</B></th>
         </tr>
         </thead>
     <tbody>
         {% for team in team_year_set %}
-        <tr>
+        <tr class="team-info-tr" value="{{team.rank}}">
 
-            <td><img class='pre-sp-emb' src= "/static/images/emblem/emblem_{{team.team_name}}.png" alt= "{{team.team_name}}" >  {{team.team_name}}</td>
+
+            <td><img class='pre-sp-emb' src= "/static/images/emblem/emblem_{{team.team_name}}.png" alt= "{{team.team_name}}" > {{team.team_name}}</td>
+            <td>{{team.rank}}</td>
             <td>{{team.stadium}}</td>
             <td>{{team.total_game_num}}</td>
             <td>{{team.win}}</td>
             <td>{{team.lose}}</td>
             <td>{{team.draw}}</td>
+            <td>{{team.win_rate}}</td>
+
         </tr>
         {% endfor %}
     </tbody>
@@ -31,5 +38,19 @@
 
 
 <script type="text/javascript">
+
+
+    get_recent_color()
+    function get_recent_color(){
+        for (var i = 1; i <= 5; i++){
+            if (i == 5){
+                $('tr[value='+ String(i)+']').attr("style","background-color: rgb(255,255,250);")
+            }
+            else{
+                $('tr[value='+ String(i)+']').attr("style","background-color: rgb(240,245,255);")
+            }
+
+        }
+    }
 
 </script>

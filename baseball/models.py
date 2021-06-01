@@ -141,7 +141,7 @@ class TeamInfo(models.Model):
         managed = False
         db_table = 'team_info'
         unique_together = (('year', 'team_num'),)
-        ordering = ['-win','-draw']
+        ordering = ['-win_rate','-win']
         
 class GameInfo(models.Model):
     game_idx = models.CharField(primary_key=True, max_length=14)

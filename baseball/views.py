@@ -30,8 +30,17 @@ def team_info(request):
     
 def team_info_year(request,year):
     team_year_set = TeamInfo.objects.filter(year__contains = year)
-    
+    rank = 1
+    last_win_rate = 0
+    for i,team_year in enumerate(team_year_set):
         
+        win_rate = team_year.win_rate
+        if win_rate != last_win_rate:
+            rank = i+1
+        team_year.rank = rank
+        last_win_rate = win_rate
+    
+    
     context = {'team_year_set':team_year_set,'year':year}
     return render(request,'baseball/team_info_year.html',context)
 
@@ -605,13 +614,93 @@ def preview(request,date,today_game_num):
     home_set = get_recent(home_game_num,home_game_idx,home_team_num,7)
     away_set = get_recent(away_game_num,away_game_idx,away_team_num,7)
     
+    def get_relative(game_idx,team_num,foe_num):
+        
+        start_idx = game_idx[:6] + '001'
+        
+        team_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx, foe_num = foe_num)
+        
+        range_idx = team_set.values('game_idx')
+        foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
+        win = 0
+        lose = 0
+        draw = 0
+        for i, team in enumerate(team_set):
+            tr = team.scorerecord.r
+            fr = foe_set[i].scorerecord.r
+            if tr > fr: win+=1
+            elif tr <fr: lose+=1
+            else: draw+=1
+        win_rate = np.round(win/(win+lose+draw),3)
+        home_rate = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+        away_rate = str('{:,.3f}'.format(round(1-win_rate,3))) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
+        return [home_rate, away_rate]
     
+    rela = get_relative(home_game_idx,home_team_num,away_team_num)
+    home_dic['rela'] = rela[0]
+    away_dic['rela'] = rela[1]
     
+    def get_home_away(game_idx,team_num,home_away):
+        
+        
+        start_idx = game_idx[:6] + '001'
+        
+        team_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx,home_away = home_away)
+        
+        range_idx = team_set.values('game_idx')
+        foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
+        win = 0
+        lose = 0
+        draw = 0
+        for i, team in enumerate(team_set):
+            tr = team.scorerecord.r
+            fr = foe_set[i].scorerecord.r
+            if tr > fr: win+=1
+            elif tr <fr: lose+=1
+            else: draw+=1
+        win_rate = np.round(win/(win+lose+draw),3)
+        result = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+        return result
     
+    home_dic['home_away'] = get_home_away(home_game_idx,home_team_num,'home')
+    away_dic['home_away'] = get_home_away(away_game_idx,away_team_num,'away')
+    
+    def get_win_rate(team_num,year):
+        team_set = TeamInfo.objects.filter(year = year, team_num = team_num)[0]
+        win = team_set.win
+        lose = team_set.lose
+        draw = team_set.draw
+        win_rate = team_set.win_rate
+        result = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+        return result
+    home_dic['win_rate'] = get_win_rate(home_team_num,year)
+    away_dic['win_rate'] = get_win_rate(away_team_num,year)
+    
+    def get_rank(team_num,year):
+        team_year_set = TeamInfo.objects.filter(year = year)
+        rank = 1
+        last_win_rate = 0
+        for i,team_year in enumerate(team_year_set):
+            
+            win_rate = team_year.win_rate
+            if win_rate != last_win_rate:
+                rank = i+1
+                
+            last_win_rate = win_rate
+            
+            if team_year.team_num == team_num:
+                break
+        return rank
+    
+    home_dic['rank'] = get_rank(home_team_num,year)
+    away_dic['rank'] = get_rank(away_team_num,year)
     
     context ={'date':date,'today_game_num':today_game_num,'stadium':stadium, 'is_end':is_end, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
     return render(request,'baseball/preview.html',context)
-
+#%%
+    a = 0.11
+    '{:,.3f}'.format(a)
+    #%%
 def lineup(request,date,today_game_num):
     today_game_num_idx_min = (2*today_game_num)-2
     today_game_num_idx_max = (2*today_game_num)

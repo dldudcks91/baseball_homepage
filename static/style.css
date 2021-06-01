@@ -356,7 +356,10 @@ body{
     width:120px;
 
 }
-
+.game-title-info div{
+    text-align:center;
+    font-size:18px;
+}
 .emb-game-title{
     position:relative;
     width:240px;
@@ -371,12 +374,12 @@ body{
     transform: translate(-50%,-50%);
 }
 #emb-title-away{
-    left:60%;
+    left:50%;
     top:50%;
     transform: translate(-50%,-50%);
 }
 #emb-title-home{
-    left:40%;
+    left:50%;
     top:50%;
     transform: translate(-50%,-50%);
 }
