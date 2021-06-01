@@ -6,14 +6,22 @@
         <tr>
             <th><B>팀</B></th>
             <th><B>구장</B></th>
+            <th><B>경기</B></th>
+            <th><B>승리</B></th>
+            <th><B>패배</B></th>
+            <th><B>무승부</B></th>
         </tr>
         </thead>
     <tbody>
-        {% for team in team_year_list %}
+        {% for team in team_year_set %}
         <tr>
-            
-            <td>{{team.team_name}}</td>
+
+            <td><img class='pre-sp-emb' src= "/static/images/emblem/emblem_{{team.team_name}}.png" alt= "{{team.team_name}}" >  {{team.team_name}}</td>
             <td>{{team.stadium}}</td>
+            <td>{{team.total_game_num}}</td>
+            <td>{{team.win}}</td>
+            <td>{{team.lose}}</td>
+            <td>{{team.draw}}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -22,3 +30,6 @@
 </table>
 
 
+<script type="text/javascript">
+
+</script>

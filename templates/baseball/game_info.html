@@ -15,7 +15,11 @@
                     <span onclick="changeDate('prev');" role='button' ><i class="fas fa-angle-left fa-2x"></i></span>
                 </li>
                 <li class= "today">
-                    <p><input id="date_pick" type="date" value={{today}}></p>
+                    {% if last_date %}
+                        <p><input id="date_pick" type="date" value={{last_date}}></p>
+                    {% else %}
+                            <p><input id="date_pick" type="date" value={{today}}></p>
+                    {% endif %}
                 </li>
                 <li class="next">
                     <span onclick="changeDate('next');" role='button'><i class="fas fa-angle-right fa-2x"></i></span>

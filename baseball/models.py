@@ -80,35 +80,7 @@ class AuthUserUserPermissions(models.Model):
         unique_together = (('user', 'permission'),)
 
 
-class BatterRecord(models.Model):
-    team_game_idx = models.OneToOneField('TeamGameInfo', models.DO_NOTHING, db_column='team_game_idx', primary_key=True)
-    bo = models.IntegerField()
-    po = models.IntegerField()
-    name = models.CharField(max_length=5, blank=True, null=True)
-    b1 = models.IntegerField(blank=True, null=True)
-    b2 = models.IntegerField(blank=True, null=True)
-    b3 = models.IntegerField(blank=True, null=True)
-    hr = models.IntegerField(blank=True, null=True)
-    bb = models.IntegerField(blank=True, null=True)
-    hbp = models.IntegerField(blank=True, null=True)
-    ibb = models.IntegerField(blank=True, null=True)
-    sac = models.IntegerField(blank=True, null=True)
-    sf = models.IntegerField(blank=True, null=True)
-    so = models.IntegerField(blank=True, null=True)
-    go = models.IntegerField(blank=True, null=True)
-    fo = models.IntegerField(blank=True, null=True)
-    gidp = models.IntegerField(blank=True, null=True)
-    etc = models.IntegerField(blank=True, null=True)
-    h = models.IntegerField(blank=True, null=True)
-    tbb = models.IntegerField(blank=True, null=True)
-    ab = models.IntegerField(blank=True, null=True)
-    pa = models.IntegerField(blank=True, null=True)
-    xr = models.FloatField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'batter_record'
-        unique_together = (('team_game_idx', 'bo', 'po'),)
 
 
 class DjangoAdminLog(models.Model):
@@ -154,7 +126,23 @@ class DjangoSession(models.Model):
         managed = False
         db_table = 'django_session'
 
+class TeamInfo(models.Model):
+    year = models.IntegerField(primary_key=True)
+    team_num = models.IntegerField()
+    team_name = models.CharField(max_length=3, blank=True, null=True)
+    stadium = models.CharField(max_length=2, blank=True, null=True)
+    total_game_num = models.IntegerField(blank=True, null=True)
+    win = models.IntegerField(blank=True, null=True)
+    lose = models.IntegerField(blank=True, null=True)
+    draw = models.IntegerField(blank=True, null=True)
+    win_rate = models.FloatField(blank=True, null=True)
 
+    class Meta:
+        managed = False
+        db_table = 'team_info'
+        unique_together = (('year', 'team_num'),)
+        ordering = ['-win','-draw']
+        
 class GameInfo(models.Model):
     game_idx = models.CharField(primary_key=True, max_length=14)
     home_name = models.CharField(max_length=3, blank=True, null=True)
@@ -184,6 +172,36 @@ class TeamGameInfo(models.Model):
         managed = False
         db_table = 'team_game_info'
         ordering = ['game_idx','home_away']
+        
+class BatterRecord(models.Model):
+    team_game_idx = models.OneToOneField('TeamGameInfo', models.DO_NOTHING, db_column='team_game_idx', primary_key=True)
+    bo = models.IntegerField()
+    po = models.IntegerField()
+    name = models.CharField(max_length=5, blank=True, null=True)
+    b1 = models.IntegerField(blank=True, null=True)
+    b2 = models.IntegerField(blank=True, null=True)
+    b3 = models.IntegerField(blank=True, null=True)
+    hr = models.IntegerField(blank=True, null=True)
+    bb = models.IntegerField(blank=True, null=True)
+    hbp = models.IntegerField(blank=True, null=True)
+    ibb = models.IntegerField(blank=True, null=True)
+    sac = models.IntegerField(blank=True, null=True)
+    sf = models.IntegerField(blank=True, null=True)
+    so = models.IntegerField(blank=True, null=True)
+    go = models.IntegerField(blank=True, null=True)
+    fo = models.IntegerField(blank=True, null=True)
+    gidp = models.IntegerField(blank=True, null=True)
+    etc = models.IntegerField(blank=True, null=True)
+    h = models.IntegerField(blank=True, null=True)
+    tbb = models.IntegerField(blank=True, null=True)
+    ab = models.IntegerField(blank=True, null=True)
+    pa = models.IntegerField(blank=True, null=True)
+    xr = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'batter_record'
+        unique_together = (('team_game_idx', 'bo', 'po'),)
 class PitcherRecord(models.Model):
     
     team_game_idx = models.OneToOneField('TeamGameInfo', models.DO_NOTHING, db_column='team_game_idx', primary_key=True)
@@ -236,22 +254,7 @@ class ScoreRecord(models.Model):
 
 
 
-class TeamInfo(models.Model):
-    year = models.IntegerField(primary_key=True)
-    team_num = models.IntegerField()
-    team_name = models.CharField(max_length=3, blank=True, null=True)
-    stadium = models.CharField(max_length=2, blank=True, null=True)
-    total_game_num = models.IntegerField(blank=True, null=True)
-    win = models.IntegerField(blank=True, null=True)
-    lose = models.IntegerField(blank=True, null=True)
-    draw = models.IntegerField(blank=True, null=True)
-    win_rate = models.FloatField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'team_info'
-        unique_together = (('year', 'team_num'),)
-        
         
 class TodayGameInfo(models.Model):
     game_idx = models.CharField(primary_key=True, max_length=14)

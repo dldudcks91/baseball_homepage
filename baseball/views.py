@@ -29,8 +29,10 @@ def team_info(request):
     return render(request,'baseball/team_info.html')
     
 def team_info_year(request,year):
-    team_year_list = TeamInfo.objects.filter(year__contains = year).values()
-    context = {'team_year_list':team_year_list,'year':year}
+    team_year_set = TeamInfo.objects.filter(year__contains = year)
+    
+        
+    context = {'team_year_set':team_year_set,'year':year}
     return render(request,'baseball/team_info_year.html',context)
 
 
@@ -40,11 +42,12 @@ def game_info(request):
     month = str(local_time[1]).zfill(2)
     day = str(local_time[2]).zfill(2)
     today = year + "-" + month + "-" + day
-    date = year+month+day
-    game_date_dic = TodayGameInfo.objects.values()
-    craw_time = list(game_date_dic.values('etc')[0].values())[0]
     
-    context = {'today':today,'craw_time':craw_time}
+    TGI = TodayGameInfo.objects.all()
+    craw_time = TGI[0].etc#list(game_date_dic.values('etc')[0].values())[0]
+    last_date = TGI[0].game_idx[:8]
+    last_date = last_date[:4]+"-" + last_date[4:6] + "-" +last_date[6:8]
+    context = {'today':today,'craw_time':craw_time,'last_date': last_date}
     
     
     return render(request,'baseball/game_info.html',context)
@@ -333,7 +336,7 @@ class SpGraphView(APIView):
                     fip += new_fip
                     er += new_er
                     
-                    if (new_inn >= 6) & (new_er <= 3):
+                    if (new_inn >= 6) & (sp.pitcherrecord.er <= 3):
                         qs_count+=1
                     
                     
@@ -520,7 +523,7 @@ def preview(request,date,today_game_num):
                 
                 recent.foe_url = "/static/images/emblem/emblem_" + foe_name + ".png"
                 inn = float(recent.inn)
-                inn_round = round(inn)
+                inn_round = inn//1
                 inn_point = (inn%1)/3
                 inn = inn_round + inn_point
                 recent.ip = round(inn,1)
@@ -606,7 +609,7 @@ def preview(request,date,today_game_num):
     
     
     
-    context ={'date':date,'today_game_num':today_game_num,'stadium':stadium, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
+    context ={'date':date,'today_game_num':today_game_num,'stadium':stadium, 'is_end':is_end, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
     return render(request,'baseball/preview.html',context)
 
 def lineup(request,date,today_game_num):
