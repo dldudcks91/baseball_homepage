@@ -179,7 +179,7 @@
         </div>
     </div>
     <hr>
-    <div class= "preview-box" id="preview-rp">
+    <div class= "preview-box" id="preview-rp" style="opacity:0">
         <div class="box-title">
 
         </div>
@@ -194,14 +194,14 @@
         </div>
     </div>
     <hr>
-    <div class= "preview-box" id="preview-run-dist">
+    <div class= "preview-box" id="preview-run-dist" style="opacity:0">
 
         <div class="box-title">
 
         </div>
 
         <div class="box-contents">
-            <div class="dist-box" id="run-dist-box">
+            <div class="dist-box" id="run-dist-box" >
 
                 <ul>
                     <li class="dist-card dist-card-away" id="run-dist-away">{{away_dic.name}}</li>
@@ -212,7 +212,7 @@
         </div>
     </div>
     <hr>
-    <div class= "preview-box" id="preview-run">
+    <div class= "preview-box" id="preview-run" style="opacity:0">
 
         <div class="box-title">
 
@@ -758,20 +758,15 @@
             dataType:'json',
             success: function(data){
                 setTimeout(function() {
+                    $('.preview-box').fadeTo(3000,1)
                     ChartRpAway(data,'rp-graph-away')
-                }, 2000);
-                setTimeout(function() {
                     ChartRpHome(data,'rp-graph-home')
-                }, 2000);
-                setTimeout(function() {
                     ChartRunDist(data,'run-dist-graph')
-                }, 3000);
-                setTimeout(function() {
                     ChartRunAway(data,'run-graph-away')
-                }, 4000);
-                setTimeout(function() {
                     ChartRunHome(data,'run-graph-home')
-                }, 4000);
+                }, 1000);
+
+
 
 
 
