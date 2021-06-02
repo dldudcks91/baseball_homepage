@@ -152,7 +152,7 @@ body{
 }
 
 
-#today-game-wrap{
+.today-game-wrap{
 	position: relative;
     vertical-align: middle;
     overflow: hidden;
@@ -160,7 +160,7 @@ body{
     margin-right:40px;
 }
 
-#today-game-wrap ul{
+.today-game-wrap ul{
 
 	text-align: center;
 	padding-left:0px;
@@ -170,7 +170,7 @@ body{
 
 
 
-#today-game-wrap li{
+.today-game-wrap li{
 
 	display:inline-block;
 

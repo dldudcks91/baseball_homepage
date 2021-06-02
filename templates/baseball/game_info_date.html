@@ -3,7 +3,7 @@
 
 
 
-<div  id="today-game-wrap" >
+<div class="today-game-wrap" >
     <input class="hidden" id="today-game-input" value="{{data_length}}">
     <div id="today-game-button">
     </div>
@@ -156,6 +156,7 @@
         document.getElementById("preview-tab").setAttribute("class","nav-link active")
         document.getElementById("preview-contents").setAttribute("class","tab-pane fade show active")
 
+
         document.getElementById("lineup-tab").setAttribute("class","nav-link")
         document.getElementById("lineup-contents").setAttribute("class","tab-pane fade")
 
@@ -203,7 +204,9 @@
     	var date = $("#date_pick").val();
     	var set_date = moment(date).format("YYYYMMDD");
         var set_url = 'preview/' + set_date +'/' + game_num_idx;
+
         getPreview(set_url);
+
     }
     	
     	
@@ -231,6 +234,7 @@
                     success:function(data){
 
                         $("#preview-contents").html(data);
+
                     },
                     error:function(request,status,error){
                         alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
