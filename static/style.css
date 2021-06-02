@@ -62,7 +62,8 @@ body{
 .team-info{
 	position: relative;
 	top:100px;
-	left: 100px;
+	width:1000px;
+
 }
 
 

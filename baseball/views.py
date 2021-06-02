@@ -576,7 +576,7 @@ def preview(request,date,today_game_num):
         
         
         
-        for i, recent in enumerate(recent_set):
+        for recent, foe in zip(recent_set, foe_set):
             recent.stadium = recent.game_idx.stadium 
             recent.date = recent.game_idx.game_idx[4:8]
             
@@ -589,7 +589,7 @@ def preview(request,date,today_game_num):
             recent.away_url = "/static/images/emblem/emblem_" + away_name + ".png"
             
             team_run = recent.scorerecord.r 
-            foe_run = foe_set[i].scorerecord.r
+            foe_run = foe.scorerecord.r
             
             if team_run > foe_run:
                 result = '승'
@@ -625,9 +625,9 @@ def preview(request,date,today_game_num):
         win = 0
         lose = 0
         draw = 0
-        for i, team in enumerate(team_set):
+        for team, foe in zip(team_set,foe_set):
             tr = team.scorerecord.r
-            fr = foe_set[i].scorerecord.r
+            fr = foe.scorerecord.r
             if tr > fr: win+=1
             elif tr <fr: lose+=1
             else: draw+=1
@@ -652,9 +652,9 @@ def preview(request,date,today_game_num):
         win = 0
         lose = 0
         draw = 0
-        for i, team in enumerate(team_set):
+        for team,foe in zip(team_set,foe_set):
             tr = team.scorerecord.r
-            fr = foe_set[i].scorerecord.r
+            fr = foe.scorerecord.r
             if tr > fr: win+=1
             elif tr <fr: lose+=1
             else: draw+=1
@@ -697,10 +697,7 @@ def preview(request,date,today_game_num):
     
     context ={'date':date,'today_game_num':today_game_num,'stadium':stadium, 'is_end':is_end, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
     return render(request,'baseball/preview.html',context)
-#%%
-    a = 0.11
-    '{:,.3f}'.format(a)
-    #%%
+
 def lineup(request,date,today_game_num):
     today_game_num_idx_min = (2*today_game_num)-2
     today_game_num_idx_max = (2*today_game_num)
