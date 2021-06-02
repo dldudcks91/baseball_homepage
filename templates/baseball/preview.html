@@ -234,9 +234,14 @@
 <script type="text/javascript">
     /* 기본정보 불러오는 java-script*/
 
+    $(document).ready(function() {
+
+        SpPicture()
+
+
+    });
 
     DateStr()
-    SpPicture()
     get_recent_color()
 
 
@@ -594,7 +599,7 @@
     $(document).ready(function() {
         setTimeout(function() {
             getSpGraph();
-        }, 500);
+        }, 1000);
 
 
 
@@ -756,19 +761,19 @@
             success: function(data){
                 setTimeout(function() {
                     ChartRpAway(data,'rp-graph-away')
-                }, 1000);
+                }, 2000);
                 setTimeout(function() {
                     ChartRpHome(data,'rp-graph-home')
-                }, 1000);
+                }, 2000);
                 setTimeout(function() {
                     ChartRunDist(data,'run-dist-graph')
-                }, 1500);
+                }, 3000);
                 setTimeout(function() {
                     ChartRunAway(data,'run-graph-away')
-                }, 2000);
+                }, 4000);
                 setTimeout(function() {
                     ChartRunHome(data,'run-graph-home')
-                }, 2000);
+                }, 4000);
 
 
 
