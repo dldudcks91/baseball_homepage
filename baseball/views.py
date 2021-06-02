@@ -331,7 +331,7 @@ class SpGraphView(APIView):
                 rp_fip = 0
                 rp_inn = 0
                 qs_count = 0
-                for i, sp in enumerate(sp_set):
+                for sp in sp_set:
                     team_game_idx = sp.team_game_idx #sp['team_game_idx_id']
                     #game_idx = TeamGameInfo.objects.filter(team_game_idx = team_game_idx).values()[0]['game_idx_id']
                     stadium = sp.game_idx.stadium#GameInfo.objects.filter(game_idx = game_idx).values()[0]['stadium']
@@ -506,6 +506,12 @@ def preview(request,date,today_game_num):
     
     
     def get_recent_sp(game_idx, sp_name, year):
+        team_name_dic = {2017:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
+                         2018:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
+                         2019:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
+                         2020:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
+                         2021:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT']}
+                            
         start_idx = game_idx[:6] + '001'
         sp_set = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1).all()
         
@@ -520,14 +526,14 @@ def preview(request,date,today_game_num):
             
             
             
-            for i, recent in enumerate(recent_set):
+            for recent in recent_set:
                 
                 
                 
                 game_idx = recent.team_game_idx.game_idx
                 foe_num = recent.team_game_idx.foe_num
                 recent.date = str(game_idx)[21:25]
-                foe_name = TeamInfo.objects.filter(year = year, team_num = foe_num)[0].team_name
+                foe_name = team_name_dic[int(year)][foe_num]
                 recent.foe_name = foe_name 
                 
                 recent.foe_url = "/static/images/emblem/emblem_" + foe_name + ".png"

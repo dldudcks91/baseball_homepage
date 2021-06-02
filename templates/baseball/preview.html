@@ -235,7 +235,7 @@
     /* 기본정보 불러오는 java-script*/
 
     $(document).ready(function() {
-        $('.preview-wrap').fadeTo(3000,1)
+        $('.preview-wrap').fadeTo(2000,1)
         SpPicture()
 
 
@@ -758,13 +758,13 @@
             dataType:'json',
             success: function(data){
                 setTimeout(function() {
-                    $('.preview-box').fadeTo(3000,1)
+                    $('.preview-box').fadeTo(2000,1)
                     ChartRpAway(data,'rp-graph-away')
                     ChartRpHome(data,'rp-graph-home')
                     ChartRunDist(data,'run-dist-graph')
                     ChartRunAway(data,'run-graph-away')
                     ChartRunHome(data,'run-graph-home')
-                }, 1500);
+                }, 2000);
 
 
 
