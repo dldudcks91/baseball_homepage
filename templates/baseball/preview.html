@@ -235,7 +235,7 @@
     /* 기본정보 불러오는 java-script*/
 
     $(document).ready(function() {
-        $('.preview-wrap').fadeTo(2000,1)
+        $('.preview-wrap').fadeTo(3000,1)
         SpPicture()
 
 
@@ -759,19 +759,19 @@
             success: function(data){
                 setTimeout(function() {
                     ChartRpAway(data,'rp-graph-away')
-                }, 1000);
-                setTimeout(function() {
-                    ChartRpHome(data,'rp-graph-home')
-                }, 1000);
-                setTimeout(function() {
-                    ChartRunDist(data,'run-dist-graph')
                 }, 2000);
                 setTimeout(function() {
-                    ChartRunAway(data,'run-graph-away')
+                    ChartRpHome(data,'rp-graph-home')
+                }, 2000);
+                setTimeout(function() {
+                    ChartRunDist(data,'run-dist-graph')
                 }, 3000);
                 setTimeout(function() {
+                    ChartRunAway(data,'run-graph-away')
+                }, 4000);
+                setTimeout(function() {
                     ChartRunHome(data,'run-graph-home')
-                }, 3000);
+                }, 4000);
 
 
 
