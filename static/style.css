@@ -27,7 +27,11 @@
 .nav-item h{
 	font-family: BlackHanSans-Regular;
 }
-
+html{
+	width:100%;
+	height:100%;
+	-webkit-text-size-adjust: None;
+}
 body{
 	width:100%;
 	height:100%;
