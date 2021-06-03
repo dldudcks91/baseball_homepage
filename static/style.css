@@ -76,12 +76,9 @@ body{
 
 }
 /* nav.html*/
-.navbar{
-    min-width:1200px;
 
-}
 .navbar-nav{
-    width:1200px;
+    min-width:1200px;
     align-items: center
 
 }
