@@ -7,6 +7,14 @@
   font-family: BlackHanSans-Regular;
   src: url('./fonts/BlackHanSans-Regular.ttf');
 }
+@font-face {
+  font-family: NotoSansKR-Bold;
+  src: url('./fonts/NotoSansKR-Bold.otf');
+}
+@font-face {
+  font-family: NotoSansKR-Regular;
+  src: url('./fonts/NotoSansKR-Regular.otf');
+}
 * {
 	font-family: BlackHanSans-Regular;
 }
@@ -259,6 +267,10 @@ body{
     margin-bottom:60px;
     width:1200px;
     height:500px;
+
+}
+.preview-box *{
+    font-family: NotoSansKR-Bold;
 }
 
 .box-title{
