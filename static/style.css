@@ -80,8 +80,9 @@ body{
     min-width:1200px;
 
 }
-.navbar-collapse{
+.navbar-nav{
     width:1200px;
+    align-items: center
 
 }
 
