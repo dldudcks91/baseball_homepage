@@ -48,7 +48,7 @@ body{
 	}
 
 .container{
-    width:1400px;
+    width:1200px;
     max-width:1500px;
 	min-height:800px;
 	margin: 0 auto;
@@ -79,7 +79,9 @@ body{
 
 }
 /* nav.html*/
-
+.nav{
+    width:100%;
+}
 .navbar-nav{
 
     align-items: center
