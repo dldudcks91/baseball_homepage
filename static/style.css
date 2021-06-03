@@ -16,6 +16,15 @@
   src: url('./fonts/NotoSansKR-Black.otf');
 }
 * {
+    font-family: NotoSansKR-Bold;
+}
+* h, th{
+	font-family: NotoSansKR-Black;
+}
+.card span{
+	font-family: NotoSansKR-Black;
+}
+.nav-item h{
 	font-family: BlackHanSans-Regular;
 }
 html{
@@ -269,9 +278,7 @@ body{
     height:500px;
 
 }
-.preview-box *{
-    font-family: NotoSansKR-Black;
-}
+
 
 .box-title{
     height:30px;
