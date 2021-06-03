@@ -11,7 +11,7 @@
                 <ul>
                     <li class="dist-card dist-card-away dist-team" id="team-dist-away">
                         <div id="recent-title-away" class="recent-title">
-                            <div class="recent-title-word"> {{away_dic.name}} - 최근7경기 </div>
+                            <div class="recent-title-word"><h> {{away_dic.name}} - 최근7경기 </h></div>
 
                             <hr style="position:absolute;width:300px;top:24px;">
                         </div>
@@ -52,10 +52,10 @@
 
                             <div id="game-title-vs" class="h4">vs</div>
                             <div class="game-title-list game-title-info">
-                                <div>순위</div>
-                                <div>승률</div>
-                                <div>홈/원정</div>
-                                <div>상대전적</div>
+                                <div><b>순위</b></div>
+                                <div><b>승률</b></div>
+                                <div><b>홈/원정</b></div>
+                                <div><b>상대전적</b></div>
                                 <div>???</div>
                             </div>
                         </div>
@@ -75,7 +75,7 @@
                     <li class="dist-card dist-card-home dist-team" id="team-dist-home">
                         <div id="recent-title-home" class="recent-title">
 
-                            <div class="recent-title-word"> {{home_dic.name}} - 최근7경기 </div>
+                            <div class="recent-title-word"><h> {{home_dic.name}} - 최근7경기 </h></div>
 
                             <hr style="position:absolute;width:300px;top:24px;right:10px;">
                         </div>
@@ -133,11 +133,11 @@
 
                 <ul>
                     <li class="dist-card dist-card-away dist-sp" id="sp-dist-away">
-                        <div id="sp-title-away" class="sp-title">{{away_dic.sp}}</div>
+                        <div id="sp-title-away" class="sp-title"><b>{{away_dic.sp}}</b></div>
                         <hr style="position:absolute;width:220px;top:6px;">
 
                         <ul>
-                            <li>- 최근등판기록</li>
+                            <li><b>- 최근등판기록</b></li>
                             {% for set in away_sp_set %}
                             <li>
                                 <div class="recent-sp">
@@ -155,11 +155,11 @@
                     </li>
                     <li class="dist-graph" id="sp-dist-graph"></li>
                     <li class="dist-card dist-card-home dist-sp" id="sp-dist-home">
-                        <div id="sp-title-home" class="sp-title">{{home_dic.sp}}</div>
+                        <div id="sp-title-home" class="sp-title"><b>{{home_dic.sp}}</b></div>
                         <hr style="position:absolute;width:220px;top:6px;right:0px">
 
                         <ul>
-                            <li>- 최근등판기록</li>
+                            <li><b>- 최근등판기록</b></li>
                             {% for set in home_sp_set %}
                             <li>
                                 <div class="recent-sp">

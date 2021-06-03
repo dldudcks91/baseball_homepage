@@ -18,7 +18,7 @@
 * {
     font-family: NotoSansKR-Bold;
 }
-* h, th{
+* h, th, b{
 	font-family: NotoSansKR-Black;
 }
 .card span{
@@ -69,6 +69,7 @@ body{
 	display:none;
 }
 .highcharts-title{
+    font-family: NotoSansKR-Black;
     font-size:24px;
 }
 /* main.html*/
@@ -244,6 +245,8 @@ body{
 .card-title{
 	background-color:black;
 	color:white;
+	height:30px;
+	margin-bottom:0.5rem;
 }
 
 .card-body{
