@@ -12,8 +12,8 @@
   src: url('./fonts/NotoSansKR-Bold.otf');
 }
 @font-face {
-  font-family: NotoSansKR-Regular;
-  src: url('./fonts/NotoSansKR-Regular.otf');
+  font-family: NotoSansKR-Black;
+  src: url('./fonts/NotoSansKR-Black.otf');
 }
 * {
 	font-family: BlackHanSans-Regular;
@@ -270,7 +270,7 @@ body{
 
 }
 .preview-box *{
-    font-family: NotoSansKR-Bold;
+    font-family: NotoSansKR-Black;
 }
 
 .box-title{
