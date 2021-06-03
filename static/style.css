@@ -92,19 +92,19 @@ body{
 
 .team-info{
 	position: absolute;
-	top:250px;
-	left:150px;
+	top:200px;
+	left:400px;
 	width:1000px;
-    
+
 }
 .team-info th,td{
     text-align: center;
 }
 .year-select{
 
-	position: relative;
-    top:95px;
-    left:110px;
+	position: absolute;
+    top:150px;
+    left:400px;
 }
 
 
