@@ -5,7 +5,7 @@
 
 <div class= 'container'>
     
-    <div class="year-select">
+    <span class="year-select">
         <h>Year </h><select id="ddlYear">
             <option value="2017">2017</option>
             <option value="2018">2018</option>
@@ -13,11 +13,11 @@
             <option value="2020">2020</option>
             <option value="2021" selected>2021</option>
         </select>
-    </div>
+    </span>
       
     
 
-    <div id="datazones" class ="team-info"></div>
+    <div id="team-info-data" class ="team-info"></div>
 
     
 </div>
@@ -34,7 +34,7 @@ $(document).ready(function() {
             url: $("#ddlYear").val(),
             success:function(data){
 
-                $("#datazones").html(data)
+                $("#team-info-data").html(data)
             },
             error:function(request,status,error){
                 alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
@@ -49,7 +49,7 @@ $(document).ready(function() {
             url: $("#ddlYear").val(),
             success:function(data){
 
-                $("#datazones").html(data)
+                $("#team-info-data").html(data)
             },
             error:function(request,status,error){
                 alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);

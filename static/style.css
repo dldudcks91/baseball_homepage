@@ -91,11 +91,14 @@ body{
 /*team_info.html*/
 
 .team-info{
-	position: relative;
-	top:100px;
-	left:100px;
+	position: absolute;
+	top:250px;
+	left:150px;
 	width:1000px;
-
+    
+}
+.team-info th,td{
+    text-align: center;
 }
 .year-select{
 
@@ -499,7 +502,7 @@ body{
     top:88%;
 }
 #sp-dist-home ul{
-    left:70%;
+    left:64%;
     top:88%;
 }
 
