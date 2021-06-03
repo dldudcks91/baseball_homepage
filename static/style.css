@@ -79,7 +79,7 @@ body{
 
 }
 /* nav.html*/
-.nav{
+.navbar{
     width:100%;
 }
 .navbar-nav{
@@ -142,7 +142,7 @@ body{
 #update-time{
     position:relative;
     float: right;
-
+    margin-right: 50px;
 }
 
 
