@@ -297,6 +297,25 @@ class TodayLineUp(models.Model):
         managed = False
         db_table = 'today_lineup'
         
+class TodayToTo(models.Model):
+    
+    date = models.CharField(primary_key = True,max_length=8)
+    time = models.CharField(max_length=5,blank=True,null=True)
+    site_name = models.CharField(max_length=20,blank=True,null=True)
+    win_type = models.IntegerField(blank=True,null=True)
+    away_name = models.CharField(max_length=10,blank=True,null=True)
+    home_name = models.CharField(max_length=10,blank=True,null=True)
+    away_odds = models.FloatField(blank=True,null=True)
+    home_odds = models.FloatField(blank=True,null=True)
+    handicap = models.FloatField(blank=True,null=True)
+    craw_time = models.CharField(max_length=5,blank=True,null=True)
+    
+    class Meta:
+        managed = False
+        db_table = 'today_toto'
+        unique_together = (('date','time','site_name','win_type','away_name','home_name','craw_time'))
+        
+        
 class RunGraphData(models.Model):
     
     team_game_idx = models.CharField(primary_key=True, max_length=9)

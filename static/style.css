@@ -377,6 +377,57 @@ body{
     text-align:right;
 }
 
+#game-rate-title{
+    height:80px;
+}
+.game-rate{
+    position:relative;
+    width:240px;
+    height:320px;
+    display:inline-block;
+    vertical-align: top;
+}
+#game-rate-middle{
+
+    width:120px;
+
+}
+
+#game-rate-away div{
+    float: right;
+}
+#game-rate-away div strong{
+    float:right;
+}
+
+.rate-info{
+    text-align:center;
+    height:28px;
+    margin-bottom:3px;
+}
+.rate-graph {
+    position: relative; /* IE is dumb */
+    width: 200px;
+    height:28px;
+    border: 1px solid #B1D632;
+    padding: 2px;
+    font-size:11px;
+    font-family:tahoma;
+    margin-bottom:3px;
+}
+.rate-graph .rate-bar {
+    display: block;
+    position: relative;
+    background: #B1D632;
+    text-align: center;
+    color: #333;
+    height: 2em;
+    line-height: 2em;
+}
+.rate-graph .rate-bar span { position: absolute; left: 1em; }
+
+
+
 .emb-back{
     position: absolute;
     left:50%;
@@ -437,7 +488,7 @@ body{
     width:100%;
     height:100px;
     text-align:center;
-
+    font-size: 24px;
 
 }
 

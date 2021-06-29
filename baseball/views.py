@@ -3,13 +3,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import TeamInfo,GameInfo,TeamGameInfo,ScoreRecord,BatterRecord,PitcherRecord,TodayGameInfo,TodayTeamGameInfo,TodayLineUp,RunGraphData
+from .models import TeamInfo,GameInfo,TeamGameInfo,ScoreRecord,BatterRecord,PitcherRecord,TodayGameInfo,TodayTeamGameInfo,TodayLineUp,TodayToTo,RunGraphData
 from django.db.models import Q
 # 그래프용 패키지
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.generic import View
-
+import json
 
 
 # 데이터용 패키지
@@ -450,7 +450,7 @@ def preview(request,date,today_game_num):
     today_game_idx = game_date_set.values("game_idx")
     
     
-    team_game_set = TGI.objects.filter(game_idx__in = today_game_idx).order_by('game_idx','home_away')
+    team_game_set = TGI.objects.filter(game_idx__in = today_game_idx)
     today_game_set= team_game_set[today_game_num_idx_min:today_game_num_idx_max]
     
     
@@ -505,7 +505,7 @@ def preview(request,date,today_game_num):
     
     
     
-    def get_recent_sp(game_idx, sp_name, year):
+    def get_recent_sp(game_idx, sp_name, year, recent_count):
         team_name_dic = {2017:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2018:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2019:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
@@ -518,8 +518,8 @@ def preview(request,date,today_game_num):
         if sp_set.exists():
             
             sp_count= sp_set.count()
-            if sp_count >= 3:
-                sp_count -= 3
+            if sp_count >= recent_count:
+                sp_count -= recent_count
             else:
                 sp_count = 0
             recent_set = sp_set[sp_count:]
@@ -550,8 +550,8 @@ def preview(request,date,today_game_num):
         return recent_set
     
     
-    home_sp_set = get_recent_sp(home_game_idx, home_sp, year)
-    away_sp_set = get_recent_sp(away_game_idx, away_sp, year)
+    home_sp_set = get_recent_sp(home_game_idx, home_sp, year,3)
+    away_sp_set = get_recent_sp(away_game_idx, away_sp, year,3)
     
     
     home_game_num = int(today_game_set[1].game_num)
@@ -701,9 +701,21 @@ def preview(request,date,today_game_num):
     home_dic['rank'] = get_rank(home_team_num,year)
     away_dic['rank'] = get_rank(away_team_num,year)
     
-    context ={'date':date,'today_game_num':today_game_num,'stadium':stadium, 'is_end':is_end, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set}
+    
+    time = game_date_set[today_game_num-1].end
+    
+    def get_toto(date,time,away_name,home_name):
+        toto_set = TodayToTo.objects.filter(date = date, time = time, away_name = away_name, home_name = home_name)
+        return toto_set.values()
+    
+    toto_set = get_toto(date,time,away_name,home_name).order_by('craw_time')
+    toto_list = [toto for toto in toto_set.values()]
+    
+    
+    context ={'date':date,'today_game_num':today_game_num,'stadium':stadium, 'is_end':is_end, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set,'toto_list':toto_list}
     return render(request,'baseball/preview.html',context)
 
+    
 def lineup(request,date,today_game_num):
     today_game_num_idx_min = (2*today_game_num)-2
     today_game_num_idx_max = (2*today_game_num)

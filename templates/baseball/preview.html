@@ -50,7 +50,7 @@
                         </div>
                         <div id="game-title-middle" class="game-title">
 
-                            <div id="game-title-vs" class="h4">vs</div>
+                            <div id="game-title-vs" ><b>vs</b></div>
                             <div class="game-title-list game-title-info">
                                 <div><b>순위</b></div>
                                 <div><b>승률</b></div>
@@ -113,8 +113,40 @@
                 <div class="dist-box" id="rate-dist-box">
                     <ul>
                         <li class="dist-card dist-card-away dist-sp" id="run-rate-away"></li>
-                        <li class="dist-graph-away" id="win-rate-away"></li>
-                        <li class="dist-graph-home" id="win-rate-home"></li>
+                        <li class="game-title-box" id="game-rate-box">
+                            <div id="game-rate-title"></div>
+                            <div class="game-rate" id="game-rate-away">
+                                <div class="rate-graph">
+                                    <strong class="rate-bar" id="rate-away-model1" ></strong>
+                                </div>
+                                <div class="rate-graph">
+                                    <strong class="rate-bar" id="rate-away-model2" ></strong>
+                                </div>
+                                <div class="rate-graph">
+                                    <strong class="rate-bar" id="rate-away-model3" ></strong>
+                                </div>
+                            </div>
+                                <div class="game-rate" id="game-rate-middle">
+                                    <div class="rate-info">model1</div>
+                                    <div class="rate-info">model2</div>
+                                    <div class="rate-info">model3</div>
+
+                                </div>
+                            <div class="game-rate" id="game-rate-home">
+
+                                <div class="rate-graph">
+                                    <strong class="rate-bar" id="rate-home-model1" ></strong>
+                                </div>
+                                <div class="rate-graph">
+                                    <strong class="rate-bar" id="rate-home-model2" ></strong>
+                                </div>
+                                <div class="rate-graph">
+                                    <strong class="rate-bar" id="rate-home-model3" ></strong>
+                                </div>
+                            </div>
+
+
+                        </li>
                         <li class="dist-card dist-card-home dist-sp" id="run-rate-home"></li>
                     </ul>
                 </div>
@@ -290,177 +322,58 @@
     /* 승률정보 불러오는 java-script */
     $(document).ready(function() {
 
-            GameRateGraph()
+        GameRateGraph()
+        ToToRate()
+
     });
+
+
 
     function GameRateGraph(){
        // var set_url = 'sp_graph/' + {{date}} +'/' + {{today_game_num}};
        //getRateGraph()
-       ChartWinRateAway('win-rate-away')
-       ChartWinRateHome('win-rate-home')
+
 
        ChartRunRateAway('run-rate-away')
        ChartRunRateHome('run-rate-home')
     }
-    function ChartWinRateAway(id_index){
 
-        Highcharts.chart(id_index, {
+    function ToToRate(){
+        var toto_list = "{{toto_list}}".replace(/&#x27;/g,"\"");
+        var toto_json = JSON.parse(toto_list)
+        var model1 = []
+        var model2 = []
+        var model3 = []
+        for(var i = 0 in toto_json){
+            var toto = toto_json[i]
+            if(toto.site_name == 'livescore'){
+                model1.push(toto)
 
-            chart: {
-                type:'bar'
-            },
-
-            title: {
-                text: null
-            },
-            xAxis: {
-                title:{
-                    text:null
-                },
-                opposite: true,
-                reversed: true,
-
-                categories: ['model1','model2','model3','model4','model5'],
-                labels:{
-                    enabled:false
-                    }
-
-            },
-
-            yAxis: {
-                title:{
-                    text:null
-                },
-                labels: {
-
-                    formatter: function () {
-                        return Math.abs(this.value) + '%';
-                    }
-                },
-            min:-100
-
-            },
-
-            plotOptions: {
-                series: {
-                    stacking: 'normal'
-                }
-            },
-
-            tooltip: {
-                formatter: function () {
-                    return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
-                        'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
-                }
-            },
-            series: [{
-                name: '한화',
-                data: [-55,-45,-48,-47,-52],
-                dataLabels: {
-                    enabled: true,
-
-                    color: '#FFFFFF',
-                    align: 'left',
-                    formatter: function() {
-                        return Math.abs(this.point.y).toFixed(1) +'%' // one decimal
-                    },
-                    style: {
-                        fontSize: '15px',
-                    }
-                }
-            }],
-            credits: {
-                enabled: false
-            },
-            legend:{
-                enabled: false
             }
-        });
+            else if (toto.site_name =='field-one'){
+                model2.push(toto)
+
+            }
+
+        }
+        function getModelRate(model,away_address,home_address){
+            model_length = model.length
+            last = model[model_length-1]
+
+            away = Math.round(last.away_odds * 1000) / 10 + "%"
+            $(away_address).attr("style","width:" + away)
+            $(away_address).text(away)
+
+            home = Math.round(last.home_odds * 1000) / 10 + "%"
+            $(home_address).attr("style","width:" + home)
+            $(home_address).text(home)
+        }
+        getModelRate(model1,'#rate-away-model1','#rate-home-model1')
+        getModelRate(model2,'#rate-away-model2','#rate-home-model2')
 
     }
 
-    function ChartWinRateHome(id_index){
 
-        Highcharts.chart(id_index, {
-
-            chart: {
-                type:'bar'
-            },
-
-            title: {
-                text: null
-            },
-            xAxis: {
-                title:{
-                    text:null
-                },
-
-                reversed: true,
-
-                categories: ['model1','model2','model3','model4','model5'],
-
-                labels:{
-                    align:'right',
-                    style:{
-                        fontSize: '15px'
-                        }
-                }
-
-            },
-
-            yAxis: {
-                title:{
-                    text:null
-                },
-                labels: {
-
-                    formatter: function () {
-                        return Math.abs(this.value) + '%';
-                    }
-                },
-            max:100
-
-            },
-
-            plotOptions: {
-                series: {
-                    stacking: 'normal'
-                }
-            },
-
-            tooltip: {
-                formatter: function () {
-                    return '<b>' + this.series.name + ', run ' + this.point.category + '</b><br/>' +
-                        'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
-                }
-            },
-            series: [{
-                name: '롯데',
-                data: [45,55,53,52,48],
-                color: 'rgb(67,67,72)',
-                dataLabels: {
-                    enabled: true,
-
-                    color: '#FFFFFF',
-                    align: 'right',
-                    formatter: function() {
-                        return Math.abs(this.point.y).toFixed(1) + "%" // one decimal
-                    },
-                    style: {
-                        fontSize: '15px',
-                    }
-                },
-
-            }],
-            credits: {
-                enabled: false
-            },
-            legend:{
-                enabled: false
-            }
-        });
-
-    }
     function ChartRunRateAway(id_index){
 
         Highcharts.chart(id_index, {
