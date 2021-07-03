@@ -332,4 +332,14 @@ class RunGraphData(models.Model):
     class Meta:
         managed = False
         db_table = 'run_graph_data'
-        
+
+class UpdateTime(models.Model):
+    
+    date = models.CharField(primary_key = True,max_length=8)
+    craw_time = models.CharField(max_length=5,blank=True,null=True)
+    craw_type = models.IntegerField(blank=True,null=True)
+    
+    class Meta:
+        managed = False
+        db_table = 'update_time'
+            

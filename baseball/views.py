@@ -3,7 +3,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import TeamInfo,GameInfo,TeamGameInfo,ScoreRecord,BatterRecord,PitcherRecord,TodayGameInfo,TodayTeamGameInfo,TodayLineUp,TodayToTo,RunGraphData
+from .models import TeamInfo,GameInfo,TeamGameInfo,ScoreRecord,BatterRecord,PitcherRecord,TodayGameInfo,TodayTeamGameInfo,TodayLineUp,TodayToTo,RunGraphData,UpdateTime
 from django.db.models import Q
 # 그래프용 패키지
 from rest_framework.response import Response
@@ -53,10 +53,14 @@ def game_info(request):
     today = year + "-" + month + "-" + day
     
     TGI = TodayGameInfo.objects.all()
-    craw_time = TGI[0].etc#list(game_date_dic.values('etc')[0].values())[0]
+    
     last_date = TGI[0].game_idx[:8]
     last_date = last_date[:4]+"-" + last_date[4:6] + "-" +last_date[6:8]
-    context = {'today':today,'craw_time':craw_time,'last_date': last_date}
+    
+    UDT = UpdateTime.objects.all().order_by('-date','-craw_time')
+    date = UDT[0].date#list(game_date_dic.values('etc')[0].values())[0]
+    craw_time = UDT[0].craw_time
+    context = {'today':today,'date':date, 'craw_time':craw_time,'last_date': last_date}
     
     
     return render(request,'baseball/game_info.html',context)
