@@ -55,6 +55,7 @@
 
 
     </ul>
+    <div class="click-info"></div>
     {% else %}<span>경기가 없는 날입니다.</span>
     {% endif %}
 </div>
@@ -137,6 +138,7 @@
     $('.card').on('click', function () {
 
         setPreview()
+        $('.click-info').addClass('hidden')
         $("#today-game-tab").removeClass('hidden')
         var game_num_idx = $('#myTab').data("game_num_idx")
         card_id = "#card" + String(game_num_idx)
@@ -153,9 +155,10 @@
 
     }
     function setPreview(){
+
+
         document.getElementById("preview-tab").setAttribute("class","nav-link active")
         document.getElementById("preview-contents").setAttribute("class","tab-pane fade show active")
-
 
         document.getElementById("lineup-tab").setAttribute("class","nav-link")
         document.getElementById("lineup-contents").setAttribute("class","tab-pane fade")

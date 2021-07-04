@@ -224,7 +224,8 @@ body{
 #today-game-contents{
 	position: relative;
 	margin-top:100px;
-
+	text-align: center;
+	font-size:20px;
 }
 
 #today-game-tab{
@@ -276,6 +277,13 @@ body{
     left:1080px;
 
 }
+
+.click-info{
+    margin-top: 50px;
+    text-align:center;
+    font-size: 16px;
+
+}
 /* boxscore.html*/
 
 .box-score-area{
@@ -320,7 +328,7 @@ body{
 }
 
 
-
+/* preview-team*/
 #preview-team{
     height:400px;
 }
@@ -346,7 +354,11 @@ body{
 }
 
 
+/*preview-rate*/
 
+#preview-rate{
+    height:400px;
+}
 
 .dist-box ul{
     padding: 0px;
@@ -377,56 +389,102 @@ body{
     text-align:right;
 }
 
-#game-rate-title{
-    height:80px;
+
+.game-rate-title{
+    position: relative;
+    margin-top:20px;
+    font-size:24px;
+    text-align:center;
+
+    height:60px;
 }
 .game-rate{
     position:relative;
     width:240px;
-    height:320px;
+    height:120px;
     display:inline-block;
     vertical-align: top;
 }
-#game-rate-middle{
+.game-rate-middle{
 
     width:120px;
 
 }
 
-#game-rate-away div{
-    float: right;
-}
-#game-rate-away div strong{
-    float:right;
-}
+
 
 .rate-info{
     text-align:center;
-    height:28px;
+    height:32px;
+    padding-top:3px;
     margin-bottom:3px;
+    vertical-align:middle;
+    font-size:18px;
 }
 .rate-graph {
     position: relative; /* IE is dumb */
     width: 200px;
-    height:28px;
-    border: 1px solid #B1D632;
+    height: 32px;
+
     padding: 2px;
-    font-size:11px;
+    font-size:16px;
     font-family:tahoma;
     margin-bottom:3px;
 }
 .rate-graph .rate-bar {
     display: block;
     position: relative;
-    background: #B1D632;
     text-align: center;
-    color: #333;
-    height: 2em;
-    line-height: 2em;
+
+    height: 26px;
+
 }
-.rate-graph .rate-bar span { position: absolute; left: 1em; }
+.rate-graph .rate-bar span {
+    position: absolute; left: 1em;
+}
 
+.game-rate-away div{
+    float: right;
+    color: rgb(33,33,33);
 
+    border: 1px solid rgb(124,181,236);
+}
+.game-rate-home div{
+    border: 1px solid rgb(67,67,72);
+    color: rgb(255,255,255);
+
+}
+
+.game-rate-away div strong{
+    float: right;
+    background: rgb(124,181,236);
+
+}
+
+.game-rate-home div strong{
+    background: rgb(67,67,72);
+    width: 0;
+
+}
+
+.add-info{
+    position:absolute;
+    left:105%;
+    top:0%;
+}
+.add-info-img{
+    width:20px;
+}
+
+.add-pop-layer{
+    position:absolute;
+    left: 30px;
+    top: 5px;
+    width:540px;
+    height:330px;
+    background: rgb(50,50,50);
+    z-index: 1;
+}
 
 .emb-back{
     position: absolute;
@@ -525,6 +583,8 @@ body{
     width:50px;
 }
 
+
+
 .pre-sp-emb{
     width:40px;
 }
@@ -612,12 +672,17 @@ body{
 
 /*lineup.html*/
 
+.lineup-wrap{
+    height: 800px;
+}
+
 .lineup-title{
     margin-bottom:10px;
 }
 
 .lineup-area{
     width: 500px;
+
     margin-top:50px;
 }
 

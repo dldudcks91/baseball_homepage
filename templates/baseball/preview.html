@@ -45,7 +45,7 @@
                                 <div>{{away_dic.win_rate}}</div>
                                 <div>{{away_dic.home_away}}</div>
                                 <div>{{away_dic.rela}}</div>
-                                <div>???</div>
+
                             </div>
                         </div>
                         <div id="game-title-middle" class="game-title">
@@ -56,7 +56,7 @@
                                 <div><b>승률</b></div>
                                 <div><b>홈/원정</b></div>
                                 <div><b>상대전적</b></div>
-                                <div>???</div>
+
                             </div>
                         </div>
                         <div id="game-title-home" class="game-title">
@@ -66,7 +66,7 @@
                                 <div>{{home_dic.win_rate}}</div>
                                 <div>{{home_dic.home_away}}</div>
                                 <div>{{home_dic.rela}}</div>
-                                <div>???</div>
+
                             </div>
                         </div>
 
@@ -109,47 +109,83 @@
     {%if is_end %}
     {% else  %}
         <div class= "preview-box" id="preview-rate">
-            <div class="box-title">
-                <div class="dist-box" id="rate-dist-box">
-                    <ul>
-                        <li class="dist-card dist-card-away dist-sp" id="run-rate-away"></li>
-                        <li class="game-title-box" id="game-rate-box">
-                            <div id="game-rate-title"></div>
-                            <div class="game-rate" id="game-rate-away">
-                                <div class="rate-graph">
-                                    <strong class="rate-bar" id="rate-away-model1" ></strong>
+            <div class="box-title"></div>
+            <div class="dist-box" id="rate-dist-box">
+                <ul>
+                    <li class="dist-card dist-card-away" id="run-rate-away"></li>
+                    <li class="game-title-box" id="game-rate-box">
+
+                        <div class="game-rate-title"><b>승부예측</b>
+                            
+                        </div>
+                        <div class="game-rate-odds">
+                            <div class="game-rate game-rate-away">
+                                <div class="rate-graph rate-graph-away">
+                                    <strong class="rate-bar rate-bar-away" id="rate-away-model1" ></strong>
                                 </div>
                                 <div class="rate-graph">
-                                    <strong class="rate-bar" id="rate-away-model2" ></strong>
+                                    <strong class="rate-bar rate-bar-away" id="rate-away-model2" ></strong>
                                 </div>
                                 <div class="rate-graph">
-                                    <strong class="rate-bar" id="rate-away-model3" ></strong>
+                                    <strong class="rate-bar rate-bar-away" id="rate-away-model3" ></strong>
                                 </div>
                             </div>
-                                <div class="game-rate" id="game-rate-middle">
-                                    <div class="rate-info">model1</div>
-                                    <div class="rate-info">model2</div>
-                                    <div class="rate-info">model3</div>
+                                <div class="game-rate game-rate-middle">
+                                    <div class="rate-info">-</div>
+                                    <div class="rate-info">-</div>
+                                    <div class="rate-info">-</div>
 
                                 </div>
-                            <div class="game-rate" id="game-rate-home">
+                            <div class="game-rate game-rate-home">
 
                                 <div class="rate-graph">
-                                    <strong class="rate-bar" id="rate-home-model1" ></strong>
+                                    <strong class="rate-bar rate-bar-home" id="rate-home-model1" ></strong>
+                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
+
                                 </div>
                                 <div class="rate-graph">
-                                    <strong class="rate-bar" id="rate-home-model2" ></strong>
+                                    <strong class="rate-bar rate-bar-home" id="rate-home-model2" ></strong>
+                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
                                 </div>
                                 <div class="rate-graph">
-                                    <strong class="rate-bar" id="rate-home-model3" ></strong>
+                                    <strong class="rate-bar rate-bar-home" id="rate-home-model3" ></strong>
+                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="game-rate-title"><b>점수예측</b></div>
+                        <div class="game-rate-uo">
+                            <div class="game-rate game-rate-away">
+                                <div class="rate-graph">
+                                    <strong class="rate-bar rate-bar-away" id="uo-away-model1" ></strong>
+                                </div>
+                                <div class="rate-graph">
+                                    <strong class="rate-bar rate-bar-away" id="uo-away-model2" ></strong>
+                                </div>
 
+                            </div>
+                                <div class="game-rate game-rate-middle">
+                                    <div class="rate-info" id="uo-info-model1">-</div>
+                                    <div class="rate-info" id="uo-info-model2">-</div>
+                                </div>
+                            <div class="game-rate game-rate-home">
 
-                        </li>
-                        <li class="dist-card dist-card-home dist-sp" id="run-rate-home"></li>
-                    </ul>
-                </div>
+                                <div class="rate-graph">
+                                    <strong class="rate-bar rate-bar-home" id="uo-home-model1" ></strong>
+                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
+                                </div>
+                                <div class="rate-graph">
+                                    <strong class="rate-bar rate-bar-home" id="uo-home-model2" ></strong>
+                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </li>
+                    <li class="dist-card dist-card-home" id="run-rate-home"></li>
+                </ul>
+
             </div>
             <div class="box-contents">
             </div>
@@ -341,36 +377,66 @@
     function ToToRate(){
         var toto_list = "{{toto_list}}".replace(/&#x27;/g,"\"");
         var toto_json = JSON.parse(toto_list)
-        var model1 = []
-        var model2 = []
-        var model3 = []
+
+        var odds_model1 = []
+        var odds_model2 = []
+        var odds_model3 = []
+
+        var uo_model1 = []
+        var uo_model2 = []
         for(var i = 0 in toto_json){
             var toto = toto_json[i]
             if(toto.site_name == 'livescore'){
-                model1.push(toto)
+                odds_model1.push(toto)
 
             }
             else if (toto.site_name =='field-one'){
-                model2.push(toto)
+                if (toto.win_type == 1){
+                    odds_model2.push(toto)
+                    }
+                else if (toto.win_type ==3){
+                    uo_model1.push(toto)
 
+                    }
             }
 
 
         }
-        function getModelRate(model,away_address,home_address){
+        function getModelRate(model,win_type,away_address,home_address,model_address){
             model_length = model.length
             last = model[model_length-1]
 
-            away = Math.round(last.away_odds * 1000) / 10 + "%"
-            $(away_address).attr("style","width:" + away)
-            $(away_address).text(away)
+            if (last.away_odds == 0 ){
+                away = ""
+                $(away_address).attr("style","width:" + 0)
+            }
+            else {
+                away = Math.round(last.away_odds * 1000) / 10 + "%"
+                $(away_address).attr("style","width:" + away)
+            }
 
-            home = Math.round(last.home_odds * 1000) / 10 + "%"
-            $(home_address).attr("style","width:" + home)
+            $(away_address).text(away)
+            if (last.home_odds == 0 ){
+                home = ""
+                $(home_address).attr("style","width:" + 0)
+            }
+            else {
+                home = Math.round(last.home_odds * 1000) / 10 + "%"
+                $(home_address).attr("style","width:" + home)
+            }
+
             $(home_address).text(home)
+
+            if (win_type == 3){
+                $(model_address).text(last.handicap)
+            }
         }
-        getModelRate(model1,'#rate-away-model1','#rate-home-model1')
-        getModelRate(model2,'#rate-away-model2','#rate-home-model2')
+        getModelRate(odds_model1,1,'#rate-away-model1','#rate-home-model1',"")
+        getModelRate(odds_model2,1,'#rate-away-model2','#rate-home-model2',"")
+
+        getModelRate(uo_model1,3,'#uo-away-model1','#uo-home-model1','#uo-info-model1')
+
+
 
     }
 
