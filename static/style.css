@@ -385,6 +385,9 @@ body{
     display: inline;
 
 }
+.dist-card-away{
+    text-align:left;
+}
 .dist-card-home{
     text-align:right;
 }
