@@ -45,6 +45,7 @@
                                 <div>{{away_dic.win_rate}}</div>
                                 <div>{{away_dic.home_away}}</div>
                                 <div>{{away_dic.rela}}</div>
+                                <div>{{away_dic.sp}}</div>
 
                             </div>
                         </div>
@@ -56,6 +57,7 @@
                                 <div><b>승률</b></div>
                                 <div><b>홈/원정</b></div>
                                 <div><b>상대전적</b></div>
+                                <div><b>선발투수</b></div>
 
                             </div>
                         </div>
@@ -66,7 +68,7 @@
                                 <div>{{home_dic.win_rate}}</div>
                                 <div>{{home_dic.home_away}}</div>
                                 <div>{{home_dic.rela}}</div>
-
+                                <div>{{home_dic.sp}}</div>
                             </div>
                         </div>
 
@@ -142,7 +144,7 @@
                                     <strong class="rate-bar rate-bar-home" id="rate-home-model1" ></strong>
                                     <span class="add-info" role="button">
                                         <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer hidden" id="layer-rate-model1">
+                                        <div class="add-pop-layer layer-rate hidden" id="layer-rate-model1">
 
                                         </div>
                                     </span>
@@ -152,14 +154,14 @@
                                     <strong class="rate-bar rate-bar-home" id="rate-home-model2" ></strong>
                                     <span class="add-info" role="button">
                                         <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer hidden" id="layer-rate-model2"></div>
+                                        <div class="add-pop-layer layer-rate hidden" id="layer-rate-model2"></div>
                                     </span>
                                 </div>
                                 <div class="rate-graph">
                                     <strong class="rate-bar rate-bar-home" id="rate-home-model3" ></strong>
                                     <span class="add-info" role="button">
                                         <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer hidden" id="layer-rate-model3"></div>
+                                        <div class="add-pop-layer layer-rate hidden" id="layer-rate-model3"></div>
                                     </span>
                                 </div>
                             </div>
@@ -185,14 +187,14 @@
                                     <strong class="rate-bar rate-bar-home" id="uo-home-model2" ></strong>
                                     <span class="add-info" role="button">
                                         <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer hidden" id="layer-uo-model2"></div>
+                                        <div class="add-pop-layer layer-uo hidden" id="layer-uo-model2"></div>
                                     </span>
                                 </div>
                                 <div class="rate-graph">
                                     <strong class="rate-bar rate-bar-home" id="uo-home-model3" ></strong>
                                     <span class="add-info" role="button">
                                         <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer hidden" id="layer-uo-model3"></div>
+                                        <div class="add-pop-layer  layer-uo hidden" id="layer-uo-model3"></div>
                                     </span>
                                 </div>
 
@@ -381,7 +383,8 @@
     });
 
     var last_pop = 0
-    $('.add-pop-layer').append('<table class="tbl-pop table"><thead><tr><th>Date</th><th>Up/Down</th><th>Away</th><th>Home</th><th>Up/Down</th><th>Time</th></tr></thead></table>')
+    $('.layer-rate').append('<table class="tbl-pop table"><thead><tr><th>Date</th><th>Up/Down</th><th>Away</th><th>Home</th><th>Up/Down</th><th>Time</th></tr></thead></table>')
+    $('.layer-uo').append('<table class="tbl-pop table"><thead><tr><th>Date</th><th>Away</th><th>Under/Over</th><th>Home</th><th>Time</th></tr></thead></table>')
     $('.add-info').on('click',function(){
 
         $('.add-pop-layer').addClass('hidden')
@@ -420,8 +423,8 @@
         var odds_model2 = []
         var odds_model3 = []
 
-        var uo_model1 = []
         var uo_model2 = []
+        var uo_model3 = []
         for(var i = 0 in toto_json){
             var toto = toto_json[i]
             if(toto.site_name == 'livescore'){
@@ -433,7 +436,16 @@
                     odds_model2.push(toto)
                     }
                 else if (toto.win_type ==3){
-                    uo_model1.push(toto)
+                    uo_model2.push(toto)
+
+                    }
+            }
+            else if (toto.site_name =='lyc'){
+               if (toto.win_type == 1){
+                    odds_model3.push(toto)
+                    }
+               else if (toto.win_type ==3){
+                    uo_model3.push(toto)
 
                     }
             }
@@ -442,6 +454,10 @@
         }
         function getModelRate(model,win_type,away_address,home_address,model_address){
             model_length = model.length
+            if (model_length == 0){
+                return
+            }
+
             last = model[model_length-1]
 
             if (last.away_odds == 0 ){
@@ -471,7 +487,11 @@
         }
         getModelRate(odds_model1,1,'#rate-away-model1','#rate-home-model1',"")
         getModelRate(odds_model2,1,'#rate-away-model2','#rate-home-model2',"")
-        getModelRate(uo_model1,3,'#uo-away-model2','#uo-home-model2','#uo-info-model2')
+        getModelRate(odds_model3,1,'#rate-away-model3','#rate-home-model3',"")
+
+
+        getModelRate(uo_model2,3,'#uo-away-model2','#uo-home-model2','#uo-info-model2')
+        getModelRate(uo_model3,3,'#uo-away-model3','#uo-home-model3','#uo-info-model3')
 
         function getPopRate(model,pop_address){
             $(pop_address).children('table').append('<tbody></tbody>')
@@ -536,6 +556,7 @@
         }
         getPopRate(odds_model1,'#layer-rate-model1')
         getPopRate(odds_model2,'#layer-rate-model2')
+        getPopRate(odds_model3,'#layer-rate-model3')
 
     }
 
