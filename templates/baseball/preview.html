@@ -116,7 +116,7 @@
                     <li class="game-title-box" id="game-rate-box">
 
                         <div class="game-rate-title"><b>승부예측</b>
-                            
+
                         </div>
                         <div class="game-rate-odds">
                             <div class="game-rate game-rate-away">
@@ -140,16 +140,27 @@
 
                                 <div class="rate-graph">
                                     <strong class="rate-bar rate-bar-home" id="rate-home-model1" ></strong>
-                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
+                                    <span class="add-info" role="button">
+                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                        <div class="add-pop-layer hidden" id="layer-rate-model1">
+
+                                        </div>
+                                    </span>
 
                                 </div>
                                 <div class="rate-graph">
                                     <strong class="rate-bar rate-bar-home" id="rate-home-model2" ></strong>
-                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
+                                    <span class="add-info" role="button">
+                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                        <div class="add-pop-layer hidden" id="layer-rate-model2"></div>
+                                    </span>
                                 </div>
                                 <div class="rate-graph">
                                     <strong class="rate-bar rate-bar-home" id="rate-home-model3" ></strong>
-                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
+                                    <span class="add-info" role="button">
+                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                        <div class="add-pop-layer hidden" id="layer-rate-model3"></div>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -157,26 +168,32 @@
                         <div class="game-rate-uo">
                             <div class="game-rate game-rate-away">
                                 <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-away" id="uo-away-model1" ></strong>
+                                    <strong class="rate-bar rate-bar-away" id="uo-away-model2" ></strong>
                                 </div>
                                 <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-away" id="uo-away-model2" ></strong>
+                                    <strong class="rate-bar rate-bar-away" id="uo-away-model3" ></strong>
                                 </div>
 
                             </div>
                                 <div class="game-rate game-rate-middle">
-                                    <div class="rate-info" id="uo-info-model1">-</div>
                                     <div class="rate-info" id="uo-info-model2">-</div>
+                                    <div class="rate-info" id="uo-info-model3">-</div>
                                 </div>
                             <div class="game-rate game-rate-home">
 
                                 <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-home" id="uo-home-model1" ></strong>
-                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
+                                    <strong class="rate-bar rate-bar-home" id="uo-home-model2" ></strong>
+                                    <span class="add-info" role="button">
+                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                        <div class="add-pop-layer hidden" id="layer-uo-model2"></div>
+                                    </span>
                                 </div>
                                 <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-home" id="uo-home-model2" ></strong>
-                                    <span class="add-info" role="button"><img class='add-info-img' src="/static/images/button/add_button.png" ></span>
+                                    <strong class="rate-bar rate-bar-home" id="uo-home-model3" ></strong>
+                                    <span class="add-info" role="button">
+                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                        <div class="add-pop-layer hidden" id="layer-uo-model3"></div>
+                                    </span>
                                 </div>
 
                             </div>
@@ -363,6 +380,27 @@
 
     });
 
+    var last_pop = 0
+    $('.add-pop-layer').append('<table class="tbl-pop table"><thead><tr><th>Date</th><th>Up/Down</th><th>Away</th><th>Home</th><th>Up/Down</th><th>Time</th></tr></thead></table>')
+    $('.add-info').on('click',function(){
+
+        $('.add-pop-layer').addClass('hidden')
+        if (last_pop == $(this).children('div').attr('id')){
+            last_pop = 0
+        }
+        else {
+            $(this).children('div').removeClass('hidden')
+            last_pop = $(this).children('div').attr('id')
+        }
+
+    })
+    $(document).mouseup(function (e){
+      var LayerPopup = $(".add-pop-layer");
+      if(LayerPopup.has(e.target).length === 0){
+        LayerPopup.addClass("hidden");
+        last_pop = 0
+      }
+    });
 
 
     function GameRateGraph(){
@@ -433,10 +471,71 @@
         }
         getModelRate(odds_model1,1,'#rate-away-model1','#rate-home-model1',"")
         getModelRate(odds_model2,1,'#rate-away-model2','#rate-home-model2',"")
+        getModelRate(uo_model1,3,'#uo-away-model2','#uo-home-model2','#uo-info-model2')
 
-        getModelRate(uo_model1,3,'#uo-away-model1','#uo-home-model1','#uo-info-model1')
+        function getPopRate(model,pop_address){
+            $(pop_address).children('table').append('<tbody></tbody>')
+            model_length = model.length
+            max_length = 5
+            start_i = 0
+            if (model_length > max_length){
+                start_i = model_length-max_length
+            }
+            last_away = model[start_i].away_odds
+            last_home = model[start_i].home_odds
+
+            function getArrow(now,last){
+                var result = ''
+                if (now > last) {
+                    result = '<td>'+ '<img src="/static/images/button/up_arrow_red.gif" style="width:24px">' +'</td>'
+                }
+                else if (now < last) {
+                    result = '<td>'+ '<img src="/static/images/button/down_arrow_blue.gif" style="width:24px">' +'</td>'
+                }
+                else {
+                    result = '<td>'+ '-' +'</td>'
+                }
+                return result
+            }
 
 
+            for (var i = start_i; i < model_length ;i++){
+                var m = model[i]
+
+                this_body = $(pop_address).children('table').children('tbody')
+
+                var insert_str = ''
+                insert_str += '<tr>'
+
+                insert_str+= '<td>'+ m.date +'</td>'
+
+
+
+                insert_str+=getArrow(m.away_odds,last_away)
+                last_away = m.away_odds
+
+                away = Math.round(m.away_odds * 1000) / 10 + "%"
+                insert_str+= '<td>'+ away +'</td>'
+
+                home = Math.round(m.home_odds * 1000) / 10 + "%"
+                insert_str+= '<td>'+ home +'</td>'
+
+
+                insert_str+=getArrow(m.home_odds,last_home)
+                last_home = m.home_odds
+
+
+                insert_str+= '<td>'+ m.craw_time +'</td>'
+
+                this_body.append(insert_str)
+
+
+
+            }
+
+        }
+        getPopRate(odds_model1,'#layer-rate-model1')
+        getPopRate(odds_model2,'#layer-rate-model2')
 
     }
 

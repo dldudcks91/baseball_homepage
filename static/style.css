@@ -478,11 +478,12 @@ body{
 
 .add-pop-layer{
     position:absolute;
-    left: 30px;
-    top: 5px;
+    left: -545px;
+    top: 32px;
     width:540px;
-    height:330px;
-    background: rgb(50,50,50);
+    height:300px;
+    background: rgb(255,255,255);
+
     z-index: 1;
 }
 
