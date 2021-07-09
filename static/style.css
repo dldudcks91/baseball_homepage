@@ -474,6 +474,9 @@ body{
     position:absolute;
     left:105%;
     top:0%;
+    padding-bottom: 5px
+    padding-left: 5px;
+    padding-right:5px;
 }
 .add-info-img{
     width:20px;

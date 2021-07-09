@@ -383,8 +383,26 @@
     });
 
     var last_pop = 0
+    var pop_fasten = 0
     $('.layer-rate').append('<table class="tbl-pop table"><thead><tr><th>Date</th><th>Up/Down</th><th>Away</th><th>Home</th><th>Up/Down</th><th>Time</th></tr></thead></table>')
-    $('.layer-uo').append('<table class="tbl-pop table"><thead><tr><th>Date</th><th>Away</th><th>Under/Over</th><th>Home</th><th>Time</th></tr></thead></table>')
+    $('.layer-uo').append('<table class="tbl-pop table"><thead><tr><th>Date</th><th>Under</th><th>Standard</th><th>Over</th><th>Time</th></tr></thead></table>')
+
+    $('.add-info').mouseover(function(){
+        if (pop_fasten == 1){
+            return
+        }
+        $(this).children('div').removeClass('hidden')
+        })
+    $('.add-info').mouseleave(function(){
+        if (pop_fasten == 1){
+            return
+        }
+        $(this).children('div').addClass('hidden')
+    })
+
+
+
+
     $('.add-info').on('click',function(){
 
         $('.add-pop-layer').addClass('hidden')
@@ -395,15 +413,19 @@
             $(this).children('div').removeClass('hidden')
             last_pop = $(this).children('div').attr('id')
         }
+        pop_fasten = 1
 
     })
+
     $(document).mouseup(function (e){
       var LayerPopup = $(".add-pop-layer");
       if(LayerPopup.has(e.target).length === 0){
         LayerPopup.addClass("hidden");
         last_pop = 0
       }
+      pop_fasten = 0
     });
+
 
 
     function GameRateGraph(){
@@ -493,9 +515,13 @@
         getModelRate(uo_model2,3,'#uo-away-model2','#uo-home-model2','#uo-info-model2')
         getModelRate(uo_model3,3,'#uo-away-model3','#uo-home-model3','#uo-info-model3')
 
-        function getPopRate(model,pop_address){
-            $(pop_address).children('table').append('<tbody></tbody>')
+        function getPopRate(model, win_type, pop_address){
+
             model_length = model.length
+            if (model_length == 0){
+                return
+            }
+            $(pop_address).children('table').append('<tbody></tbody>')
             max_length = 5
             start_i = 0
             if (model_length > max_length){
@@ -530,34 +556,44 @@
                 insert_str+= '<td>'+ m.date +'</td>'
 
 
+                if (win_type == 1){
+                    insert_str+=getArrow(m.away_odds,last_away)
+                    last_away = m.away_odds
 
-                insert_str+=getArrow(m.away_odds,last_away)
-                last_away = m.away_odds
+                    away = Math.round(m.away_odds * 1000) / 10 + "%"
+                    insert_str+= '<td>'+ away +'</td>'
 
-                away = Math.round(m.away_odds * 1000) / 10 + "%"
-                insert_str+= '<td>'+ away +'</td>'
-
-                home = Math.round(m.home_odds * 1000) / 10 + "%"
-                insert_str+= '<td>'+ home +'</td>'
+                    home = Math.round(m.home_odds * 1000) / 10 + "%"
+                    insert_str+= '<td>'+ home +'</td>'
 
 
-                insert_str+=getArrow(m.home_odds,last_home)
-                last_home = m.home_odds
+                    insert_str+=getArrow(m.home_odds,last_home)
+                    last_home = m.home_odds
+                }
 
+                else if(win_type == 3){
+                    under = Math.round(m.away_odds *1000) / 10 + "%"
+                    insert_str+= '<td>'+ under +'</td>'
+
+                    standard = m.handicap
+                    insert_str+= '<td>'+ standard +'</td>'
+
+                    over = Math.round(m.home_odds *1000) / 10 + "%"
+                    insert_str+= '<td>'+ over +'</td>'
+
+                }
 
                 insert_str+= '<td>'+ m.craw_time +'</td>'
-
                 this_body.append(insert_str)
-
-
-
             }
 
         }
-        getPopRate(odds_model1,'#layer-rate-model1')
-        getPopRate(odds_model2,'#layer-rate-model2')
-        getPopRate(odds_model3,'#layer-rate-model3')
+        getPopRate(odds_model1, 1, '#layer-rate-model1')
+        getPopRate(odds_model2, 1, '#layer-rate-model2')
+        getPopRate(odds_model3, 1, '#layer-rate-model3')
 
+        getPopRate(uo_model2,3, '#layer-uo-model2')
+        getPopRate(uo_model3,3, '#layer-uo-model3')
     }
 
 
