@@ -57,7 +57,7 @@ def game_info(request):
         last_date = TGI[0].game_idx[:8]
     except:
         GI = GameInfo.objects.all()
-        last_date = GI[-1].game_idx[:8]
+        last_date = GI.last().game_idx[:8]
     last_date = last_date[:4]+"-" + last_date[4:6] + "-" +last_date[6:8]
     
     UDT = UpdateTime.objects.all().order_by('-date','-craw_time')
