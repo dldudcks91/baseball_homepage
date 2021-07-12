@@ -286,6 +286,10 @@ body{
 }
 /* boxscore.html*/
 
+.box-score table{
+    font-size: 16px;
+}
+
 .box-score-area{
 	position: relative;
 	width:1200px;
@@ -302,9 +306,18 @@ body{
 	width:1200px;
 	margin:50px 50px 0px 0px;
 }
-
-
-
+.pitcher-record-area td{
+    width: 100px
+}
+.box-score-title{
+    text-align: left;
+}
+.batter-title{
+    text-align: left;
+}
+.pitcher-title{
+    text-align: left;
+}
 /*preview.html*/
 
 .preview-box{

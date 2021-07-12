@@ -108,109 +108,108 @@
         </div>
     </div>
     <hr>
-    {%if is_end %}
-    {% else  %}
-        <div class= "preview-box" id="preview-rate">
-            <div class="box-title"></div>
-            <div class="dist-box" id="rate-dist-box">
-                <ul>
-                    <li class="dist-card dist-card-away" id="run-rate-away"></li>
-                    <li class="game-title-box" id="game-rate-box">
 
-                        <div class="game-rate-title"><b>승부예측</b>
+    <div class= "preview-box" id="preview-rate">
+        <div class="box-title"></div>
+        <div class="dist-box" id="rate-dist-box">
+            <ul>
+                <li class="dist-card dist-card-away" id="run-rate-away"></li>
+                <li class="game-title-box" id="game-rate-box">
 
-                        </div>
-                        <div class="game-rate-odds">
-                            <div class="game-rate game-rate-away">
-                                <div class="rate-graph rate-graph-away">
-                                    <strong class="rate-bar rate-bar-away" id="rate-away-model1" ></strong>
-                                </div>
-                                <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-away" id="rate-away-model2" ></strong>
-                                </div>
-                                <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-away" id="rate-away-model3" ></strong>
-                                </div>
+                    <div class="game-rate-title"><b>승부예측</b>
+
+                    </div>
+                    <div class="game-rate-odds">
+                        <div class="game-rate game-rate-away">
+                            <div class="rate-graph rate-graph-away">
+                                <strong class="rate-bar rate-bar-away" id="rate-away-model1" ></strong>
                             </div>
-                                <div class="game-rate game-rate-middle">
-                                    <div class="rate-info">-</div>
-                                    <div class="rate-info">-</div>
-                                    <div class="rate-info">-</div>
-
-                                </div>
-                            <div class="game-rate game-rate-home">
-
-                                <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-home" id="rate-home-model1" ></strong>
-                                    <span class="add-info" role="button">
-                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer layer-rate hidden" id="layer-rate-model1">
-
-                                        </div>
-                                    </span>
-
-                                </div>
-                                <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-home" id="rate-home-model2" ></strong>
-                                    <span class="add-info" role="button">
-                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer layer-rate hidden" id="layer-rate-model2"></div>
-                                    </span>
-                                </div>
-                                <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-home" id="rate-home-model3" ></strong>
-                                    <span class="add-info" role="button">
-                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer layer-rate hidden" id="layer-rate-model3"></div>
-                                    </span>
-                                </div>
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-away" id="rate-away-model2" ></strong>
+                            </div>
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-away" id="rate-away-model3" ></strong>
                             </div>
                         </div>
-                        <div class="game-rate-title"><b>점수예측</b></div>
-                        <div class="game-rate-uo">
-                            <div class="game-rate game-rate-away">
-                                <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-away" id="uo-away-model2" ></strong>
-                                </div>
-                                <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-away" id="uo-away-model3" ></strong>
-                                </div>
+                            <div class="game-rate game-rate-middle">
+                                <div class="rate-info">-</div>
+                                <div class="rate-info">-</div>
+                                <div class="rate-info">-</div>
 
                             </div>
-                                <div class="game-rate game-rate-middle">
-                                    <div class="rate-info" id="uo-info-model2">-</div>
-                                    <div class="rate-info" id="uo-info-model3">-</div>
-                                </div>
-                            <div class="game-rate game-rate-home">
+                        <div class="game-rate game-rate-home">
 
-                                <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-home" id="uo-home-model2" ></strong>
-                                    <span class="add-info" role="button">
-                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer layer-uo hidden" id="layer-uo-model2"></div>
-                                    </span>
-                                </div>
-                                <div class="rate-graph">
-                                    <strong class="rate-bar rate-bar-home" id="uo-home-model3" ></strong>
-                                    <span class="add-info" role="button">
-                                        <img class='add-info-img' src="/static/images/button/add_button.png" >
-                                        <div class="add-pop-layer  layer-uo hidden" id="layer-uo-model3"></div>
-                                    </span>
-                                </div>
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-home" id="rate-home-model1" ></strong>
+                                <span class="add-info" role="button">
+                                    <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                    <div class="add-pop-layer layer-rate hidden" id="layer-rate-model1">
 
+                                    </div>
+                                </span>
+
+                            </div>
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-home" id="rate-home-model2" ></strong>
+                                <span class="add-info" role="button">
+                                    <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                    <div class="add-pop-layer layer-rate hidden" id="layer-rate-model2"></div>
+                                </span>
+                            </div>
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-home" id="rate-home-model3" ></strong>
+                                <span class="add-info" role="button">
+                                    <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                    <div class="add-pop-layer layer-rate hidden" id="layer-rate-model3"></div>
+                                </span>
                             </div>
                         </div>
+                    </div>
+                    <div class="game-rate-title"><b>점수예측</b></div>
+                    <div class="game-rate-uo">
+                        <div class="game-rate game-rate-away">
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-away" id="uo-away-model2" ></strong>
+                            </div>
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-away" id="uo-away-model3" ></strong>
+                            </div>
 
-                    </li>
-                    <li class="dist-card dist-card-home" id="run-rate-home"></li>
-                </ul>
+                        </div>
+                            <div class="game-rate game-rate-middle">
+                                <div class="rate-info" id="uo-info-model2">-</div>
+                                <div class="rate-info" id="uo-info-model3">-</div>
+                            </div>
+                        <div class="game-rate game-rate-home">
 
-            </div>
-            <div class="box-contents">
-            </div>
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-home" id="uo-home-model2" ></strong>
+                                <span class="add-info" role="button">
+                                    <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                    <div class="add-pop-layer layer-uo hidden" id="layer-uo-model2"></div>
+                                </span>
+                            </div>
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-home" id="uo-home-model3" ></strong>
+                                <span class="add-info" role="button">
+                                    <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                    <div class="add-pop-layer  layer-uo hidden" id="layer-uo-model3"></div>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </li>
+                <li class="dist-card dist-card-home" id="run-rate-home"></li>
+            </ul>
+
         </div>
-        <hr>
-    {% endif %}
+        <div class="box-contents">
+        </div>
+    </div>
+    <hr>
+
     <div class= "preview-box" id="preview-pitcher">
         <div class="box-title">
 
