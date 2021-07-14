@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'baseball.apps.BaseballConfig',
     'main.apps.MainConfig',
 
-    
 ]
 
 MIDDLEWARE = [
