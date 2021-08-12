@@ -297,23 +297,7 @@
             </div>
         </div>
     </div>
-    <hr>
-    <div class= "preview-box" id="preview-run" style="opacity:0">
 
-        <div class="box-title">
-
-        </div>
-
-        <div class="box-contents">
-
-            <div class="run-box" id="run-graph-box">
-                <div class="run-graph run-graph-away" id="run-graph-away"></div>
-                <div class="run-graph run-graph-home" id="run-graph-home"></div>
-
-            </div>
-        </div>
-    <hr>
-    </div>
 </div>
 
 
@@ -894,11 +878,9 @@
             success: function(data){
                 setTimeout(function() {
                     $('.preview-box').fadeTo(2000,1)
-                    ChartRpAway(data,'rp-graph-away')
-                    ChartRpHome(data,'rp-graph-home')
+                    ChartBt(data,'rp-graph-away')
+                    ChartRp(data,'rp-graph-home')
                     ChartRunDist(data,'run-dist-graph')
-                    ChartRunAway(data,'run-graph-away')
-                    ChartRunHome(data,'run-graph-home')
                 }, 2000);
 
 
@@ -1004,84 +986,7 @@
             },
         });
     }
-    function ChartRunAway(data,id_index){
-        Highcharts.chart(id_index, {
-                    chart: {
-                        width: 600,
-                        height: 400
-                    },
-
-                    title: {
-                        text: '  최근득점추이 - ' + data.away_dic.name
-                    },
-
-                    subtitle: {
-                        text: null
-                    },
-
-                    yAxis: {
-
-                        title: {
-                            text: 'Mean of Run'
-
-                        },
-                        min: 0,
-                        max: 10,
-                    },
-
-                    series: [{
-                        name: '5-games',
-                        data: data.away_dic.r5
-                    },
-                    {
-                        name: '20-games',
-                        data: data.away_dic.r20
-                    }],
-                    credits: {
-                        enabled: false
-                    },
-                });
-    }
-    function ChartRunHome(data,id_index){
-        Highcharts.chart(id_index, {
-
-            chart: {
-                width: 600,
-                height: 400
-            },
-
-            title: {
-                text: '  최근득점추이 - ' + data.home_dic.name
-            },
-
-            subtitle: {
-                text: null
-            },
-
-            yAxis: {
-
-                title: {
-                    text: 'Mean of Run'
-
-                },
-                min: 0,
-                max: 10,
-            },
-
-            series: [{
-                name: '5-games',
-                data: data.home_dic.r5
-            },
-            {
-                name: '20-games',
-                data: data.home_dic.r20
-            }],
-            credits: {
-                enabled: false
-            },
-        });
-    }
-    function ChartRpAway(data,id_index){
+    function ChartRp(data,id_index){
         Highcharts.chart(id_index, {
             chart: {
                 width: 600,
@@ -1089,7 +994,7 @@
             },
 
             title: {
-                text: '  불펜실점추이 - ' + data.away_dic.name
+                text: '  불펜실점추이 - 최근 20경기 '
             },
 
             subtitle: {
@@ -1107,19 +1012,19 @@
             },
 
             series: [{
-                name: '5-games',
-                data: data.away_dic.f5
-            },
-            {
-                name: '20-games',
+                name: data.away_dic.name,
                 data: data.away_dic.f20
+            },
+            {
+                name: data.home_dic.name,
+                data: data.home_dic.f20
             }],
             credits: {
                 enabled: false
             },
         });
     }
-    function ChartRpHome(data,id_index){
+    function ChartBt(data,id_index){
         Highcharts.chart(id_index, {
             chart: {
                 width: 600,
@@ -1127,7 +1032,7 @@
             },
 
             title: {
-                text: '  불펜실점추이 - ' + data.home_dic.name
+                text: '  타선득점추이 - 최근 20경기 '
             },
 
             subtitle: {
@@ -1145,12 +1050,12 @@
             },
 
             series: [{
-                name: '5-games',
-                data: data.home_dic.f5
+                name: data.away_dic.name,
+                data: data.away_dic.r20
             },
             {
-                name: '20-games',
-                data: data.home_dic.f20
+                name: data.home_dic.name,
+                data: data.home_dic.r20
             }],
             credits: {
                 enabled: false
