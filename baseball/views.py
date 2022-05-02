@@ -518,8 +518,12 @@ def preview(request,date,today_game_num):
                          2019:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2020:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2021:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
+<<<<<<< HEAD
                          2022:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT']
                          }
+=======
+                         2022:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT']}
+>>>>>>> e53468f76f63a8f67dc8c0ff40217c005254c6bd
                             
         start_idx = game_idx[:6] + '001'
         sp_set = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1).all()
