@@ -220,7 +220,7 @@
                 <ul>
                     <li class="dist-card dist-card-away dist-sp" id="sp-dist-away">
                         <div id="sp-title-away" class="sp-title"><b>{{away_dic.sp}}</b></div>
-                        <hr style="position:absolute;width:220px;top:6px;">
+                        <hr style="position:absolute;width:240px;top:6px;">
 
                         <ul>
                             <li><b>- 최근등판기록</b></li>
@@ -242,7 +242,7 @@
                     <li class="dist-graph" id="sp-dist-graph"></li>
                     <li class="dist-card dist-card-home dist-sp" id="sp-dist-home">
                         <div id="sp-title-home" class="sp-title"><b>{{home_dic.sp}}</b></div>
-                        <hr style="position:absolute;width:220px;top:6px;right:0px">
+                        <hr style="position:absolute;width:240px;top:6px;right:0px">
 
                         <ul>
                             <li><b>- 최근등판기록</b></li>
@@ -259,12 +259,14 @@
                             </li>
                             {% endfor %}
                         </ul>
+
                     </li>
                 </ul>
             </div>
         </div>
     </div>
     <hr>
+
     <div class= "preview-box" id="preview-rp" style="opacity:0">
         <div class="box-title">
 
@@ -280,6 +282,8 @@
         </div>
     </div>
     <hr>
+
+
     <div class= "preview-box" id="preview-run-dist" style="opacity:0">
 
         <div class="box-title">
@@ -663,7 +667,7 @@
 
                 reversed: false,
                 opposite: true,
-                categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+                categories: ['-30','30-35','35-40','40-45','45-50','50-55','55-60','60-65','65-70','70-']
 
 
             },
@@ -698,8 +702,20 @@
                 name: '롯데',
 
 
-                data: [-15,-30,-15,-15,-10,-5,-7,-3],
-                color: 'rgb(67,67,72)'
+                data: [-30,-35,-40,-45,-50,-55,-60,-65,-70,-75],
+                color: 'rgb(67,67,72)',
+                dataLabels: {
+                            enabled: true,
+
+                            color: '#FFFFFF',
+                            align: 'left',
+                            formatter: function() {
+                                return Math.abs(this.point.y).toFixed(1) // one decimal
+                            },
+                            style: {
+                                fontSize: '13px',
+                            }
+                        }
             }]
             ,
             credits: {

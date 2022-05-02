@@ -517,7 +517,9 @@ def preview(request,date,today_game_num):
                          2018:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2019:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2020:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
-                         2021:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT']}
+                         2021:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
+                         2022:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT']
+                         }
                             
         start_idx = game_idx[:6] + '001'
         sp_set = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1).all()
@@ -644,7 +646,7 @@ def preview(request,date,today_game_num):
             if tr > fr: win+=1
             elif tr <fr: lose+=1
             else: draw+=1
-        win_rate = np.round(win/(win+lose+draw),3)
+        win_rate = np.round(win/(win+lose),3)
         home_rate = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
         away_rate = str('{:,.3f}'.format(round(1-win_rate,3))) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
         return [home_rate, away_rate]
@@ -671,7 +673,7 @@ def preview(request,date,today_game_num):
             if tr > fr: win+=1
             elif tr <fr: lose+=1
             else: draw+=1
-        win_rate = np.round(win/(win+lose+draw),3)
+        win_rate = np.round(win/(win+lose),3)
         result = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
         return result
     
