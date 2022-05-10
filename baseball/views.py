@@ -709,17 +709,25 @@ def preview(request,date,today_game_num):
     home_dic['rank'] = get_rank(home_team_num,year)
     away_dic['rank'] = get_rank(away_team_num,year)
     
-    
+    '''
     time = game_date_set[today_game_num-1].end
     
     def get_toto(date,time,away_name,home_name):
         if time =="경기종료":
-            toto_set = TodayToTo.objects.filter(date = str(date), away_name = away_name, home_name = home_name)
+            toto_set = TodayToTo.objects.filter(date = date, away_name = away_name, home_name = home_name)
         else:
-            toto_set = TodayToTo.objects.filter(date = str(date), time = time, away_name = away_name, home_name = home_name)
+            toto_set = TodayToTo.objects.filter(date = date, time = time, away_name = away_name, home_name = home_name)
         return toto_set.values()
     
     toto_set = get_toto(date,time,away_name,home_name).order_by('craw_time')
+    '''
+    
+    def get_toto(date,away_name,home_name):
+        
+        toto_set = TodayToTo.objects.filter(date = date, away_name = away_name, home_name = home_name)
+        return toto_set.values()
+    
+    toto_set = get_toto(date,away_name,home_name).order_by('craw_time')
     toto_list = [toto for toto in toto_set.values()]
     
     
