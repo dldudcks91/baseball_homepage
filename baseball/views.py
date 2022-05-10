@@ -714,9 +714,9 @@ def preview(request,date,today_game_num):
     
     def get_toto(date,time,away_name,home_name):
         if time =="경기종료":
-            toto_set = TodayToTo.objects.filter(date = 20220510, away_name = away_name, home_name = home_name)
+            toto_set = TodayToTo.objects.filter(date = 20211030, away_name = away_name, home_name = home_name)
         else:
-            toto_set = TodayToTo.objects.filter(date = 20220510, time = time, away_name = away_name, home_name = home_name)
+            toto_set = TodayToTo.objects.filter(date = 20211030, time = time, away_name = away_name, home_name = home_name)
         return toto_set.values()
     
     toto_set = get_toto(date,time,away_name,home_name).order_by('craw_time')
