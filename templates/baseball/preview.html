@@ -301,17 +301,14 @@
             </div>
         </div>
     </div>
-        {% for set in away_set %}
+        {% for set in toto_list %}
             <li>
                 <div class="recent-games">
                     <div>{{set.date}}</div>
-                    <div>{{set.stadium}}</div>
-                    <div><img class='pre-emb' src= "{{set.away_url}}" alt= "{{set.away_name}}" ></div>
-                    <div class="recent-run">{{set.away_run}}</div>
-                    <div>:</div>
-                    <div class="recent-run">{{set.home_run}}</div>
-                    <div><img class='pre-emb' src= "{{set.home_url}}" alt= "{{set.home_name}}"></div>
-                    <div class="recent-result" value="{{set.result}}">{{set.result}}</div>
+                    <div>{{set.site_name}}</div>
+                    <div>{{set.away_name}}</div>
+                    <div>{{set.home_name}}</div>
+                   
                 </div>
             </li>
         {% endfor %}
