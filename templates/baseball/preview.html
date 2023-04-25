@@ -283,7 +283,7 @@
     </div>
     <hr>
 
-
+    <!--
     <div class= "preview-box" id="preview-run-dist" style="opacity:0">
 
         <div class="box-title">
@@ -301,7 +301,7 @@
             </div>
         </div>
     </div>
-        
+    -->
 </div>
 
 
@@ -416,12 +416,26 @@
 
 
     function GameRateGraph(){
-       // var set_url = 'sp_graph/' + {{date}} +'/' + {{today_game_num}};
-       //getRateGraph()
+        var set_url = 'run_graph/'  + {{date}} +'/' + {{today_game_num}};
+        $.ajax({
+            url: set_url,
+            dataType:'json',
+            success: function(data){
+                setTimeout(function() {
+                    $('.preview-box').fadeTo(500,1)
+                    ChartRunRateAway(data,'run-rate-away')
+                    ChartRunRateHome(data,'run-rate-home')
+                }, 500);
 
 
-       ChartRunRateAway('run-rate-away')
-       ChartRunRateHome('run-rate-home')
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+
+
+        });
+       
     }
 
     function ToToRate(){
@@ -584,16 +598,16 @@
     }
 
 
-    function ChartRunRateAway(id_index){
-
-        Highcharts.chart(id_index, {
+    function ChartRunRateAway(data, id_index){
+        
+        Highcharts.chart( id_index, {
 
             chart: {
                 type:'bar'
             },
 
             title: {
-                text: null
+                text: data.away_dic.name + ' 득점분포'
             },
             xAxis: {
                 title:{
@@ -603,24 +617,27 @@
                 reversed: false,
 
                 categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
-
+                accessibility: {
+                    description: data.away_dic.name
+                },
 
             },
 
             yAxis: {
-                title:{
-                    text:null
-                },
 
-                labels: {
+                    title: {
+                    text: null
+                    },
+                    labels: {
+                        formatter: function () {
+                            return Math.abs(this.value) + '%';
+                        }
+                    },
+                    min: 0,
+                    max: 50
 
-                    formatter: function () {
-                        return Math.abs(this.value) + '%';
-                    }
-                },
+                    },
 
-
-            },
 
             plotOptions: {
                 series: {
@@ -635,8 +652,8 @@
                 }
             },
             series: [{
-                name: '한화',
-                data: [15,30,15,15,10,5,7,3],
+                name: data.away_dic.name,
+                data: data.away_dic.dist,
 
             }],
             credits: {
@@ -649,8 +666,11 @@
         });
 
     }
-    function ChartRunRateHome(id_index){
-
+    function ChartRunRateHome(data, id_index){
+        var home_dist_list = data.home_dic.dist
+        for(var i in home_dist_list){
+            home_dist_list[i] = -home_dist_list[i]
+        }
         Highcharts.chart(id_index, {
 
             chart: {
@@ -658,7 +678,7 @@
             },
 
             title: {
-                text: null
+                text: data.home_dic.name + ' 득점분포'
             },
             xAxis: {
                 title:{
@@ -667,24 +687,29 @@
 
                 reversed: false,
                 opposite: true,
-                categories: ['-30','30-35','35-40','40-45','45-50','50-55','55-60','60-65','65-70','70-']
-
+                categories: ['0-1','2-3','4-5','6-7','8-9','10-11','12-13','14+'],
+                accessibility: {
+                    description: data.home_dic.name
+                },
 
             },
 
             yAxis: {
-                title:{
-                    text:null
-                },
-                labels: {
 
-                    formatter: function () {
-                        return Math.abs(this.value) + '%';
-                    }
-                },
+                    title: {
+                        text: null
+                    },
+                    labels: {
+                        formatter: function () {
+                            return Math.abs(this.value) + '%';
+                        }
+                    },
+                    min: -50,
+                    max: 0 
+                    
+                    },
 
-
-            },
+                        
 
             plotOptions: {
                 series: {
@@ -699,11 +724,11 @@
                 }
             },
             series: [{
-                name: '롯데',
-
-
-                data: [-30,-35,-40,-45,-50,-55,-60,-65,-70,-75],
+                name: data.home_dic.name,
+                data: home_dist_list,
+                
                 color: 'rgb(67,67,72)',
+                /*
                 dataLabels: {
                             enabled: true,
 
@@ -716,6 +741,7 @@
                                 fontSize: '13px',
                             }
                         }
+                */
             }]
             ,
             credits: {
@@ -727,6 +753,10 @@
         });
 
     }
+    
+
+    
+
 </script>
 <script type="text/javascript">
     /* 선발투수기록 불러오는 java-script*/
@@ -893,14 +923,11 @@
             dataType:'json',
             success: function(data){
                 setTimeout(function() {
-                    $('.preview-box').fadeTo(2000,1)
+                    $('.preview-box').fadeTo(1000,1)
                     ChartBt(data,'rp-graph-away')
                     ChartRp(data,'rp-graph-home')
-                    ChartRunDist(data,'run-dist-graph')
-                }, 2000);
-
-
-
+                    //ChartRunDist(data,'run-dist-graph')
+                }, 1000);
 
 
             },
@@ -1076,6 +1103,7 @@
             credits: {
                 enabled: false
             },
+            
         });
     }
 

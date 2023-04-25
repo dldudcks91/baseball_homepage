@@ -208,7 +208,8 @@ class RunGraphView(APIView):
         
         def get_run_dist(data_set):
             r_list = [0 for i in range(16)]
-            length= data_set.count()    
+            length= data_set.count()
+            
             for data in data_set:
                 r = round(data.run_1)
                 
@@ -225,8 +226,11 @@ class RunGraphView(APIView):
                 
                 r_sum+=r
                 count+=1
-                if count == 2:                    
-                    result_list.append(r_sum / length*100)
+                if count == 2:
+                    if length == 0:
+                        result_list.append(0)
+                    else:
+                        result_list.append(r_sum / length*100)
                     count = 0
                     r_sum = 0 
                 
@@ -369,8 +373,7 @@ class SpGraphView(APIView):
                 inn= sum(data_set.values_list('inn',flat=True))
                 
                 er = sum(data_set.values_list('er',flat=True))
-                if rp_inn == 0:
-                    rp_fip = 0
+                
                     
                     
                 if inn == 0:
@@ -381,8 +384,11 @@ class SpGraphView(APIView):
                     era = round(er / inn * 9, 2)
                     inn = round(inn / count,1)
                     
-                rp = rp_fip / rp_inn + 3.2
-                qs = qs_count / count * 10
+                if rp_inn == 0:
+                    rp = 0
+                else:
+                    rp = (rp_fip / rp_inn) + 3.2
+                qs = (qs_count / count) * 10
                 run = round(run / count, 2)
                 
                 
@@ -518,7 +524,10 @@ def preview(request,date,today_game_num):
                          2019:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2020:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2021:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
-                         2022:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT']}
+                         2022:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
+                         2023:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT']
+                         }
+        
                          
         start_idx = game_idx[:6] + '001'
         sp_set = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1).all()
@@ -645,9 +654,15 @@ def preview(request,date,today_game_num):
             if tr > fr: win+=1
             elif tr <fr: lose+=1
             else: draw+=1
-        win_rate = np.round(win/(win+lose),3)
-        home_rate = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
-        away_rate = str('{:,.3f}'.format(round(1-win_rate,3))) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
+
+        if (win+lose) == 0:
+            win_rate = 0
+            home_rate = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+            away_rate = '{:,.3f}'.format(round(win_rate,3)) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
+        else:
+            win_rate = np.round(win/(win+lose),3)
+            home_rate = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+            away_rate = '{:,.3f}'.format(round(1-win_rate,3)) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
         return [home_rate, away_rate]
     
     rela = get_relative(home_game_idx,home_team_num,away_team_num)
@@ -672,7 +687,12 @@ def preview(request,date,today_game_num):
             if tr > fr: win+=1
             elif tr <fr: lose+=1
             else: draw+=1
-        win_rate = np.round(win/(win+lose),3)
+
+        if (win+lose) == 0:
+            win_rate = 0
+        else:
+            win_rate = np.round(win/(win+lose),3)
+
         result = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
         return result
     
