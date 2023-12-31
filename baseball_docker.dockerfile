@@ -13,7 +13,7 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-WORKDIR /
+WORKDIR /baseball/baseball_homepage
 # manage.py를 실행할 수 있는 디렉토리로 이동합니다.
 
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
