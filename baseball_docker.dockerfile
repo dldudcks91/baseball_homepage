@@ -1,4 +1,4 @@
-FROM python:3.9.18
+FROM python:3.7.7
 # python 3.7.7 버전의 컨테이너 이미지를 base이미지
 
 MAINTAINER yh Bang <yh20studio@gmail.com>
