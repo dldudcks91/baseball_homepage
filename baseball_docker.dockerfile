@@ -1,7 +1,7 @@
 FROM python:3.7.7
 # python 3.7.7 버전의 컨테이너 이미지를 base이미지
 
-MAINTAINER yh Bang <yh20studio@gmail.com>
+MAINTAINER LYC <dldudcks91o@gmail.com>
 # Docker의 컨테이너를 생성 및 관리 하는 사람의 정보를 기입해줍니다.
 
 RUN pip3 install django
@@ -13,7 +13,7 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-WORKDIR ./letterproject
+WORKDIR .
 # manage.py를 실행할 수 있는 디렉토리로 이동합니다.
 
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
