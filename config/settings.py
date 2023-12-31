@@ -87,11 +87,22 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'baseball',
-        'USER': 'lyc',
+        'USER': 'root',
         'PASSWORD': 'an98',
-        'HOST': 'ec2-3-37-61-176.ap-northeast-2.compute.amazonaws.com',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
         
     }
+    
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'baseball',
+    #     'USER': 'lyc',
+    #     'PASSWORD': 'an98',
+    #     'HOST': 'ec2-3-37-61-176.ap-northeast-2.compute.amazonaws.com',
+        
+    # }
+    
 }
 
 
