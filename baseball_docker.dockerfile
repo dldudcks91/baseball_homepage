@@ -4,7 +4,7 @@ FROM python:3.7.7
 MAINTAINER LYC <dldudcks91o@gmail.com>
 # Docker의 컨테이너를 생성 및 관리 하는 사람의 정보를 기입해줍니다.
 
-RUN pip3 install django
+RUN pip3 install -r requirements.txt
 # python:3.9.18 이미지 상에 django를 pip를 통해 설치합니다.
 
 WORKDIR ./
