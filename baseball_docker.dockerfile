@@ -7,7 +7,7 @@ MAINTAINER LYC <dldudcks91o@gmail.com>
 RUN pip3 install django
 # python:3.9.18 이미지 상에 django를 pip를 통해 설치합니다.
 
-WORKDIR /usr/src/app
+WORKDIR ./
 # WORKDIR은 cd와 같은 명령으로, 작업 경로를 /usr/src/app으로 이동합니다.
 # CMD에서 설정한 실행 파일이 실행될 디렉터리를 지정해주어야 한다.
 
