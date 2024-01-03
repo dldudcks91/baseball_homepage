@@ -12,8 +12,8 @@ WORKDIR ./
 
 COPY . .
 
-RUN pip3 install --upgrade pip3
-RUN pip3 install -r requirements.txt
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 # python:3.9.18 이미지 상에 django를 pip를 통해 설치합니다.
 
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
