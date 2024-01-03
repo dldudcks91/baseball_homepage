@@ -4,8 +4,7 @@ FROM python:3.7.7
 MAINTAINER LYC <dldudcks91o@gmail.com>
 # Docker의 컨테이너를 생성 및 관리 하는 사람의 정보를 기입해줍니다.
 
-RUN pip3 install -r requirements.txt
-# python:3.9.18 이미지 상에 django를 pip를 통해 설치합니다.
+
 
 WORKDIR ./
 # WORKDIR은 cd와 같은 명령으로, 작업 경로를 /usr/src/app으로 이동합니다.
@@ -13,6 +12,8 @@ WORKDIR ./
 
 COPY . .
 
+RUN pip3 install -r requirements.txt
+# python:3.9.18 이미지 상에 django를 pip를 통해 설치합니다.
 
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 # 이동한 디렉토리에서 django를 가동시켜주는 코드를 작성합니다. 여기서 port는 8000로 실행시키겠습니다.
