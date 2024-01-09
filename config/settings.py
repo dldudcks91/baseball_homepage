@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+import yaml
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
@@ -83,14 +84,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # to aws server
 
 
+with open('./config/db_settings.yml') as f:
+    db_yaml = yaml.full_load(f)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'baseball',
-        'USER': 'root',
-        'PASSWORD': 'an98',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'ENGINE': db_yaml['ENGINE'],
+        'NAME': db_yaml['NAME'],
+        'USER': db_yaml['USER'],
+        'PASSWORD': db_yaml['PASSWORD'],
+        'HOST': db_yaml['HOST'],
+        'PORT': db_yaml['PORT'],
         
     }
     
