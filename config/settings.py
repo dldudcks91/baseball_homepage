@@ -88,12 +88,12 @@ with open('./config/db_settings.yml') as f:
     db_yaml = yaml.full_load(f)
 DATABASES = {
     'default': {
-        'ENGINE': db_yaml['ENGINE'],
-        'NAME': db_yaml['NAME'],
-        'USER': db_yaml['USER'],
-        'PASSWORD': db_yaml['PASSWORD'],
-        'HOST': db_yaml['HOST'],
-        'PORT': db_yaml['PORT'],
+        'ENGINE': db_yaml['BASEBALL']['ENGINE'],
+        'NAME': db_yaml['BASEBALL']['NAME'],
+        'USER': db_yaml['BASEBALL']['USER'],
+        'PASSWORD': db_yaml['BASEBALL']['PASSWORD'],
+        'HOST': db_yaml['BASEBALL']['HOST'],
+        'PORT': db_yaml['BASEBALL']['PORT'],
         
     }
     

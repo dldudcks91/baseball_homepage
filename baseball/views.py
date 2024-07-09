@@ -28,7 +28,10 @@ def team_info(request):
     '''
     return render(request,'baseball/team_info.html')
     
-def team_info_year(request,year):
+def team_info_year(request, year):
+    '''
+    연도별 team_info 데이터 불러오는 view
+    '''
     team_year_set = TeamInfo.objects.filter(year__contains = year)
     rank = 1
     last_win_rate = 0
@@ -50,7 +53,7 @@ def game_info(request):
     year = str(local_time[0])
     month = str(local_time[1]).zfill(2)
     day = str(local_time[2]).zfill(2)
-    today = year + "-" + month + "-" + day
+    today = f'{year}-{month}-{day}'
     
     try:
         TGI = TodayGameInfo.objects.all()
@@ -69,12 +72,18 @@ def game_info(request):
     return render(request,'baseball/game_info.html',context)
     
 def game_info_date(request,date):
+    '''
+    특정날짜에 진행되는 경기들의 데이터를 가져옴
     
+    '''
     game_date_set = GameInfo.objects.filter(game_idx__contains = str(date)).values()
     game_date_idx = game_date_set.values('game_idx')
+    
     team_game_dic = TeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
     team_game_idx = team_game_dic.values("team_game_idx","home_away")
     is_end = True
+    
+    
     if game_date_set.exists():
         pass
     else:
@@ -84,12 +93,13 @@ def game_info_date(request,date):
         team_game_idx = team_game_dic.values("team_game_idx","home_away")
         is_end = False
         
-        
+    
     for game_num_idx, game_date in enumerate(game_date_set):
         
         game_date['game_num_idx'] = game_num_idx+1
         game_date['away_url'] = "/static/images/emblem/emblem_" + game_date['away_name'] + ".png";
         game_date['home_url'] = "/static/images/emblem/emblem_" + game_date['home_name'] + ".png";
+        
         
         game_idx = game_num_idx * 2
         if team_game_idx[game_idx]['home_away'] == 'home':
@@ -100,6 +110,8 @@ def game_info_date(request,date):
             home_idx = team_game_idx[game_idx+1]['team_game_idx']
             away_idx = team_game_idx[game_idx]['team_game_idx']
         
+        
+        print(home_idx, away_idx)
         if is_end:
             home_score_dic = ScoreRecord.objects.filter(team_game_idx = home_idx).values()
             away_score_dic = ScoreRecord.objects.filter(team_game_idx = away_idx).values()
@@ -123,7 +135,7 @@ def game_info_date(request,date):
             pass
     
     data_length = game_date_set.count()
-    
+    #print(game_date_set)
     context = {'game_date_set':game_date_set,'is_end':is_end, 'data_length':data_length}
     return render(request,'baseball/game_info_date.html',context)
 
@@ -525,7 +537,8 @@ def preview(request,date,today_game_num):
                          2020:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2021:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
                          2022:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
-                         2023:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT']
+                         2023:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
+                         2024:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
                          }
         
                          
