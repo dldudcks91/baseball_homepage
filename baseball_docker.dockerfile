@@ -1,7 +1,7 @@
-FROM python:3.7.7
-# python 3.7.7 버전의 컨테이너 이미지를 base이미지
+FROM python:3.11.7
+# python 3.11.7 버전의 컨테이너 이미지를 base이미지
 
-MAINTAINER LYC <dldudcks91o@gmail.com>
+MAINTAINER LYC <dldudcks91@gmail.com>
 # Docker의 컨테이너를 생성 및 관리 하는 사람의 정보를 기입해줍니다.
 
 
@@ -16,7 +16,8 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 # python:3.9.18 이미지 상에 django를 pip를 통해 설치합니다.
 
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]
+#["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 # 이동한 디렉토리에서 django를 가동시켜주는 코드를 작성합니다. 여기서 port는 8000로 실행시키겠습니다.
 
 EXPOSE 8000
