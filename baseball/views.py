@@ -467,15 +467,12 @@ def preview(request,date,today_game_num):
         is_end = True
     
     game_date_set = GI.objects.filter(game_idx__contains = str(date))
-    today_game_idx = game_date_set.values("game_idx")
+    today_game_idx_values = game_date_set.values("game_idx")
     
     
-    team_game_set = TGI.objects.filter(game_idx__in = today_game_idx)
+    team_game_set = TGI.objects.filter(game_idx__in = today_game_idx_values)
     today_game_set= team_game_set[today_game_num_idx_min:today_game_num_idx_max]
-    
-    
-   
-    
+
     
     home_dic = dict()
     away_dic = dict()
@@ -521,19 +518,11 @@ def preview(request,date,today_game_num):
     else:
         home_sp_name = TodayLineUp.objects.filter(team_game_idx=home_game_idx)[0].name
         away_sp_name = TodayLineUp.objects.filter(team_game_idx=away_game_idx)[0].name
-    
 
-
-    
 
     home_dic['sp'] = home_sp_name
     away_dic['sp'] = away_sp_name
-    
-    
-    
-    
-    
-    
+        
     def get_recent_sp(sp_set, team_game_idx, sp_name, year, recent_count):
         team_name_dic = {2017:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2018:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
@@ -593,38 +582,52 @@ def preview(request,date,today_game_num):
     
 
     
-
+    #스코어 데이터 불러오기
     home_score_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = home_start_game_idx, team_game_idx__lt = home_game_idx)
     away_score_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = away_start_game_idx, team_game_idx__lt = away_game_idx)
 
+
+    home_score_list = list(home_score_set)
+    away_score_list = list(away_score_set)
+
+
+    #상대팀 스코어 데이터 불러오기
+    home_game_idx_list = [score.game_idx for score in home_score_list]
+    away_game_idx_list = [score.game_idx for score in away_score_list]
+
+    home_foe_score_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=home_game_idx_list)
+    away_foe_score_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=away_game_idx_list)
+
+    home_foe_score_list = list(home_foe_score_set)
+    home_foe_score_list = [score for score in home_foe_score_list if score.team_num !=home_team_num]
+
+    away_foe_score_list = list(away_foe_score_set)
+    away_foe_score_list = [score for score in away_foe_score_list if score.team_num !=away_team_num]
+
+
+    #최신값으로 변경
     recent_range = 7
     
     home_recent_game_num = 1 if home_game_num <= recent_range else home_game_num - recent_range
-    home_recent_game_idx = home_game_idx[:6] + str(home_recent_game_num).zfill(3)
-
     away_recent_game_num = 1 if away_game_num <= recent_range else away_game_num - recent_range
-    away_recent_game_idx = away_game_idx[:6] + str(away_recent_game_num).zfill(3)
+
+    home_recent_score_list = home_score_list[home_recent_game_num-1:]
+    away_recent_score_list = away_score_list[away_recent_game_num-1:]
+
+    home_recent_foe_score_list = home_foe_score_list[home_recent_game_num-1:]
+    away_recent_foe_score_list = away_foe_score_list[away_recent_game_num-1:]
     
-
-    home_recent_score_set = home_score_set.filter(team_game_idx__gte = home_recent_game_idx)
-    away_recent_score_set = away_score_set.filter(team_game_idx__gte = away_recent_game_idx)
-
-    def get_recent(score_set, game_num,game_idx,team_num):
+    def get_recent(recent_list, recent_foe_list, game_num,game_idx,team_num):
         
-        
-        
-        recent_set = score_set
-        
-        
-        range_idx = recent_set.values('game_idx')
-        foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
-        print(foe_set)
-        print(recent_set)
+        #range_idx_list = [recent.game_idx for recent in recent_list]
+        #range_idx = recent_set.values('game_idx')
+        #foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx_list).exclude(team_num= team_num)
+        #foe_list = list(foe_set)
         
         
         
         
-        for recent, foe in zip(recent_set, foe_set):
+        for recent, foe in zip(recent_list, recent_foe_list):
             recent.stadium = recent.game_idx.stadium 
             recent.date = recent.game_idx.game_idx[4:8]
             
@@ -657,22 +660,25 @@ def preview(request,date,today_game_num):
                 recent.home_run = foe_run
                 recent.away_run = team_run
                 
-        return recent_set
+        return recent_list
     
-    home_set = get_recent(home_recent_score_set, home_game_num,home_game_idx,home_team_num)
-    away_set = get_recent(away_recent_score_set, away_game_num,away_game_idx,away_team_num)
+    home_set = get_recent(home_recent_score_list, home_recent_foe_score_list, home_game_num, home_game_idx, home_team_num)
+    away_set = get_recent(away_recent_score_list, away_recent_foe_score_list, away_game_num, away_game_idx, away_team_num)
     
-    def get_relative(score_set, game_idx,team_num,foe_num):
+    def get_relative(score_list, score_foe_list, game_idx, team_num, foe_num):
         
         
-        team_set = score_set.filter(foe_num = foe_num)
-        
-        range_idx = team_set.values('game_idx')
-        foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
+        #team_set = score_set.filter(foe_num = foe_num)
+        #range_idx = team_set.values('game_idx')
+
+        #range_idx_list = [score.game_idx for score in score_list if score.foe_num == foe_num]
+        #foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx_list).exclude(team_num= team_num)
+
+        foe_list = [score for score in score_foe_list if score.team_num == foe_num]
         win = 0
         lose = 0
         draw = 0
-        for team, foe in zip(team_set,foe_set):
+        for team, foe in zip(score_list, foe_list):
             tr = team.scorerecord.r
             fr = foe.scorerecord.r
             if tr > fr: win+=1
@@ -682,35 +688,42 @@ def preview(request,date,today_game_num):
         if (win+lose) == 0:
             win_rate = 0
             win_rate = '{:,.3f}'.format(win_rate)
-            home_rate =  + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
-            away_rate = '{:,.3f}'.format(round(win_rate,3)) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
+            home_rate = f'{win_rate}({win}-{draw}-{lose})'
+            away_rate = f'{win_rate}({win}-{draw}-{lose})'
         else:
             win_rate = np.round(win/(win+lose),3)
             away_win_rate = 1-win_rate
 
             win_rate = '{:,.3f}'.format(win_rate)
+
             away_win_rate = '{:,.3f}'.format(away_win_rate)
             home_rate =  f'{win_rate}({win}-{draw}-{lose})'
             away_rate = f'{away_win_rate}({lose}-{draw}-{win})'
         return [home_rate, away_rate]
     
-    rela = get_relative(home_score_set, home_game_idx,home_team_num,away_team_num)
+    rela = get_relative(home_score_list, home_foe_score_list, home_game_idx, home_team_num, away_team_num)
     home_dic['rela'] = rela[0]
     away_dic['rela'] = rela[1]
     
-    def get_home_away(score_set, game_idx,team_num,home_away):
+
+
+    def get_home_away(score_list, score_foe_list, game_idx,team_num,home_away):
         
         
         
         
-        team_set = score_set.filter(home_away = home_away)
+        #team_set = score_set.filter(home_away = home_away)
         
-        range_idx = team_set.values('game_idx')
-        foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
+        #range_idx = team_set.values('game_idx')
+        #foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
+
+        team_list = [score for score in score_list if score.home_away == home_away]
+        foe_list = [score for score in score_foe_list if score.home_away == home_away]
         win = 0
         lose = 0
         draw = 0
-        for team,foe in zip(team_set,foe_set):
+        
+        for team,foe in zip(team_list,foe_list):
             tr = team.scorerecord.r
             fr = foe.scorerecord.r
             if tr > fr: win+=1
@@ -725,25 +738,27 @@ def preview(request,date,today_game_num):
         result = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
         return result
     
-    home_dic['home_away'] = get_home_away(home_score_set, home_game_idx,home_team_num,'home')
-    away_dic['home_away'] = get_home_away(away_score_set, away_game_idx,away_team_num,'away')
+    home_dic['home_away'] = get_home_away(home_score_list, home_foe_score_list, home_game_idx,home_team_num,'home')
+    away_dic['home_away'] = get_home_away(away_score_list, away_foe_score_list, away_game_idx,away_team_num,'away')
     
-    def get_win_rate(team_num, year):
-        team_set = TeamInfo.objects.filter(year = year, team_num = team_num)[0]
+
+    team_set = TeamInfo.objects.filter(year = year)
+    def get_win_rate(team_set, team_num):
+        team_set = team_set.filter(team_num = team_num)[0]
         win = team_set.win
         lose = team_set.lose
         draw = team_set.draw
         win_rate = team_set.win_rate
         result = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
         return result
-    home_dic['win_rate'] = get_win_rate(home_team_num,year)
-    away_dic['win_rate'] = get_win_rate(away_team_num,year)
+    home_dic['win_rate'] = get_win_rate(team_set, home_team_num)
+    away_dic['win_rate'] = get_win_rate(team_set, away_team_num)
     
-    def get_rank(team_num,year):
-        team_year_set = TeamInfo.objects.filter(year = year)
+    def get_rank(team_set, team_num):
+        
         rank = 1
         last_win_rate = 0
-        for i,team_year in enumerate(team_year_set):
+        for i,team_year in enumerate(team_set):
             
             win_rate = team_year.win_rate
             if win_rate != last_win_rate:
@@ -755,8 +770,8 @@ def preview(request,date,today_game_num):
                 break
         return rank
     
-    home_dic['rank'] = get_rank(home_team_num,year)
-    away_dic['rank'] = get_rank(away_team_num,year)
+    home_dic['rank'] = get_rank(team_set, home_team_num)
+    away_dic['rank'] = get_rank(team_set, away_team_num)
     
     '''
     time = game_date_set[today_game_num-1].end
