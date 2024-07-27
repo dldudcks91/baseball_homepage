@@ -341,20 +341,22 @@ class SpGraphView(APIView):
             
             data_set = PitcherRecord.objects.filter(team_game_idx__gte = start_idx, team_game_idx__lt= end_idx, name = sp_name, po = 1)
             
-            team_game_idx = data_set.values('team_game_idx')
-            rp_set = PitcherRecord.objects.filter(team_game_idx__in=team_game_idx).exclude(po=1)
-            sp_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__in= team_game_idx).prefetch_related('pitcherrecord')
+            team_game_idx_values = data_set.values('team_game_idx')
+            rp_set = PitcherRecord.objects.filter(team_game_idx__in=team_game_idx_values).exclude(po=1)
+            sp_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__in= team_game_idx_values).prefetch_related('pitcherrecord')
             
-            
+            fip = 0
+            er = 0
+            run = 0
+            rp_fip = 0
+            rp_inn = 0
+            qs_count = 0
+
             if sp_set.exists():
                 count = sp_set.count()
-                fip = 0
-                er = 0
-                run = 0
-                rp_fip = 0
-                rp_inn = 0
-                qs_count = 0
+                
                 for sp in sp_set:
+                    
                     team_game_idx = sp.team_game_idx #sp['team_game_idx_id']
                     #game_idx = TeamGameInfo.objects.filter(team_game_idx = team_game_idx).values()[0]['game_idx_id']
                     stadium = sp.game_idx.stadium#GameInfo.objects.filter(game_idx = game_idx).values()[0]['stadium']
@@ -400,24 +402,17 @@ class SpGraphView(APIView):
                     rp = 0
                 else:
                     rp = (rp_fip / rp_inn) + 3.2
-                qs = (qs_count / count) * 10
+                qs_count = (qs_count / count) * 10
                 run = round(run / count, 2)
                 
                 
                 
                 
                 
-            else:
-                count = 0
-                inn = 0
-                fip = 0
-                era= 0
-                run = 0
-                rp = 0
-                qs = 0
+            
                 
             
-            return [count, inn, fip, era, run, rp, qs]
+            return [count, inn, fip, era, run, rp, qs_count]
         hsp = get_sp(home_start_idx, home_game_idx, home_sp)
         asp = get_sp(away_start_idx, away_game_idx, away_sp)
         
@@ -503,10 +498,7 @@ def preview(request,date,today_game_num):
     
     away_game_idx = today_game_set[0].team_game_idx
     home_game_idx = today_game_set[1].team_game_idx
-    
-    
-    
-    
+
     
     home_dic['url'] = "/static/images/emblem_back/emblem_" + home_name + ".png"
     away_dic['url'] = "/static/images/emblem_back/emblem_" + away_name + ".png"
@@ -515,22 +507,34 @@ def preview(request,date,today_game_num):
     away_dic['emb_url'] = "/static/images/emblem/emblem_" + away_name + ".png"
 
     
+    home_start_game_idx = home_game_idx[:6] + '001'
+    away_start_game_idx = away_game_idx[:6] + '001'
+
+    home_pitcher_data = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte = home_start_game_idx)
+    away_pitcher_data = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte = away_start_game_idx)
+
     if is_end:
-        home_sp = PitcherRecord.objects.filter(team_game_idx = home_game_idx)[0].name
-        away_sp = PitcherRecord.objects.filter(team_game_idx = away_game_idx)[0].name
+        #home_pitcher_data = PitcherRecord.objects.filter(team_game_idx = home_game_idx)
+        #away_pitcher_data = PitcherRecord.objects.filter(team_game_idx = away_game_idx)
+        home_sp_name = home_pitcher_data.filter(team_game_idx = home_game_idx)[0].name
+        away_sp_name = away_pitcher_data.filter(team_game_idx = away_game_idx)[0].name
     else:
-        home_sp = TodayLineUp.objects.filter(team_game_idx=home_game_idx)[0].name
-        away_sp = TodayLineUp.objects.filter(team_game_idx=away_game_idx)[0].name
+        home_sp_name = TodayLineUp.objects.filter(team_game_idx=home_game_idx)[0].name
+        away_sp_name = TodayLineUp.objects.filter(team_game_idx=away_game_idx)[0].name
     
-    home_dic['sp'] = home_sp
-    away_dic['sp'] = away_sp
+
+
+    
+
+    home_dic['sp'] = home_sp_name
+    away_dic['sp'] = away_sp_name
     
     
     
     
     
     
-    def get_recent_sp(game_idx, sp_name, year, recent_count):
+    def get_recent_sp(sp_set, team_game_idx, sp_name, year, recent_count):
         team_name_dic = {2017:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2018:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
                          2019:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
@@ -542,8 +546,8 @@ def preview(request,date,today_game_num):
                          }
         
                          
-        start_idx = game_idx[:6] + '001'
-        sp_set = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1).all()
+        
+        sp_set = sp_set.filter(team_game_idx__lt = team_game_idx, name = sp_name ,po = 1).all()
         
         if sp_set.exists():
             
@@ -580,34 +584,42 @@ def preview(request,date,today_game_num):
         return recent_set
     
     
-    home_sp_set = get_recent_sp(home_game_idx, home_sp, year,3)
-    away_sp_set = get_recent_sp(away_game_idx, away_sp, year,3)
+    home_sp_set = get_recent_sp( home_pitcher_data , home_game_idx, home_sp_name, year,3)
+    away_sp_set = get_recent_sp( away_pitcher_data , away_game_idx, away_sp_name, year,3)
     
     
     home_game_num = int(today_game_set[1].game_num)
     away_game_num = int(today_game_set[0].game_num)
     
+
     
+
+    home_score_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = home_start_game_idx, team_game_idx__lt = home_game_idx)
+    away_score_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = away_start_game_idx, team_game_idx__lt = away_game_idx)
+
+    recent_range = 7
     
+    home_recent_game_num = 1 if home_game_num <= recent_range else home_game_num - recent_range
+    home_recent_game_idx = home_game_idx[:6] + str(home_recent_game_num).zfill(3)
+
+    away_recent_game_num = 1 if away_game_num <= recent_range else away_game_num - recent_range
+    away_recent_game_idx = away_game_idx[:6] + str(away_recent_game_num).zfill(3)
     
-    
-    def get_recent(game_num,game_idx,team_num, recent_range):
-        
-        if game_num <= recent_range :
-            start_num = 1
-        else:
-            start_num = game_num - recent_range
+
+    home_recent_score_set = home_score_set.filter(team_game_idx__gte = home_recent_game_idx)
+    away_recent_score_set = away_score_set.filter(team_game_idx__gte = away_recent_game_idx)
+
+    def get_recent(score_set, game_num,game_idx,team_num):
         
         
-        game_num = str(game_num)
-        start_num = str(start_num).zfill(3)
-        start_idx = game_idx[:6] + start_num
         
-        recent_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx)
+        recent_set = score_set
         
         
         range_idx = recent_set.values('game_idx')
         foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
+        print(foe_set)
+        print(recent_set)
         
         
         
@@ -647,14 +659,13 @@ def preview(request,date,today_game_num):
                 
         return recent_set
     
-    home_set = get_recent(home_game_num,home_game_idx,home_team_num,7)
-    away_set = get_recent(away_game_num,away_game_idx,away_team_num,7)
+    home_set = get_recent(home_recent_score_set, home_game_num,home_game_idx,home_team_num)
+    away_set = get_recent(away_recent_score_set, away_game_num,away_game_idx,away_team_num)
     
-    def get_relative(game_idx,team_num,foe_num):
+    def get_relative(score_set, game_idx,team_num,foe_num):
         
-        start_idx = game_idx[:6] + '001'
         
-        team_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx, foe_num = foe_num)
+        team_set = score_set.filter(foe_num = foe_num)
         
         range_idx = team_set.values('game_idx')
         foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
@@ -670,24 +681,29 @@ def preview(request,date,today_game_num):
 
         if (win+lose) == 0:
             win_rate = 0
-            home_rate = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+            win_rate = '{:,.3f}'.format(win_rate)
+            home_rate =  + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
             away_rate = '{:,.3f}'.format(round(win_rate,3)) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
         else:
             win_rate = np.round(win/(win+lose),3)
-            home_rate = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
-            away_rate = '{:,.3f}'.format(round(1-win_rate,3)) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
+            away_win_rate = 1-win_rate
+
+            win_rate = '{:,.3f}'.format(win_rate)
+            away_win_rate = '{:,.3f}'.format(away_win_rate)
+            home_rate =  f'{win_rate}({win}-{draw}-{lose})'
+            away_rate = f'{away_win_rate}({lose}-{draw}-{win})'
         return [home_rate, away_rate]
     
-    rela = get_relative(home_game_idx,home_team_num,away_team_num)
+    rela = get_relative(home_score_set, home_game_idx,home_team_num,away_team_num)
     home_dic['rela'] = rela[0]
     away_dic['rela'] = rela[1]
     
-    def get_home_away(game_idx,team_num,home_away):
+    def get_home_away(score_set, game_idx,team_num,home_away):
         
         
-        start_idx = game_idx[:6] + '001'
         
-        team_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx,home_away = home_away)
+        
+        team_set = score_set.filter(home_away = home_away)
         
         range_idx = team_set.values('game_idx')
         foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
@@ -709,10 +725,10 @@ def preview(request,date,today_game_num):
         result = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
         return result
     
-    home_dic['home_away'] = get_home_away(home_game_idx,home_team_num,'home')
-    away_dic['home_away'] = get_home_away(away_game_idx,away_team_num,'away')
+    home_dic['home_away'] = get_home_away(home_score_set, home_game_idx,home_team_num,'home')
+    away_dic['home_away'] = get_home_away(away_score_set, away_game_idx,away_team_num,'away')
     
-    def get_win_rate(team_num,year):
+    def get_win_rate(team_num, year):
         team_set = TeamInfo.objects.filter(year = year, team_num = team_num)[0]
         win = team_set.win
         lose = team_set.lose
