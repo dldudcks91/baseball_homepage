@@ -6,7 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-
+from django.contrib.auth.models import User
 
 class AuthGroup(models.Model):
     id = models.AutoField(primary_key=True)
@@ -342,4 +342,31 @@ class UpdateTime(models.Model):
     class Meta:
         managed = False
         db_table = 'update_time'
-            
+
+class Post(models.Model):
+    post_id = models.IntegerField(primary_key = True)
+    user_id = models.ForeignKey(User, db_column = 'user_id', on_delete= models.DO_NOTHING)
+    title = models.CharField(max_length=30)           # 게시물 제목
+    content = models.TextField(max_length = 1000)                       # 게시물 내용
+    created_at = models.DateTimeField(auto_now_add=True)  # 게시물 작성 시간
+    updated_at = models.DateTimeField(auto_now=True)      # 게시물 수정 시간
+
+    def __str__(self):
+        return self.title
+    class Meta:
+        
+        db_table = 'board_post'
+
+class Comment(models.Model):
+    comment_id = models.IntegerField(primary_key = True)
+    user_id = models.ForeignKey(User, db_column = 'user_id', on_delete= models.DO_NOTHING)
+    post_id = models.ForeignKey(Post, db_column = 'post_id', on_delete=models.CASCADE)  # 게시물 참조
+    content = models.TextField()                        # 댓글 내용
+    created_at = models.DateTimeField(auto_now_add=True)  # 댓글 작성 시간
+    updated_at = models.DateTimeField(auto_now=True)      # 댓글 수정 시간
+
+    def __str__(self):
+        return f'Comment by {self.post.title}'
+    class Meta:
+        
+        db_table = 'board_comment'

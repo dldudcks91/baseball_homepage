@@ -3,16 +3,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import TeamInfo,GameInfo,TeamGameInfo,ScoreRecord,BatterRecord,PitcherRecord,TodayGameInfo,TodayTeamGameInfo,TodayLineUp,TodayToTo,RunGraphData,UpdateTime
+from .models import AuthUser, TeamInfo, GameInfo, TeamGameInfo, ScoreRecord, BatterRecord, PitcherRecord, TodayGameInfo, TodayTeamGameInfo, TodayLineUp, TodayToTo, RunGraphData, UpdateTime, Post
+# 데이터용 패키지
 from django.db.models import Q
 # 그래프용 패키지
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.generic import View
+#제네릭 뷰
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+
+from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+
 import json
-
-
-# 데이터용 패키지
 import time
 import numpy as np
 # ---------------------------------------------------------------------------------------- #
@@ -343,19 +349,24 @@ class SpGraphView(APIView):
             
             team_game_idx_values = data_set.values('team_game_idx')
             rp_set = PitcherRecord.objects.filter(team_game_idx__in=team_game_idx_values).exclude(po=1)
-            sp_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__in= team_game_idx_values).prefetch_related('pitcherrecord')
+            sp_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__in= team_game_idx_values).prefetch_related('pitcherrecord').all()
+            sp_list = list(sp_set)
             
+            count = 0
+            inn = 0
             fip = 0
-            er = 0
+            era = 0
             run = 0
+            rp =0
+
             rp_fip = 0
             rp_inn = 0
             qs_count = 0
-
-            if sp_set.exists():
-                count = sp_set.count()
+            er = 0
+            if sp_list:
+                count = len(sp_list) # sp_set.count()
                 
-                for sp in sp_set:
+                for sp in sp_list:
                     
                     team_game_idx = sp.team_game_idx #sp['team_game_idx_id']
                     #game_idx = TeamGameInfo.objects.filter(team_game_idx = team_game_idx).values()[0]['game_idx_id']
@@ -798,6 +809,329 @@ def preview(request,date,today_game_num):
     context ={'date':date,'today_game_num':today_game_num,'stadium':stadium, 'is_end':is_end, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set,'toto_list':toto_list}
     return render(request,'baseball/preview.html',context)
 
+def preview_old(request,date,today_game_num):
+    
+    
+    today_game_num_idx_min = (2*today_game_num)-2
+    today_game_num_idx_max = (2*today_game_num)
+    
+    if TodayGameInfo.objects.filter(game_idx__contains = str(date)).values():
+        
+        TGI = TodayTeamGameInfo
+        GI = TodayGameInfo
+        is_end = False
+    else:
+        
+        TGI = TeamGameInfo
+        GI = GameInfo
+        is_end = True
+    
+    game_date_set = GI.objects.filter(game_idx__contains = str(date))
+    today_game_idx = game_date_set.values("game_idx")
+    
+    
+    team_game_set = TGI.objects.filter(game_idx__in = today_game_idx)
+    today_game_set= team_game_set[today_game_num_idx_min:today_game_num_idx_max]
+    
+    
+   
+    
+    
+    home_dic = dict()
+    away_dic = dict()
+    
+    year = str(date)[:4]
+    stadium = game_date_set[today_game_num-1].stadium
+    
+    away_team_num = today_game_set[0].team_num
+    home_team_num = today_game_set[1].team_num
+    
+    
+    
+    
+    home_name = game_date_set[today_game_num-1].home_name
+    away_name = game_date_set[today_game_num-1].away_name
+    
+    home_dic['name'] = home_name    
+    away_dic['name'] = away_name
+    
+    
+    away_game_idx = today_game_set[0].team_game_idx
+    home_game_idx = today_game_set[1].team_game_idx
+    
+    
+    
+    
+    
+    home_dic['url'] = "/static/images/emblem_back/emblem_" + home_name + ".png"
+    away_dic['url'] = "/static/images/emblem_back/emblem_" + away_name + ".png"
+    
+    home_dic['emb_url'] = "/static/images/emblem/emblem_" + home_name + ".png"
+    away_dic['emb_url'] = "/static/images/emblem/emblem_" + away_name + ".png"
+
+    
+    if is_end:
+        home_sp = PitcherRecord.objects.filter(team_game_idx = home_game_idx)[0].name
+        away_sp = PitcherRecord.objects.filter(team_game_idx = away_game_idx)[0].name
+    else:
+        home_sp = TodayLineUp.objects.filter(team_game_idx=home_game_idx)[0].name
+        away_sp = TodayLineUp.objects.filter(team_game_idx=away_game_idx)[0].name
+    
+    home_dic['sp'] = home_sp
+    away_dic['sp'] = away_sp
+    
+    
+    
+    
+    
+    
+    def get_recent_sp(game_idx, sp_name, year, recent_count):
+        team_name_dic = {2017:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
+                         2018:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
+                         2019:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
+                         2020:[0, 'LG','롯데','KIA','삼성','두산','한화','SK','키움','NC','KT'],
+                         2021:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
+                         2022:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
+                         2023:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT'],
+                         2024:[0, 'LG','롯데','KIA','삼성','두산','한화','SSG','키움','NC','KT']
+                         }
+        
+                         
+        start_idx = game_idx[:6] + '001'
+        sp_set = PitcherRecord.objects.select_related('team_game_idx').filter(team_game_idx__gte= start_idx, team_game_idx__lt = game_idx, name = sp_name ,po = 1).all()
+        sp_list = list(sp_set)
+        
+        if sp_list:
+            
+            #sp_count= sp_set.count()
+            sp_count = len(sp_list)
+            if sp_count >= recent_count:
+                sp_count -= recent_count
+            else:
+                sp_count = 0
+            #recent_set = sp_set[sp_count:]
+            
+            recent_list = sp_list[sp_count:]
+            
+            for recent in recent_list:
+                
+                
+                
+                game_idx = recent.team_game_idx.game_idx
+                foe_num = recent.team_game_idx.foe_num
+                recent.date = str(game_idx)[21:25]
+                foe_name = team_name_dic[int(year)][foe_num]
+                recent.foe_name = foe_name 
+                
+                recent.foe_url = "/static/images/emblem/emblem_" + foe_name + ".png"
+                inn = float(recent.inn)
+                inn_round = inn//1
+                inn_point = (inn%1)/3
+                inn = inn_round + inn_point
+                recent.ip = round(inn,1)
+                
+            
+        else:
+            #recent_set = sp_set
+            recent_list = sp_list
+        
+        return recent_list
+    
+    
+    home_sp_set = get_recent_sp(home_game_idx, home_sp, year,3)
+    away_sp_set = get_recent_sp(away_game_idx, away_sp, year,3)
+    
+    
+    home_game_num = int(today_game_set[1].game_num)
+    away_game_num = int(today_game_set[0].game_num)
+    
+    
+    
+    
+    
+    def get_recent(game_num,game_idx,team_num, recent_range):
+        
+        if game_num <= recent_range :
+            start_num = 1
+        else:
+            start_num = game_num - recent_range
+        
+        
+        game_num = str(game_num)
+        start_num = str(start_num).zfill(3)
+        start_idx = game_idx[:6] + start_num
+        
+        recent_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx).all()
+        
+        
+        range_idx = recent_set.values('game_idx')
+        foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num).all()
+        
+        recent_list = list(recent_set)
+        foe_list = foe_set
+        
+        
+        
+        for recent, foe in zip(recent_list, foe_list):
+            recent.stadium = recent.game_idx.stadium 
+            recent.date = recent.game_idx.game_idx[4:8]
+            
+            
+            home_name = recent.game_idx.home_name
+            away_name = recent.game_idx.away_name
+            recent.home_name = home_name
+            recent.away_name = away_name
+            recent.home_url = "/static/images/emblem/emblem_" + home_name + ".png"
+            recent.away_url = "/static/images/emblem/emblem_" + away_name + ".png"
+            
+            team_run = recent.scorerecord.r 
+            foe_run = foe.scorerecord.r
+            
+            if team_run > foe_run:
+                result = '승'
+            elif team_run == foe_run:
+                result = '무'
+            else:
+                result= '패'
+            recent.result = result
+            
+            if str(recent.home_away) =='home':
+
+                recent.home_run = team_run
+                recent.away_run = foe_run
+                
+                
+            else:
+                recent.home_run = foe_run
+                recent.away_run = team_run
+                
+        return recent_set
+    
+    home_set = get_recent(home_game_num,home_game_idx,home_team_num,7)
+    away_set = get_recent(away_game_num,away_game_idx,away_team_num,7)
+    
+    def get_relative(game_idx,team_num,foe_num):
+        
+        start_idx = game_idx[:6] + '001'
+        
+        team_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx, foe_num = foe_num)
+        
+        range_idx = team_set.values('game_idx')
+        foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
+        win = 0
+        lose = 0
+        draw = 0
+        for team, foe in zip(team_set,foe_set):
+            tr = team.scorerecord.r
+            fr = foe.scorerecord.r
+            if tr > fr: win+=1
+            elif tr <fr: lose+=1
+            else: draw+=1
+
+        if (win+lose) == 0:
+            win_rate = 0
+            home_rate = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+            away_rate = '{:,.3f}'.format(round(win_rate,3)) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
+        else:
+            win_rate = np.round(win/(win+lose),3)
+            home_rate = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+            away_rate = '{:,.3f}'.format(round(1-win_rate,3)) + '(' + str(lose) + '-' + str(draw) + '-' + str(win) + ')'
+        return [home_rate, away_rate]
+    
+    rela = get_relative(home_game_idx,home_team_num,away_team_num)
+    home_dic['rela'] = rela[0]
+    away_dic['rela'] = rela[1]
+    
+    def get_home_away(game_idx,team_num,home_away):
+        
+        
+        start_idx = game_idx[:6] + '001'
+        
+        team_set = TeamGameInfo.objects.select_related('game_idx','scorerecord').filter(team_game_idx__gte = start_idx, team_game_idx__lt = game_idx,home_away = home_away)
+        
+        range_idx = team_set.values('game_idx')
+        foe_set = TeamGameInfo.objects.select_related('scorerecord').filter(game_idx__in=range_idx).exclude(team_num= team_num)
+        win = 0
+        lose = 0
+        draw = 0
+        for team,foe in zip(team_set,foe_set):
+            tr = team.scorerecord.r
+            fr = foe.scorerecord.r
+            if tr > fr: win+=1
+            elif tr <fr: lose+=1
+            else: draw+=1
+
+        if (win+lose) == 0:
+            win_rate = 0
+        else:
+            win_rate = np.round(win/(win+lose),3)
+
+        result = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+        return result
+    
+    home_dic['home_away'] = get_home_away(home_game_idx,home_team_num,'home')
+    away_dic['home_away'] = get_home_away(away_game_idx,away_team_num,'away')
+    
+    def get_win_rate(team_num,year):
+        team_set = TeamInfo.objects.filter(year = year, team_num = team_num)[0]
+        win = team_set.win
+        lose = team_set.lose
+        draw = team_set.draw
+        win_rate = team_set.win_rate
+        result = '{:,.3f}'.format(win_rate) + '(' + str(win) + '-' + str(draw) + '-' + str(lose) + ')'
+        return result
+    home_dic['win_rate'] = get_win_rate(home_team_num,year)
+    away_dic['win_rate'] = get_win_rate(away_team_num,year)
+    
+    def get_rank(team_num,year):
+        team_year_set = TeamInfo.objects.filter(year = year)
+        rank = 1
+        last_win_rate = 0
+        for i,team_year in enumerate(team_year_set):
+            
+            win_rate = team_year.win_rate
+            if win_rate != last_win_rate:
+                rank = i+1
+                
+            last_win_rate = win_rate
+            
+            if team_year.team_num == team_num:
+                break
+        return rank
+    
+    home_dic['rank'] = get_rank(home_team_num,year)
+    away_dic['rank'] = get_rank(away_team_num,year)
+    
+    '''
+    time = game_date_set[today_game_num-1].end
+    
+    def get_toto(date,time,away_name,home_name):
+        if time =="경기종료":
+            toto_set = TodayToTo.objects.filter(date = date, away_name = away_name, home_name = home_name)
+        else:
+            toto_set = TodayToTo.objects.filter(date = date, time = time, away_name = away_name, home_name = home_name)
+        return toto_set.values()
+    
+    toto_set = get_toto(date,time,away_name,home_name).order_by('craw_time')
+    '''
+    
+    def get_toto(date,away_name,home_name):
+        
+        toto_set = TodayToTo.objects.filter(date = date, away_name = away_name, home_name = home_name)
+        return toto_set.values()
+    
+    toto_set = get_toto(date,away_name,home_name).order_by('craw_time')
+    toto_list = [toto for toto in toto_set.values()]
+    
+    
+    context ={'date':date,'today_game_num':today_game_num,'stadium':stadium, 'is_end':is_end, 'home_dic':home_dic,'away_dic':away_dic, 'home_set': home_set, 'away_set':away_set, 'home_sp_set':home_sp_set,'away_sp_set':away_sp_set,'toto_list':toto_list}
+    return render(request,'baseball/preview.html',context)
+
+
+
+
+
+
     
 def lineup(request,date,today_game_num):
     today_game_num_idx_min = (2*today_game_num)-2
@@ -836,3 +1170,73 @@ def lineup(request,date,today_game_num):
     
     return render(request,'baseball/lineup.html',context)
 
+
+
+
+#게시판 제네릭뷰
+
+
+class PostListView(ListView):
+    model = Post
+    template_name = 'baseball/board/list.html'
+    context_object_name = 'posts'
+
+    
+
+
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'baseball/board/detail.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.object
+        current_user = self.request.user
+        
+        if post.user_id_id == current_user.id:
+            context['edit_button'] = True
+        else:
+            context['edit_button'] = False
+
+        return context
+
+class PostCreateView(CreateView, LoginRequiredMixin):
+    model = Post
+    template_name = 'baseball/board/create.html'
+    fields = ['title', 'content']
+    success_url = reverse_lazy('baseball:board')
+    def form_valid(self, form):
+        
+        form.instance.user_id = self.request.user # 현재 로그인된 사용자 정보를 추가합니다
+        return super().form_valid(form)
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    
+    model = Post
+    template_name = 'baseball/board/update.html'
+    fields = ['title', 'content']
+
+    
+    
+    def test_func(self):
+        
+        post = self.get_object()
+        current_user = self.request.user
+        
+        #print(self.request.user.is_authenticated)
+        print(f"Is user authenticated? {self.request.user.is_authenticated}")
+        
+        # 게시글의 소유자와 현재 사용자를 비교
+        print(f"Current user ID: {current_user.id}, Post user ID: {post.user_id_id}")
+        return current_user.id == post.user_id_id
+
+    def get_success_url(self):
+        
+        return reverse_lazy('baseball:board')
+
+#    success_url = reverse_lazy('baseball:board')
+
+class PostDeleteView(DeleteView):
+    model = Post
+    template_name = 'baseball/board/delete.html'
+    success_url = reverse_lazy('baseball:board')

@@ -14,8 +14,16 @@
         <li class="nav-item">
             <a class="nav-link mb-0 h5" href="{% url 'baseball:game_info' %}" ><b>게임정보</b></a>
         </li>
-
-
+        <li class="nav-item">
+            <a class="nav-link mb-0 h5" href="{% url 'baseball:board' %}" ><b>게시판</b></a>
+        </li>
+        <li class="nav-item">
+            {% if user.is_authenticated %}
+                <p class="nav-link mb-0 h5">Hello, {{ user.username }}! <a href="{% url 'accounts:logout' %}">Logout</a></p>
+            {% else %}
+                <p class="nav-link mb-0 h5"><a href="{% url 'accounts:login' %}">Login</a></p>
+            {% endif %}
+        </li>
     </ul>
    
 </nav>

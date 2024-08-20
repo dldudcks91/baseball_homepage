@@ -17,11 +17,24 @@ from django.contrib import admin
 # ---------------------------------------- [edit] ---------------------------------------- #
 from django.urls import include, path
 # ---------------------------------------------------------------------------------------- #
+from config import settings
+
+import mimetypes
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('main.urls')),
     
     # ---------------------------------------------------------------------------------------- #
-    path('baseball/',include('baseball.urls'))
+    path('baseball/',include('baseball.urls')),
+    path('accounts/', include('accounts.urls'))
 ]
+
+# ------------------------------------------ [debug] --------------------------------------------- #
+if settings.DEBUG:
+    mimetypes.add_type("application/javascript", ".js", True)
+    if "debug_toolbar" in settings.INSTALLED_APPS:
+        
+        import debug_toolbar
+        urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns

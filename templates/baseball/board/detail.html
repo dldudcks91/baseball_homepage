@@ -1,0 +1,85 @@
+<!-- board/templates/board/detail.html -->
+{% extends "base.html" %}
+
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+        .post-box {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 30px;
+            margin-top: 20px;
+            background-color: #ffffff;
+        }
+        .post-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .post-meta {
+            font-size: 0.9rem;
+            
+            margin-bottom: 20px;
+        }
+        .post-content {
+            font-size: 1.1rem;
+            
+            margin-top: 50px;
+            
+        }
+        hr {
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 10px 0;
+    }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="post-box">
+            <div class="post-header">
+                <div class="post-title">{{ post.title }}</div>
+                {% if edit_button %}
+                 
+                <div>
+                    <a href="{% url 'baseball:update_post' post.post_id %}">수정</a>
+                </div>
+                <div>
+                    <a href="{% url 'baseball:delete_post' post.post_id %}">삭제</a>
+                </div>
+                {% endif %}
+                <div class="post-meta">
+                    작성자: {{ post.user_id }} | 작성일: {{ post.created_at|date:"Y-m-d H:i" }}
+                </div>
+            </div>
+            <hr>
+            <div class="post-content">
+                {{ post.content }}
+            </div>
+        </div>
+        <a href="{% url 'baseball:board' %}" class="btn btn-primary mt-3">목록으로 돌아가기</a>
+    </div>
+    <div>
+        
+            
+
+        
+    </div>
+</body>
+
+
+</html>
+
+{% endblock %}
