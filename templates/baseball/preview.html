@@ -177,6 +177,7 @@
 
                         </div>
                             <div class="game-rate game-rate-middle">
+                                <div class="rate-info" id="uo-info-model1">-</div>
                                 <div class="rate-info" id="uo-info-model2">-</div>
                                 <div class="rate-info" id="uo-info-model3">-</div>
                             </div>
@@ -446,12 +447,19 @@
         var odds_model2 = []
         var odds_model3 = []
 
+        var uo_model1 = []
         var uo_model2 = []
         var uo_model3 = []
         for(var i = 0 in toto_json){
             var toto = toto_json[i]
             if(toto.site_name == 'livescore'){
-                odds_model1.push(toto)
+                if (toto.win_type == 1){
+                    odds_model1.push(toto)
+                }
+                else if (toto.win_type == 3){
+                    uo_model1.push(toto)
+                }
+
 
             }
             else if (toto.site_name =='field-one'){
@@ -513,6 +521,7 @@
         getModelRate(odds_model3,1,'#rate-away-model3','#rate-home-model3',"")
 
 
+        getModelRate(uo_model1,3,'#uo-away-model1','#uo-home-model1','#uo-info-model1')
         getModelRate(uo_model2,3,'#uo-away-model2','#uo-home-model2','#uo-info-model2')
         getModelRate(uo_model3,3,'#uo-away-model3','#uo-home-model3','#uo-info-model3')
 
