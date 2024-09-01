@@ -160,7 +160,7 @@ class RunGraphView(APIView):
         self.away_set = None
 
         
-    def set_data(self, request, date, today_game_num):
+    def set_data(self, request, date, today_game_num, team_or_foe = 'team'):
         today_game_num_idx_min = (2*today_game_num)-2
         today_game_num_idx_max = (2*today_game_num)
         
@@ -194,12 +194,14 @@ class RunGraphView(APIView):
 
         home_game_num = today_game_set[1].game_num
         away_game_num = today_game_set[0].game_num
-
-        self.home_set = TeamGameInfo.objects.select_related('scorerecord').filter(year = year, team_num= home_team_num)
-        self.away_set = TeamGameInfo.objects.select_related('scorerecord').filter(year = year, team_num= away_team_num)
-
+        if team_or_foe == 'team':
+            self.home_set = TeamGameInfo.objects.select_related('scorerecord').filter(year = year, team_num= home_team_num)
+            self.away_set = TeamGameInfo.objects.select_related('scorerecord').filter(year = year, team_num= away_team_num)
         
-
+        else:
+            self.home_set = TeamGameInfo.objects.select_related('scorerecord').filter(year = year, foe_num= home_team_num)
+            self.away_set = TeamGameInfo.objects.select_related('scorerecord').filter(year = year, foe_num= away_team_num)
+            
     def get_run_dist(self, score_set):
             run_list = [0 for i in range(16)]
             length= score_set.count()
@@ -241,7 +243,8 @@ class RunGraphView(APIView):
                 range_score+= now_score
                 if i >= game_range:
                     range_score-= temp_score_list[i - game_range]
-                    score_list.append(round(range_score / game_range,3))
+                devide = game_range if i >= game_range else i + 1 
+                score_list.append(round(range_score / devide,3))
             
             return score_list
 
@@ -277,10 +280,14 @@ class RunGraphView(APIView):
     
     def post(self,request,date,today_game_num):
         
-        self.set_data(request, date, today_game_num)
+        
         
         
         game_range = int(eval(request.body)['game_range'])
+        team_or_foe = str(eval(request.body)['team_or_foe'])
+        
+        self.set_data(request, date, today_game_num, team_or_foe)
+
         year = self.year
         home_name = self.home_name
         away_name = self.away_name
@@ -302,6 +309,10 @@ class RunGraphView(APIView):
         result_data = {'year':year, 'home_dic':home_dic,'away_dic':away_dic, 'game_range': game_range}
 
         return Response(result_data)
+
+
+
+
 class SpGraphView(APIView):
     
     def get(self,request,date,today_game_num):

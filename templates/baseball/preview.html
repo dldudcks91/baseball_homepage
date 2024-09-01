@@ -11,7 +11,7 @@
                 <ul>
                     <li class="dist-card dist-card-away dist-team" id="team-dist-away">
                         <div id="recent-title-away" class="recent-title">
-                            <div class="recent-title-word"><h> {{away_dic.name}} - 최근7경기 </h></div>
+                            <div class="recent-title-word"><h> {{away_dic.name}} - 최근 7경기 </h></div>
 
                             <hr style="position:absolute;width:300px;top:24px;">
                         </div>
@@ -77,7 +77,7 @@
                     <li class="dist-card dist-card-home dist-team" id="team-dist-home">
                         <div id="recent-title-home" class="recent-title">
 
-                            <div class="recent-title-word"><h> {{home_dic.name}} - 최근7경기 </h></div>
+                            <div class="recent-title-word"><h> {{home_dic.name}} - 최근 7경기 </h></div>
 
                             <hr style="position:absolute;width:300px;top:24px;right:10px;">
                         </div>
@@ -283,20 +283,48 @@
         </div>
         <div class="box-contents">
             <div class="run-box" id="rp-graph-box">
-                   
-                <div class="run-graph run-graph-away" id="rp-graph-away"></div>
+                
+                <div class = "game-graph-title-container">
+                    <div id = "game-graph-title-left">
+                        <div class="game-graph-title">득점 추이 - 최근 </div>
+                        <span class="select-game-range">
+                            <select id="select-game-range-left">
+                                <option value= 5 >5</option>
+                                <option value= 10 selected>10</option>
+                                <option value= 20>20</option>
+                                <option value= 30>30</option>
+                                
+                            </select>
+                        </span>
+                        
+                        <div class="game-graph-title"> 경기 </div>
+                        
+                    </div>
+                    <div id = "game-graph-title-right">
+                        <div class="game-graph-title">실점 추이 - 최근 </div>
+                        <span class="select-game-range">
+                            <select id="select-game-range-right">
+                                <option value= 5 >5</option>
+                                <option value= 10 selected>10</option>
+                                <option value= 20>20</option>
+                                <option value= 30>30</option>
+                                
+                            </select>
+                        </span>
+                        <div class="game-graph-title"> 경기 </div>
+                        
+                    </div>
+                </div>
+                
+
+                <div class="run-graph run-graph-away" id="rp-graph-away"></div>    
+                
+                
                 <div class="run-graph run-graph-home" id="rp-graph-home"></div>
                    
                 
             </div>
-            <div class="slider-container">
-                <input type="range" id="slider" min="5" max="50" step = "5" value="5" onchange="getRunGraph(this.value)" oninput = "updateValue(this.value)">
-                
-            </div>  
-            <div class="slider-container">
-                <input type="range" id="slider" min="5" max="50" step = "5" value="5" onchange="getRunGraph(this.value)" oninput = "updateValue(this.value)">
-                
-            </div> 
+            
         </div>
         
     </div>
@@ -939,17 +967,32 @@
     $(document).ready(function() {
 
 
-        getRunGraph();
+        getTeamRunGraph();
+        getFoeRunGraph();
 
+        $("#select-game-range-left").change(function(){
+
+            getTeamRunGraph($("#select-game-range-left").val());
+        });
+        $("#select-game-range-right").change(function(){
+
+            getFoeRunGraph($("#select-game-range-right").val());
+            });
 
     });
 
-    function getRunGraph(game_range){
+    
+
+
+    function getTeamRunGraph(game_range=10){
         
         var set_url = 'run_graph/'  + {{date}} +'/' + {{today_game_num}};
         var postData = {
-            game_range: game_range || 5
+            game_range: game_range,
+            //game_range: $("select-game-range-left").val()
+            team_or_foe: 'team'
         }
+        
         $.ajax({
             url: set_url,
             type: 'POST',
@@ -959,6 +1002,36 @@
                 setTimeout(function() {
                     $('.preview-box').fadeTo(1000,1)
                     ChartBt(data,'rp-graph-away')
+                    
+                    //ChartRunDist(data,'run-dist-graph')
+                }, 1000);
+
+
+            },
+            error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+
+
+        });
+    };
+    function getFoeRunGraph(game_range=10){
+        
+        var set_url = 'run_graph/'  + {{date}} +'/' + {{today_game_num}};
+        var postData = {
+            game_range: game_range,
+            //game_range: $("select-game-range-left").val()
+            team_or_foe: 'foe'
+        }
+        
+        $.ajax({
+            url: set_url,
+            type: 'POST',
+            data: JSON.stringify(postData),
+            dataType:'json',
+            success: function(data){
+                setTimeout(function() {
+                    $('.preview-box').fadeTo(1000,1)
                     ChartRp(data,'rp-graph-home')
                     //ChartRunDist(data,'run-dist-graph')
                 }, 1000);
@@ -1069,11 +1142,12 @@
                 width: 600,
                 height: 400
             },
-
+            
             title: {
-                text: '  불펜실점추이 - 최근 20경기 '
+                text: null
+                //text: '  불펜실점추이 - 최근 20경기 '
             },
-
+            
             subtitle: {
                 text: null
             },
@@ -1107,9 +1181,10 @@
                 width: 600,
                 height: 400
             },
-
+            
             title: {
-                text: '  타선득점추이 - 최근 ' + data.game_range + '경기 '
+                text: null
+                //text: '  타선득점추이 - 최근 ' + data.game_range + '경기'
             },
 
             subtitle: {
@@ -1140,8 +1215,10 @@
             
         });
     }
-    function updateValue(value) {
-            document.getElementById('slider-value').innerText = value;
+
+
+    function updateValueLeft(value) {
+            document.getElementById('game-range-value-left').innerText = value;
         }
         
 </script>
