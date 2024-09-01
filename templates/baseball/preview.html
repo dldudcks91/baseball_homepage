@@ -132,9 +132,9 @@
                             </div>
                         </div>
                             <div class="game-rate game-rate-middle">
-                                <div class="rate-info">-</div>
-                                <div class="rate-info">-</div>
-                                <div class="rate-info">-</div>
+                                <div class="rate-info">Domestic</div>
+                                <div class="rate-info">Global</div>
+                                <div class="rate-info">Custom</div>
 
                             </div>
                         <div class="game-rate game-rate-home">
@@ -169,6 +169,9 @@
                     <div class="game-rate-uo">
                         <div class="game-rate game-rate-away">
                             <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-away" id="uo-away-model1" ></strong>
+                            </div>
+                            <div class="rate-graph">
                                 <strong class="rate-bar rate-bar-away" id="uo-away-model2" ></strong>
                             </div>
                             <div class="rate-graph">
@@ -182,7 +185,13 @@
                                 <div class="rate-info" id="uo-info-model3">-</div>
                             </div>
                         <div class="game-rate game-rate-home">
-
+                            <div class="rate-graph">
+                                <strong class="rate-bar rate-bar-home" id="uo-home-model1" ></strong>
+                                <span class="add-info" role="button">
+                                    <img class='add-info-img' src="/static/images/button/add_button.png" >
+                                    <div class="add-pop-layer layer-uo hidden" id="layer-uo-model1"></div>
+                                </span>
+                            </div>
                             <div class="rate-graph">
                                 <strong class="rate-bar rate-bar-home" id="uo-home-model2" ></strong>
                                 <span class="add-info" role="button">
@@ -274,13 +283,22 @@
         </div>
         <div class="box-contents">
             <div class="run-box" id="rp-graph-box">
+                   
                 <div class="run-graph run-graph-away" id="rp-graph-away"></div>
                 <div class="run-graph run-graph-home" id="rp-graph-home"></div>
-
+                   
+                
             </div>
-
-
+            <div class="slider-container">
+                <input type="range" id="slider" min="5" max="50" step = "5" value="5" onchange="getRunGraph(this.value)" oninput = "updateValue(this.value)">
+                
+            </div>  
+            <div class="slider-container">
+                <input type="range" id="slider" min="5" max="50" step = "5" value="5" onchange="getRunGraph(this.value)" oninput = "updateValue(this.value)">
+                
+            </div> 
         </div>
+        
     </div>
     <hr>
 
@@ -602,6 +620,7 @@
         getPopRate(odds_model2, 1, '#layer-rate-model2')
         getPopRate(odds_model3, 1, '#layer-rate-model3')
 
+        getPopRate(uo_model1,3, '#layer-uo-model1')
         getPopRate(uo_model2,3, '#layer-uo-model2')
         getPopRate(uo_model3,3, '#layer-uo-model3')
     }
@@ -925,10 +944,16 @@
 
     });
 
-    function getRunGraph(){
+    function getRunGraph(game_range){
+        
         var set_url = 'run_graph/'  + {{date}} +'/' + {{today_game_num}};
+        var postData = {
+            game_range: game_range || 5
+        }
         $.ajax({
             url: set_url,
+            type: 'POST',
+            data: JSON.stringify(postData),
             dataType:'json',
             success: function(data){
                 setTimeout(function() {
@@ -1065,11 +1090,11 @@
 
             series: [{
                 name: data.away_dic.name,
-                data: data.away_dic.f20
+                data: data.away_dic.range_run
             },
             {
                 name: data.home_dic.name,
-                data: data.home_dic.f20
+                data: data.home_dic.range_run
             }],
             credits: {
                 enabled: false
@@ -1084,7 +1109,7 @@
             },
 
             title: {
-                text: '  타선득점추이 - 최근 20경기 '
+                text: '  타선득점추이 - 최근 ' + data.game_range + '경기 '
             },
 
             subtitle: {
@@ -1094,7 +1119,7 @@
             yAxis: {
 
                 title: {
-                    text: 'Mean of FIP'
+                    text: 'Mean of RUN'
 
                 },
                 min: 0,
@@ -1103,11 +1128,11 @@
 
             series: [{
                 name: data.away_dic.name,
-                data: data.away_dic.r20
+                data: data.away_dic.range_run
             },
             {
                 name: data.home_dic.name,
-                data: data.home_dic.r20
+                data: data.home_dic.range_run
             }],
             credits: {
                 enabled: false
@@ -1115,6 +1140,9 @@
             
         });
     }
-
+    function updateValue(value) {
+            document.getElementById('slider-value').innerText = value;
+        }
+        
 </script>
 

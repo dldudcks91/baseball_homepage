@@ -145,52 +145,26 @@ def game_info_date(request,date):
     context = {'game_date_set':game_date_set,'is_end':is_end, 'data_length':data_length}
     return render(request,'baseball/game_info_date.html',context)
 
-def boxscore(request,date,today_game_num):
-    
-    today_game_num_idx_min = (2*today_game_num)-2
-    today_game_num_idx_max = (2*today_game_num)
-    
-    game_date_dic = GameInfo.objects.filter(game_idx__contains = str(date)).values()
-    game_date_idx = game_date_dic.values("game_idx")
-    team_game_dic = TeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
-    
-    team_game_idx = team_game_dic.values("team_game_idx","home_away")[today_game_num_idx_min:today_game_num_idx_max]
-    
-    if team_game_idx[0]['home_away'] == 'home':
-        home_idx = team_game_idx[0]['team_game_idx']
-        away_idx = team_game_idx[1]['team_game_idx']
-        
-    else:
-        home_idx = team_game_idx[1]['team_game_idx']
-        away_idx = team_game_idx[0]['team_game_idx']
-        
-    team_name = game_date_dic.values('away_name','home_name')[today_game_num-1]
-    home_name = team_name['home_name']
-    away_name = team_name['away_name']
-    
-    team_name = {'home':home_name,'away':away_name}
 
-    home_score = ScoreRecord.objects.filter(team_game_idx = home_idx).values()
-    away_score = ScoreRecord.objects.filter(team_game_idx = away_idx).values()
-    
-    home_batter = BatterRecord.objects.filter(team_game_idx = home_idx).values()
-    away_batter = BatterRecord.objects.filter(team_game_idx = away_idx).values()
-    
-    home_pitcher = PitcherRecord.objects.filter(team_game_idx = home_idx).values()
-    away_pitcher = PitcherRecord.objects.filter(team_game_idx = away_idx).values()
-    
-    context ={'home_score':home_score,'away_score':away_score,'home_batter':home_batter,'away_batter':away_batter,'team_name':team_name,
-              'home_pitcher':home_pitcher, 'away_pitcher':away_pitcher}
-    return render(request,'baseball/boxscore.html',context)
 
 class RunGraphView(APIView):
     
-    def get(self,request,date,today_game_num):
+    def __init__(self):
+
+        self.year = int 
+
+        self.home_name = str
+        self.away_name = str
+
+        self.home_set = None
+        self.away_set = None
+
         
+    def set_data(self, request, date, today_game_num):
         today_game_num_idx_min = (2*today_game_num)-2
         today_game_num_idx_max = (2*today_game_num)
         
-        if TodayGameInfo.objects.filter(game_idx__contains = str(date)).values():
+        if TodayGameInfo.objects.filter(game_idx__contains = str(date)).exists():
             
             TGI = TodayTeamGameInfo
             GI = TodayGameInfo
@@ -207,83 +181,127 @@ class RunGraphView(APIView):
         team_game_set = TGI.objects.filter(game_idx__in = today_game_idx)
         today_game_set = team_game_set[today_game_num_idx_min:today_game_num_idx_max]
         
-        
-        
+
         year = int(str(date)[:4])
-        
+        self.year = year
+
         home_team_num = today_game_set[1].team_num
         away_team_num = today_game_set[0].team_num
         
-        home_name = game_date_set[today_game_num-1].home_name
-        away_name = game_date_set[today_game_num-1].away_name
+        self.home_name = game_date_set[today_game_num-1].home_name
+        self.away_name = game_date_set[today_game_num-1].away_name
         
+
         home_game_num = today_game_set[1].game_num
         away_game_num = today_game_set[0].game_num
-              
-        home_set= RunGraphData.objects.filter(year = year , team_num = home_team_num, game_num__lt = home_game_num)
-        away_set = RunGraphData.objects.filter(year = year , team_num = away_team_num, game_num__lt = away_game_num)
+
+        self.home_set = TeamGameInfo.objects.select_related('scorerecord').filter(year = year, team_num= home_team_num)
+        self.away_set = TeamGameInfo.objects.select_related('scorerecord').filter(year = year, team_num= away_team_num)
+
         
-        
-        def get_run_dist(data_set):
-            r_list = [0 for i in range(16)]
-            length= data_set.count()
+
+    def get_run_dist(self, score_set):
+            run_list = [0 for i in range(16)]
+            length= score_set.count()
             
-            for data in data_set:
-                r = round(data.run_1)
+            for score in score_set:
+                run = round(score.scorerecord.r)
                 
-                if r >=15:
-                    r_list[-1]+=1
+                if run >=15:
+                    run_list[-1]+=1
                 else:
-                    r_list[r]+=1
+                    run_list[run]+=1
                     
             
             result_list= list()
             count = 0
-            r_sum = 0
-            for r in r_list:
+            run_sum = 0
+            for run in run_list:
                 
-                r_sum+=r
+                run_sum+=run
                 count+=1
                 if count == 2:
                     if length == 0:
                         result_list.append(0)
                     else:
-                        result_list.append(r_sum / length*100)
+                        result_list.append(run_sum / length*100)
                     count = 0
-                    r_sum = 0 
+                    run_sum = 0 
                 
             return result_list
+
+    def get_run_range(self, score_set, game_range):
+            length = score_set.count()
+            score_list = list()
+            temp_score_list = list()
+            range_score = 0
+            for i,score in enumerate(score_set):
+                now_score = score.scorerecord.r
+                temp_score_list.append(now_score)
+                range_score+= now_score
+                if i >= game_range:
+                    range_score-= temp_score_list[i - game_range]
+                    score_list.append(round(range_score / game_range,3))
+            
+            return score_list
+
+    
+
+    def get(self,request,date,today_game_num):
         
-        
-        def get_run_list(data_set,column_name):
-            game_num = data_set.values_list('game_num',flat=True)
-            run = data_set.values_list(column_name,flat=True)
-            result = list()
-            for g,r in zip(game_num,run):
-                result.append([g,r])
-            return result
-        
-        
-        def set_dic(data_set):
-            dic = dict()
-            dic['r5'] = get_run_list(data_set,'run_5')
-            dic['r20'] = get_run_list(data_set,'run_20')
-            dic['f5'] = get_run_list(data_set,'rp_fip_5')
-            dic['f20'] = get_run_list(data_set,'rp_fip_20')
-            dic['dist'] = get_run_dist(data_set)
-            return dic
-        
-        
-        home_dic = set_dic(home_set)
+        self.set_data(request, date, today_game_num)
+
+        year = self.year
+        home_name = self.home_name
+        away_name = self.away_name
+
+        home_set = self.home_set
+        away_set = self.away_set
+     
+        home_dic = dict()
+        home_dic['dist'] = self.get_run_dist(home_set)
+        home_dic['range_run'] = self.get_run_range(home_set, 5)
         home_dic['name'] = home_name
-        away_dic = set_dic(away_set)
+
+        away_dic = dict()
+        away_dic['dist'] = self.get_run_dist(away_set)
+        away_dic['range_run'] = self.get_run_range(away_set, 5)
         away_dic['name'] = away_name
+        
         
         result_data = {'year':year, 'home_dic':home_dic,'away_dic':away_dic}
         
         
         return Response(result_data)
+    
+    
+    def post(self,request,date,today_game_num):
+        
+        self.set_data(request, date, today_game_num)
+        
+        
+        game_range = int(eval(request.body)['game_range'])
+        year = self.year
+        home_name = self.home_name
+        away_name = self.away_name
 
+        home_set = self.home_set
+        away_set = self.away_set
+     
+        home_dic = dict()
+        home_dic['dist'] = self.get_run_dist(home_set)
+        home_dic['range_run'] = self.get_run_range(home_set, game_range)
+        home_dic['name'] = home_name
+
+        away_dic = dict()
+        away_dic['dist'] = self.get_run_dist(away_set)
+        away_dic['range_run'] = self.get_run_range(away_set, game_range)
+        away_dic['name'] = away_name
+        
+
+        result_data = {'year':year, 'home_dic':home_dic,'away_dic':away_dic, 'game_range': game_range}
+
+        return Response(result_data)
 class SpGraphView(APIView):
     
     def get(self,request,date,today_game_num):
@@ -1170,12 +1188,53 @@ def lineup(request,date,today_game_num):
     
     return render(request,'baseball/lineup.html',context)
 
+def boxscore(request,date,today_game_num):
+    
+    today_game_num_idx_min = (2*today_game_num)-2
+    today_game_num_idx_max = (2*today_game_num)
+    
+    game_date_dic = GameInfo.objects.filter(game_idx__contains = str(date)).values()
+    game_date_idx = game_date_dic.values("game_idx")
+    team_game_dic = TeamGameInfo.objects.filter(game_idx__in = game_date_idx).values()
+    
+    team_game_idx = team_game_dic.values("team_game_idx","home_away")[today_game_num_idx_min:today_game_num_idx_max]
+    
+    if team_game_idx[0]['home_away'] == 'home':
+        home_idx = team_game_idx[0]['team_game_idx']
+        away_idx = team_game_idx[1]['team_game_idx']
+        
+    else:
+        home_idx = team_game_idx[1]['team_game_idx']
+        away_idx = team_game_idx[0]['team_game_idx']
+        
+    team_name = game_date_dic.values('away_name','home_name')[today_game_num-1]
+    home_name = team_name['home_name']
+    away_name = team_name['away_name']
+    
+    team_name = {'home':home_name,'away':away_name}
+
+    home_score = ScoreRecord.objects.filter(team_game_idx = home_idx).values()
+    away_score = ScoreRecord.objects.filter(team_game_idx = away_idx).values()
+    
+    home_batter = BatterRecord.objects.filter(team_game_idx = home_idx).values()
+    away_batter = BatterRecord.objects.filter(team_game_idx = away_idx).values()
+    
+    home_pitcher = PitcherRecord.objects.filter(team_game_idx = home_idx).values()
+    away_pitcher = PitcherRecord.objects.filter(team_game_idx = away_idx).values()
+    
+    context ={'home_score':home_score,'away_score':away_score,'home_batter':home_batter,'away_batter':away_batter,'team_name':team_name,
+              'home_pitcher':home_pitcher, 'away_pitcher':away_pitcher}
+    return render(request,'baseball/boxscore.html',context)
+
+
+
+
+
+
 
 
 
 #게시판 제네릭뷰
-
-
 class PostListView(ListView):
     model = Post
     template_name = 'baseball/board/list.html'
