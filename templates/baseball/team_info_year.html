@@ -4,15 +4,15 @@
     <thead>
 
         <tr>
-
-            <th>팀</th>
             <th>순위</th>
+            <th>팀</th>
             <th>구장</th>
             <th>경기</th>
             <th>승리</th>
             <th>패배</th>
             <th>무승부</th>
             <th>승률</th>
+            <th>게임차</th>
         </tr>
         </thead>
     <tbody>
@@ -20,14 +20,16 @@
         <tr class="team-info-tr" value="{{team.rank}}">
 
 
-            <td><img class='pre-sp-emb' src= "/static/images/emblem/emblem_{{team.team_name}}.png" alt= "{{team.team_name}}" > {{team.team_name}}</td>
+            
             <td>{{team.rank}}</td>
+            <td><img class='pre-sp-emb' src= "/static/images/emblem/emblem_{{team.team_name}}.png" alt= "{{team.team_name}}" > {{team.team_name}}</td>
             <td>{{team.stadium}}</td>
             <td>{{team.total_game_num}}</td>
             <td>{{team.win}}</td>
             <td>{{team.lose}}</td>
             <td>{{team.draw}}</td>
             <td>{{team.win_rate}}</td>
+            <td>{{team.difference_1st}}</td>
 
         </tr>
         {% endfor %}

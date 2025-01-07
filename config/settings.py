@@ -38,9 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'baseball.apps.BaseballConfig',
-
     'main.apps.MainConfig',
-
+    'upbit.apps.UpbitConfig',
     'accounts'
     
 ]
@@ -89,14 +88,26 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 with open('./config/db_settings.yml') as f:
     db_yaml = yaml.full_load(f)
+baseball_dic = db_yaml['BASEBALL']
+upbit_dic = db_yaml['UPBIT']
+
 DATABASES = {
     'default': {
-        'ENGINE': db_yaml['BASEBALL']['ENGINE'],
-        'NAME': db_yaml['BASEBALL']['NAME'],
-        'USER': db_yaml['BASEBALL']['USER'],
-        'PASSWORD': db_yaml['BASEBALL']['PASSWORD'],
-        'HOST': db_yaml['BASEBALL']['HOST'],
-        'PORT': db_yaml['BASEBALL']['PORT'],
+        'ENGINE': baseball_dic['ENGINE'],
+        'NAME': baseball_dic['NAME'],
+        'USER': baseball_dic['USER'],
+        'PASSWORD': baseball_dic['PASSWORD'],
+        'HOST': baseball_dic['HOST'],
+        'PORT': baseball_dic['PORT'],
+        
+    },
+    'upbit': {
+        'ENGINE': upbit_dic['ENGINE'],
+        'NAME': upbit_dic['NAME'],
+        'USER': upbit_dic['USER'],
+        'PASSWORD': upbit_dic['PASSWORD'],
+        'HOST': upbit_dic['HOST'],
+        'PORT': upbit_dic['PORT'],
         
     }
     
@@ -110,7 +121,7 @@ DATABASES = {
     # }
     
 }
-
+DATABASE_ROUTERS = ['config.routers.DatabaseRouter']
 
 
 # Password validation

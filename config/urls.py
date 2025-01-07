@@ -28,7 +28,8 @@ urlpatterns = [
     
     # ---------------------------------------------------------------------------------------- #
     path('baseball/',include('baseball.urls')),
-    path('accounts/', include('accounts.urls'))
+    path('accounts/', include('accounts.urls')),
+    path('upbit/', include('upbit.urls'))
 ]
 
 # ------------------------------------------ [debug] --------------------------------------------- #

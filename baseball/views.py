@@ -41,6 +41,7 @@ def team_info_year(request, year):
     team_year_set = TeamInfo.objects.filter(year__contains = year)
     rank = 1
     last_win_rate = 0
+    max_predicted_win = 0
     for i,team_year in enumerate(team_year_set):
         
         win_rate = team_year.win_rate
@@ -48,8 +49,18 @@ def team_info_year(request, year):
             rank = i+1
         team_year.rank = rank
         last_win_rate = win_rate
+
+        matched_count = team_year.win + team_year.draw + team_year.lose
+        last_count = 144 - matched_count
+        predicted_win = team_year.win + last_count * 0.5
+        max_predicted_win = max(max_predicted_win, predicted_win)
+        team_year.predicted_win = predicted_win
     
-    
+    for i,team_year in enumerate(team_year_set):
+        difference_1st = max_predicted_win - team_year.predicted_win
+        team_year.difference_1st = difference_1st
+
+
     context = {'team_year_set':team_year_set,'year':year}
     return render(request,'baseball/team_info_year.html',context)
 
