@@ -13,8 +13,8 @@ app_name = 'upbit'
 urlpatterns = [
     # ---------------------------------------- [edit] ---------------------------------------- #
     path('', views.index, name='index'),
-    path('full_data/', views.full_data, name='full_data'),
-    
+    path('market_data/', views.market_data, name='market_data'),
+    path('get_market_data/', views.get_market_data, name='get_market_data'),
     ]
         
 
