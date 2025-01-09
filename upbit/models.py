@@ -13,3 +13,17 @@ class Market(models.Model):
         managed = False
         db_table = 'tb_market'
         unique_together = (('log_dt','market'),)
+
+class MarketInfo(models.Model):
+    
+    
+    market = models.CharField(max_length = 45, primary_key = True)
+    korean_name = models.CharField(max_length = 45)
+    english_name = models.CharField(max_length = 45)
+    
+    
+    
+    class Meta:
+        managed = False
+        db_table = 'tb_market_info'
+        

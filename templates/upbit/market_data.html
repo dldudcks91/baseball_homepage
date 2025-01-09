@@ -19,51 +19,46 @@
         background-color: #ffeeba;
         transition: background-color 2s;
     }
+    .positive {
+        color: #0a60ff;  /* 파란색 */
+    }
+    .negative {
+        color: #FF3B30;  /* 빨간색 */
+    }
 </style>
 
 <div class="table-container">
     <table id="marketTable" class="display">
         <thead>
             <tr>
-                <th colspan="7">A</th>
-                <th colspan="7">B</th>
+                <th colspan="3">기본정보</th>
+                <th colspan="4">가격</th>
+                <th colspan="5">거래량(직전 60분 평균 대비 변화량)</th>
 
             </tr>
             <tr>
                 <th>종목</th>
-                <th>1분</th>
-                <th>5분</th>
-                <th>30분</th>
-                <th>60분</th>
-                <th>240분</th>
-                <th>거래량</th>
-                <th>거래대금</th>
-                <th>거래량</th>
-                <th>거래대금</th>
-                <th>거래량</th>
-                <th>거래대금</th>
-                <th>거래량</th>
-                <th>거래대금</th>
+                <th>이름</th>
+                <th>현재가격</th>
+                <th>5분 대비</th>
+                <th>30분 대비</th>
+                <th>60분 대비</th>
+                <th>240분 대비</th>
+                <th>1분 거래량</th>
+                <th>5분 거래량</th>
+                <th>10분 거래량</th>
+                <th>1분 거래대금</th>
+                <th>60분 거래대금</th>
+                
             </tr>
         </thead>
         <tbody>
             
-            {% for item in market_data %}
+            {% for market in markets %}
+            
+            
             <tr>
-                <td>{{ item.market }}</td>
-                <td>{{ item.price_1m }}</td>
-                <td>{{ item.price_5m }}</td>
-                <td>{{ item.price_30m }}</td>
-                <td>{{ item.price_60m }}</td>
-                <td>{{ item.price_240m }}</td>
-                <td>{{ item.volume }}</td>
-                <td>{{ item.amount }}</td>
-                <td>{{ item.volume }}</td>
-                <td>{{ item.amount }}</td>
-                <td>{{ item.volume }}</td>
-                <td>{{ item.amount }}</td>
-                <td>{{ item.volume }}</td>
-                <td>{{ item.amount }}</td>
+                <!--데이터 들어오는 자리-->
             </tr>
             {% endfor %}
         </tbody>
@@ -78,9 +73,10 @@
             
             pageLength: 160,            // 페이지당 10개 표시
             order: [[3, 'desc']],      // 거래대금 기준 내림차순 정렬
+            
             language: {
                 search: "검색:",
-                lengthMenu: "페이지당 _MENU_ 개",
+                //lengthMenu: "페이지당 _MENU_ 개",
                 info: "_TOTAL_개 중 _START_ - _END_",
                 paginate: {
                     first: "처음",
@@ -89,18 +85,75 @@
                     previous: "이전"
                 },
                 zeroRecords: "검색 결과가 없습니다."
+            },
+            columnDefs: [{
+                targets: 10, // 1분 거래대금 열 인덱스
+                render: function(data, type, row) {
+                    if (type === 'display') {
+                        return data + '백만';
+                    } else if (type === 'sort') {
+                        return parseFloat(data);
+                    }
+                    return data;
+                },
+                
+            },
+            {
+                targets: 11, // 60분 거래대금 열 인덱스
+                render: function(data, type, row) {
+                    if (type === 'display') {
+                        return data + '억';
+                    } else if (type === 'sort') {
+                        return parseFloat(data);
+                    }
+                    return data;
+                },
+                
             }
+            ],
+            
+
         });
 
         console.log("Fetching new data...");
 
         
-
-        setInterval(refreshData, 3000000); // 600s = 1분
+        refreshData()
+        setInterval(refreshData, 10000); // 600s = 1분
     });
     
     
+    function priceData(item) {
+        item.ratio_5m = (((item.price_1m - item.price_5m) / item.price_5m)*100).toFixed(2)
+        item.ratio_30m = (((item.price_1m - item.price_30m) / item.price_30m)*100).toFixed(2)
+        item.ratio_60m = (((item.price_1m - item.price_60m) / item.price_60m)*100).toFixed(2)
+        item.ratio_240m = (((item.price_1m - item.price_240m)/ item.price_240m)*100).toFixed(2)
+        return item
+    }
+    function volumeData(item){
+        item.ratio_1m_60m = (item.ratio_1m_60m*100).toFixed(1)
+        item.ratio_3m_60m = (item.ratio_3m_60m*100).toFixed(1)
+        item.ratio_5m_60m = (item.ratio_5m_60m*100).toFixed(1)
+        item.ratio_10m_60m = (item.ratio_10m_60m*100).toFixed(1)
+                            
+        return item
+    }
 
+    function formatRatio(ratio) {
+        const value = parseFloat(ratio);
+        if (value > 0) {
+            return `<span class="positive">+${ratio}%</span>`;
+        } else if (value < 0) {
+            return `<span class="negative">${ratio}%</span>`;
+        }
+        return `${ratio}%`;
+    }
+    function formatBillions(number) {
+         return (number / 100000000).toFixed(1);
+    }
+    function formatMillions(number) {
+         return (number / 1000000).toFixed(1);
+    }
     function refreshData() {
         $.ajax({
             url: "{% url 'upbit:market_data' %}",
@@ -117,11 +170,27 @@
                     
                     // 새 데이터 추가
                     data.forEach(function(item) {
+                        item = priceData(item)
+                        item = volumeData(item)
+                        console.log("처리된 아이템:", item);
                         dataTable.row.add([
-                            item.market,
-                            item.price,
-                            item.volume,
-                            item.amount
+                            `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`,
+                            item.korean_name,
+                            item.price_1m ,
+                            formatRatio(item.ratio_5m),
+
+                            formatRatio(item.ratio_30m),
+                            formatRatio(item.ratio_60m),
+                            formatRatio(item.ratio_240m),
+                            formatRatio(item.ratio_1m_60m),
+                            formatRatio(item.ratio_5m_60m),
+                            formatRatio(item.ratio_10m_60m),
+                            formatMillions(item.amount_1m),
+                            formatBillions(item.amount_60m)
+
+                            
+                            
+                            
                         ]);
                     });
                     
