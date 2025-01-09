@@ -17,7 +17,7 @@
 
     .highlight {
         background-color: #ffeeba;
-        transition: background-color 1s;
+        transition: background-color 2s;
     }
 </style>
 
@@ -25,17 +25,43 @@
     <table id="marketTable" class="display">
         <thead>
             <tr>
+                <th colspan="7">A</th>
+                <th colspan="7">B</th>
+
+            </tr>
+            <tr>
                 <th>종목</th>
-                <th>현재가</th>
+                <th>1분</th>
+                <th>5분</th>
+                <th>30분</th>
+                <th>60분</th>
+                <th>240분</th>
+                <th>거래량</th>
+                <th>거래대금</th>
+                <th>거래량</th>
+                <th>거래대금</th>
+                <th>거래량</th>
+                <th>거래대금</th>
                 <th>거래량</th>
                 <th>거래대금</th>
             </tr>
         </thead>
         <tbody>
+            
             {% for item in market_data %}
             <tr>
                 <td>{{ item.market }}</td>
-                <td>{{ item.price }}</td>
+                <td>{{ item.price_1m }}</td>
+                <td>{{ item.price_5m }}</td>
+                <td>{{ item.price_30m }}</td>
+                <td>{{ item.price_60m }}</td>
+                <td>{{ item.price_240m }}</td>
+                <td>{{ item.volume }}</td>
+                <td>{{ item.amount }}</td>
+                <td>{{ item.volume }}</td>
+                <td>{{ item.amount }}</td>
+                <td>{{ item.volume }}</td>
+                <td>{{ item.amount }}</td>
                 <td>{{ item.volume }}</td>
                 <td>{{ item.amount }}</td>
             </tr>
@@ -70,15 +96,18 @@
 
         
 
-        setInterval(refreshData, 3000); // 300000ms = 5분
+        setInterval(refreshData, 3000000); // 600s = 1분
     });
     
     
 
     function refreshData() {
         $.ajax({
-            url: "{% url 'upbit:get_market_data' %}",
+            url: "{% url 'upbit:market_data' %}",
             method: 'GET',
+            headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
             success: function(data) {
                 console.log("데이터 수신:", data);  // 데이터 확인
                 
