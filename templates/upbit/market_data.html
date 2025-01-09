@@ -25,6 +25,15 @@
     .negative {
         color: #FF3B30;  /* 빨간색 */
     }
+    
+   .dataTables_wrapper {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+    #marketTable {
+        width: 100% !important;
+    }
 </style>
 
 <div class="table-container">
@@ -71,12 +80,14 @@
     $(document).ready(function() {
         dataTable = $('#marketTable').DataTable({
             
-            pageLength: 160,            // 페이지당 10개 표시
+            pageLength: 200,            // 페이지당 10개 표시
             order: [[3, 'desc']],      // 거래대금 기준 내림차순 정렬
-            
+            responsive: true, // 반응형 디자인 활성화
+
             language: {
                 search: "검색:",
                 //lengthMenu: "페이지당 _MENU_ 개",
+                
                 info: "_TOTAL_개 중 _START_ - _END_",
                 paginate: {
                     first: "처음",
@@ -86,7 +97,11 @@
                 },
                 zeroRecords: "검색 결과가 없습니다."
             },
-            columnDefs: [{
+            
+
+            columnDefs: [ 
+                
+            {
                 targets: 10, // 1분 거래대금 열 인덱스
                 render: function(data, type, row) {
                     if (type === 'display') {
@@ -112,7 +127,6 @@
             }
             ],
             
-
         });
 
         console.log("Fetching new data...");
@@ -154,7 +168,24 @@
     function formatMillions(number) {
          return (number / 1000000).toFixed(1);
     }
+    function calculateAverages(data) {
+        const averages = {
+            market: '평균',
+            korean_name: '',
+            ratio_5m: data.reduce((sum, item) => sum + parseFloat(item.ratio_5m), 0) / data.length,
+            ratio_30m: data.reduce((sum, item) => sum + parseFloat(item.ratio_30m), 0) / data.length,
+            ratio_60m: data.reduce((sum, item) => sum + parseFloat(item.ratio_60m), 0) / data.length,
+            ratio_240m: data.reduce((sum, item) => sum + parseFloat(item.ratio_240m), 0) / data.length,
+            ratio_1m_60m: data.reduce((sum, item) => sum + parseFloat(item.ratio_1m_60m), 0) / data.length,
+            ratio_5m_60m: data.reduce((sum, item) => sum + parseFloat(item.ratio_5m_60m), 0) / data.length,
+            ratio_10m_60m: data.reduce((sum, item) => sum + parseFloat(item.ratio_10m_60m), 0) / data.length,
+        };
+        return averages;
+    }
+
+
     function refreshData() {
+        
         $.ajax({
             url: "{% url 'upbit:market_data' %}",
             method: 'GET',
@@ -167,8 +198,9 @@
                 if (dataTable) {
                     // 기존 데이터 삭제
                     dataTable.clear();
+
                     
-                    // 새 데이터 추가
+                    // forEach로 데이터 추가
                     data.forEach(function(item) {
                         item = priceData(item)
                         item = volumeData(item)
@@ -196,6 +228,7 @@
                     
                     // 테이블 다시 그리기
                     dataTable.draw();
+                    
                 }
             },
             error: function(err) {
