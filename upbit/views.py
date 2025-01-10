@@ -23,20 +23,20 @@ def market_data(request):
         formatted_time = rounded_time.strftime('%Y-%m-%d %H:%M:%S')
         return formatted_time
     
-    last_1_time = get_current_time(datetime.now(), -1 -30)
-    last_3_time = get_current_time(datetime.now(), -3 -30)
-    last_5_time = get_current_time(datetime.now(), -5 -30)
-    last_10_time = get_current_time(datetime.now(), -10 -30)
-    last_30_time = get_current_time(datetime.now(), -30 -30)
-    last_60_time = get_current_time(datetime.now(), -60 -30)
-    last_240_time = get_current_time(datetime.now(), -240 -30)
+    last_1_time = get_current_time(datetime.now(), -1)
+    last_3_time = get_current_time(datetime.now(), -3)
+    last_5_time = get_current_time(datetime.now(), -5)
+    last_10_time = get_current_time(datetime.now(), -10)
+    last_30_time = get_current_time(datetime.now(), -30)
+    last_60_time = get_current_time(datetime.now(), -60)
+    last_240_time = get_current_time(datetime.now(), -240)
     
     last_1_sum_data = Market.objects.filter(log_dt__gte= last_1_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     last_3_sum_data = Market.objects.filter(log_dt__gte= last_3_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     last_5_sum_data = Market.objects.filter(log_dt__gte= last_5_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     last_10_sum_data = Market.objects.filter(log_dt__gte= last_10_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     last_60_sum_data = Market.objects.filter(log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
-    print(last_3_sum_data)
+    #print(last_3_sum_data)
     # 직전 n~60분 데이터 -> 나중에 수정해보자 좋은값찾아서
     last_1_60_sum_data = Market.objects.filter(log_dt__lt= last_1_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     last_3_60_sum_data = Market.objects.filter(log_dt__lt= last_3_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
@@ -94,7 +94,7 @@ def market_data(request):
         for item in market_info_list if item.market !='KRW-BTC'
         ]
 
-    print(market_list)
+    #print(market_list)
     context = {'market_data': market_list}
     
 
