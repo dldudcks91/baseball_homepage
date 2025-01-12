@@ -23,7 +23,7 @@ def market_data(request):
         formatted_time = rounded_time.strftime('%Y-%m-%d %H:%M:%S')
         return formatted_time
     
-    TEST_MINUTES= 20
+    TEST_MINUTES= 0
     current_time = datetime.now() #- timedelta(minutes = TEST_MINUTES)
     last_1_time = get_current_time(current_time, -(1+TEST_MINUTES))
     last_3_time = get_current_time(current_time, -(3+TEST_MINUTES))
