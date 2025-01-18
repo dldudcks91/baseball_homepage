@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import Market, MarketInfo
+from .models import Market, MarketInfo, MarketSupply
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Sum, F, Count, Max
+from django.db.models import Sum, F, Count, Max, Min
 
 from datetime import datetime, timedelta
 # Create your views here.
@@ -37,7 +37,8 @@ def market_data(request):
 
 
     #고점데이터
-    today_high_data = Market.objects.filter(log_dt__gte= utc_00_time, volume__gt = 0).values('market').annotate(max_price = Max('price')).order_by('market')
+    today_high_low_data = Market.objects.filter(log_dt__gte= utc_00_time, volume__gt = 0).values('market').annotate(max_price = Max('price'), min_price = Min('price')).order_by('market')
+    
     #거래량,거래대금
     last_1_sum_data = Market.objects.filter(log_dt__gte= last_1_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     last_3_sum_data = Market.objects.filter(log_dt__gte= last_3_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
@@ -48,10 +49,10 @@ def market_data(request):
 
     #print(last_3_sum_data)
     # 직전 n~60분 데이터 -> 나중에 수정해보자 좋은값찾아서
-    last_1_60_sum_data = Market.objects.filter(log_dt__lt= last_1_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
-    last_3_60_sum_data = Market.objects.filter(log_dt__lt= last_3_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
-    last_5_60_sum_data = Market.objects.filter(log_dt__lt= last_5_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
-    last_10_60_sum_data = Market.objects.filter(log_dt__lt= last_10_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
+    # last_1_60_sum_data = Market.objects.filter(log_dt__lt= last_1_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
+    # last_3_60_sum_data = Market.objects.filter(log_dt__lt= last_3_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
+    # last_5_60_sum_data = Market.objects.filter(log_dt__lt= last_5_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
+    # last_10_60_sum_data = Market.objects.filter(log_dt__lt= last_10_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
 
     
     
@@ -80,11 +81,10 @@ def market_data(request):
     last_60_data = Market.objects.filter(log_dt = last_60_time)
     last_240_data = Market.objects.filter(log_dt = last_240_time)
     
-    for a,b in zip(last_1_data, last_1_60_sum_data):
-        print(a.market, a.volume,b)
-        #print(a,b)
+    
 
-    market_info_list = MarketInfo.objects.all()
+    market_info_list = MarketInfo.objects.all().order_by('symbol')
+    market_supply_list = MarketSupply.objects.all().order_by('symbol')
     
     
     market_list = [
@@ -92,7 +92,14 @@ def market_data(request):
             'market': item.market,
             'korean_name':item.korean_name,
             'english_name':item.english_name,
-            'capitalization':item.capitalization,
+            'issue_month': item.issue_month,
+            'listing_month': item.listing_month,
+
+            'capitalization':next((d.capitalization for d in market_supply_list if d.symbol == item.symbol), None),
+            'max_supply':next((d.max_supply for d in market_supply_list if d.symbol == item.symbol), None),
+            'now_supply':next((d.now_supply for d in market_supply_list if d.symbol == item.symbol), None),
+
+
             'kimchi_premium':next((round(((d.price/d.price_foreign)-1)*100,2) if d.price_foreign !=0 else 0 for d in last_1_data if d.market == item.market), None),
 
             'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
@@ -100,11 +107,12 @@ def market_data(request):
             'price_30m': next((d.price for d in last_30_data if d.market == item.market), None),
             'price_60m': next((d.price for d in last_60_data if d.market == item.market), None),
             'price_240m': next((d.price for d in last_240_data if d.market == item.market), None),
-            'price_today_high': next((d['max_price'] for d in today_high_data if d['market'] == item.market), None),
-            'ratio_1m_60m':next((get_volume_ratio(nu, de) for nu, de in zip(last_1_sum_data, last_1_60_sum_data) if de['market'] == item.market),None),
-            'ratio_3m_60m':next((get_volume_ratio(nu, de) for nu, de in zip(last_3_sum_data, last_3_60_sum_data) if de['market'] == item.market),None),
-            'ratio_5m_60m':next((get_volume_ratio(nu, de) for nu, de in zip(last_5_sum_data, last_5_60_sum_data) if de['market'] == item.market),None),
-            'ratio_10m_60m':next((get_volume_ratio(nu, de) for nu, de in zip(last_10_sum_data, last_10_60_sum_data) if de['market'] == item.market),None),
+            'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item.market), None),
+            'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item.market), None),
+            'ratio_1m_60m':next((get_volume_ratio(nu, de) for nu, de in zip(last_1_sum_data, last_60_sum_data) if de['market'] == item.market),None),
+            'ratio_3m_60m':next((get_volume_ratio(nu, de) for nu, de in zip(last_3_sum_data, last_60_sum_data) if de['market'] == item.market),None),
+            'ratio_5m_60m':next((get_volume_ratio(nu, de) for nu, de in zip(last_5_sum_data, last_60_sum_data) if de['market'] == item.market),None),
+            'ratio_10m_60m':next((get_volume_ratio(nu, de) for nu, de in zip(last_10_sum_data, last_60_sum_data) if de['market'] == item.market),None),
             
             'amount_1m': next((d.amount for d in last_1_data if d.market == item.market), None),
             

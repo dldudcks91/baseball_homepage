@@ -42,8 +42,8 @@
     <table id="marketTable" class="display">
         <thead>
             <tr>
-                <th colspan="5">기본정보</th>
-                <th colspan="5">가격(n분 전 대비 현재가격)</th>
+                <th colspan="8">기본정보</th>
+                <th colspan="6">가격(n분 전 대비 현재가격)</th>
                 <th colspan="3">거래량(직전 60분 평균 대비 n분 변화량)</th>
                 <th colspan="4">거래대금</th>
 
@@ -52,13 +52,19 @@
                 <th>종목</th>
                 <th>이름</th>
                 <th>시총</th>
+                <th>발행률</th>
+                <th>발행일</th>
+                <th>상장일</th>
                 <th>현재가</th>
                 <th>김프</th>
+
                 <th>5분</th>
                 <th>30분</th>
                 <th>60분</th>
                 <th>240분</th>
                 <th>고점</th>
+                <th>저점</th>
+
                 <th>1분</th>
                 <th>5분</th>
                 <th>10분</th>
@@ -89,9 +95,9 @@
         dataTable = $('#marketTable').DataTable({
             
             pageLength: 200,            // 페이지당 10개 표시
-            order: [[13, 'desc']],      // 1분 거래대금 기준 내림차순 정렬
+            order: [[16, 'desc']],      // 1분 거래대금 기준 내림차순 정렬
             responsive: true, // 반응형 디자인 활성화
-            
+             
             language: {
                 search: "검색:",
                 //lengthMenu: "페이지당 _MENU_ 개",
@@ -108,15 +114,33 @@
             
 
             columnDefs: [ 
+            
+
             {
                 targets: '_all', // 모든 컬럼에 적용
-                sortSequence: ['desc', 'asc',null]
+                sortSequence: ['desc', 'asc',null],
+                width: '5%'
             },
             {
-                targets: 2, // 1분 거래대금 열 인덱스
+                targets: 2, // 시가총액 인덱스
                 render: function(data, type, row) {
                     if (type === 'display') {
-                        return data.toLocaleString() + '억';
+                        if (data == null || isNaN(data)) return '0억';
+                            return Number(data).toLocaleString() + '억';
+                    } else if (type === 'sort') {
+                        return parseFloat(data);
+                    }
+                    return data;
+                },
+                
+            },
+           
+            {
+                targets: 6, // 현재가격 인덱스
+                render: function(data, type, row) {
+                    if (type === 'display') {
+                        
+                        return Number(data).toLocaleString();
                     } else if (type === 'sort') {
                         return parseFloat(data);
                     }
@@ -125,31 +149,7 @@
                 
             },
             {
-                targets: 13, // 1분 거래대금 열 인덱스
-                render: function(data, type, row) {
-                    if (type === 'display') {
-                        return data + '억';
-                    } else if (type === 'sort') {
-                        return parseFloat(data);
-                    }
-                    return data;
-                },
-                
-            },
-            {
-                targets: 14, // 5분 거래대금 열 인덱스
-                render: function(data, type, row) {
-                    if (type === 'display') {
-                        return data + '억';
-                    } else if (type === 'sort') {
-                        return parseFloat(data);
-                    }
-                    return data;
-                },
-                
-            },
-            {
-                targets: 15, // 60분 거래대금 열 인덱스
+                targets: 17, // 1분 거래대금 열 인덱스
                 render: function(data, type, row) {
                     if (type === 'display') {
                         return data + '억';
@@ -161,7 +161,31 @@
                 
             },
             {
-                targets: 16, // 오늘 전체 거래대금 열 인덱스
+                targets: 18, // 5분 거래대금 열 인덱스
+                render: function(data, type, row) {
+                    if (type === 'display') {
+                        return data + '억';
+                    } else if (type === 'sort') {
+                        return parseFloat(data);
+                    }
+                    return data;
+                },
+                
+            },
+            {
+                targets: 19, // 60분 거래대금 열 인덱스
+                render: function(data, type, row) {
+                    if (type === 'display') {
+                        return data + '억';
+                    } else if (type === 'sort') {
+                        return parseFloat(data);
+                    }
+                    return data;
+                },
+                
+            },
+            {
+                targets: 20, // 오늘 전체 거래대금 열 인덱스
                 render: function(data, type, row) {
                     if (type === 'display') {
                         return data + '억';
@@ -180,9 +204,9 @@
 
         
         refreshData()
-        setInterval(refreshData, 30000); // 600s = 1분
+        setInterval(refreshData, 20000); // 600s = 1분
     });
-    
+    `${item.supply_ratio}%`
     
     function priceData(item) {
         item.price_ratio_5m = (((item.price_1m - item.price_5m) / item.price_5m)*100).toFixed(2)
@@ -190,6 +214,9 @@
         item.price_ratio_60m = (((item.price_1m - item.price_60m) / item.price_60m)*100).toFixed(2)
         item.price_ratio_240m = (((item.price_1m - item.price_240m)/ item.price_240m)*100).toFixed(2)
         item.price_ratio_high = (((item.price_1m - item.price_today_high)/ item.price_today_high)*100).toFixed(2)
+        item.price_ratio_low = (((item.price_1m - item.price_today_low)/ item.price_today_low)*100).toFixed(2)
+        
+        item.supply_ratio = !item.max_supply ? '-' : `${((item.now_supply / item.max_supply)*100).toFixed(1)}%`
         return item
     }
     function volumeData(item){
@@ -198,6 +225,12 @@
         item.volume_ratio_5m_60m = (item.ratio_5m_60m*100).toFixed(1)
         item.volume_ratio_10m_60m = (item.ratio_10m_60m*100).toFixed(1)
                             
+        return item
+    }
+
+    function capitalizationData(item){
+        item.capitalization = (item.capitalization / 100000000).toFixed(0)
+
         return item
     }
 
@@ -252,20 +285,25 @@
                     data.forEach(function(item) {
                         item = priceData(item)
                         item = volumeData(item)
+                        item = capitalizationData(item)
                         console.log("처리된 아이템:", item);
                         dataTable.row.add([
                             `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`,
                             item.korean_name,
                             item.capitalization,
-                            item.price_1m.toLocaleString(),
-                            formatRatio(item.kimchi_premium),
+                            item.supply_ratio,
+                            item.issue_month,
+                            item.listing_month,
 
+                            item.price_1m,
+                            formatRatio(item.kimchi_premium),
                             formatRatio(item.price_ratio_5m),
 
                             formatRatio(item.price_ratio_30m),
                             formatRatio(item.price_ratio_60m),
                             formatRatio(item.price_ratio_240m),
                             formatRatio(item.price_ratio_high),
+                            formatRatio(item.price_ratio_low),
 
                             formatRatio(item.volume_ratio_1m_60m),
                             formatRatio(item.volume_ratio_5m_60m),
