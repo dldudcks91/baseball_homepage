@@ -107,15 +107,36 @@
         item.supply_ratio = !item.max_supply ? '-' : `${((item.now_supply / item.max_supply)*100).toFixed(1)}%`
         return item
     }
-    function volumeData(item){
-        item.volume_ratio_1m_60m = (item.ratio_1m_60m*100).toFixed(1)
-        item.volume_ratio_3m_60m = (item.ratio_3m_60m*100).toFixed(1)
-        item.volume_ratio_5m_60m = (item.ratio_5m_60m*100).toFixed(1)
-        item.volume_ratio_10m_60m = (item.ratio_10m_60m*100).toFixed(1)
-                            
+
+
+    
+
+    function calVolumeRatio(nu_amount, nu_cnt, de_amount, de_cnt) {
+        let nu_mean = 0;
+        let de_mean = 0;
+
+        if(nu_cnt !== 0) {
+            nu_mean = nu_amount / nu_cnt;
+        }
+
+        if(de_cnt !== 0) {
+            de_mean = de_amount / de_cnt;
+        }
+
+        if(de_mean === 0) {
+            return 0;
+        }
+
+        return (nu_mean / de_mean) - 1;
+    }
+    function getVolumeRatio(item){
+        
+        item.volume_ratio_1m_60m = (calVolumeRatio(item.amount_1m, item.count_1m, item.amount_60m, item.count_60m)*100).toFixed(1)
+        item.volume_ratio_5m_60m = (calVolumeRatio(item.amount_5m, item.count_5m, item.amount_60m, item.count_60m)*100).toFixed(1)
+        item.volume_ratio_10m_60m = (calVolumeRatio(item.amount_10m, item.count_10m, item.amount_60m, item.count_60m)*100).toFixed(1)
         return item
     }
-
+    
     function capitalizationData(item){
         item.capitalization = (item.capitalization / 100000000).toFixed(0)
 
@@ -154,7 +175,7 @@
 
 
     function refreshTradeToday(tabType) {
-        
+        console.log('AJAX 요청 발생'); 
         $.ajax({
             url: "{% url 'upbit:trade_day' %}",
             method: 'GET',
@@ -165,17 +186,16 @@
                 console.log("데이터 수신:", response);  // 데이터 확인
                 const container = $(`#${tabType}_contents`);
                 
-                 // 기본 정렬
-                if (dataTableTradeToday) {
-                    currentOrderTradeToday = dataTableTradeToday.order(); // 현재 정렬 상태 가져오기
-                     
-
+                // 기본 정렬
+                 if (dataTableTradeToday && typeof dataTableTradeToday.order === 'function') {
+                    currentOrderTradeToday = dataTableTradeToday.order() || currentOrderTradeToday;
+                    dataTableTradeToday.destroy();
                 }
             
                 const processedData = response['data'].map(item => {
                 item = priceData(item);
-                item = volumeData(item);
                 item = capitalizationData(item);
+                item = getVolumeRatio(item)
                 return [
                     `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
                     item.korean_name, // 이름
@@ -204,9 +224,12 @@
                     formatBillions(item.amount_today,1) // 하루
                 ];
                 });
+
+                
+                
                 dataTableTradeToday = container.html(response.html);
                 
-                    $('#dataTableTradeToday').DataTable({
+                $('#dataTableTradeToday').DataTable({
                     data: processedData, 
                     
                     pageLength: 200,            // 페이지당 10개 표시

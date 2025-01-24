@@ -27,8 +27,8 @@ def trade_day(request):
         return rounded_time
     
     TEST_MINUTES= 0
-    #current_time = datetime(2025, 1, 18, 14, 36, 0, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
-    current_time = datetime.noW()
+    current_time = datetime(2025, 1, 23, 7, 36, 0, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
+    #current_time = datetime.now()
     last_1_time = get_current_time(current_time, -(1+TEST_MINUTES))
     last_3_time = get_current_time(current_time, -(3+TEST_MINUTES))
     last_5_time = get_current_time(current_time, -(5+TEST_MINUTES))
@@ -46,7 +46,7 @@ def trade_day(request):
     last_240_data = Market.objects.filter(log_dt = last_240_time)
 
     #고점데이터
-    today_high_low_data = Market.objects.filter(log_dt__gte= utc_00_time, volume__gt = 0).values('market').annotate(max_price = Max('price'), min_price = Min('price')).order_by('market')
+    today_high_low_data = Market.objects.filter(log_dt__gte= utc_00_time, volume__gt = 0, price__gt = 0).values('market').annotate(max_price = Max('price'), min_price = Min('price')).order_by('market')
     
     #거래량,거래대금
     last_1_sum_data = Market.objects.filter(log_dt__gte= last_1_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
@@ -55,10 +55,10 @@ def trade_day(request):
     last_60_sum_data = Market.objects.filter(log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     last_today_sum_data = Market.objects.filter(log_dt__gte= utc_00_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
 
-    last_1_dict = {item['market']: item for item in last_1_sum_data}
-    last_5_dict = {item['market']: item for item in last_5_sum_data}
-    last_10_dict = {item['market']: item for item in last_10_sum_data}
-    last_60_dict = {item['market']: item for item in last_60_sum_data}
+    # last_1_dict = {item['market']: item for item in last_1_sum_data}
+    # last_5_dict = {item['market']: item for item in last_5_sum_data}
+    # last_10_dict = {item['market']: item for item in last_10_sum_data}
+    # last_60_dict = {item['market']: item for item in last_60_sum_data}
 
 
     #print(last_3_sum_data)
@@ -72,25 +72,25 @@ def trade_day(request):
     
     
 
-    def get_volume_ratio(nu: dict, de: dict) -> float:
-        if nu['cnt'] == 0:
-            nu_mean = 0
-        else:
-            nu_mean = nu['total_volume'] / nu['cnt']
+    # def get_volume_ratio(nu: dict, de: dict) -> float:
+    #     if nu['cnt'] == 0:
+    #         nu_mean = 0
+    #     else:
+    #         nu_mean = nu['total_volume'] / nu['cnt']
 
-        if de['cnt'] ==0:
-            de_mean = 0
-        else:
-            de_mean = de['total_volume'] / de['cnt']
+    #     if de['cnt'] ==0:
+    #         de_mean = 0
+    #     else:
+    #         de_mean = de['total_volume'] / de['cnt']
 
         
-        if de_mean == 0:
-            return 0
-        else:
-            return (nu_mean / de_mean) -1
+    #     if de_mean == 0:
+    #         return 0
+    #     else:
+    #         return (nu_mean / de_mean) -1
 
     
-    print(last_1_dict['KRW-AERGO'], last_60_dict['KRW-AERGO'])
+    
             
 
 
@@ -123,21 +123,25 @@ def trade_day(request):
             'price_240m': next((d.price for d in last_240_data if d.market == item.market), None),
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item.market), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item.market), None),
-            'ratio_1m_60m':get_volume_ratio(last_1_dict.get(item.market), last_60_dict.get(item.market)) if item.market in last_1_dict and item.market in last_60_dict else None,
-            'ratio_5m_60m':get_volume_ratio(last_5_dict.get(item.market), last_60_dict.get(item.market)) if item.market in last_1_dict and item.market in last_60_dict else None,
-            'ratio_10m_60m':get_volume_ratio(last_10_dict.get(item.market), last_60_dict.get(item.market)) if item.market in last_1_dict and item.market in last_60_dict else None,
+            # 'ratio_1m_60m':get_volume_ratio(last_1_dict.get(item.market), last_60_dict.get(item.market)) if item.market in last_1_dict and item.market in last_60_dict else None,
+            # 'ratio_5m_60m':get_volume_ratio(last_5_dict.get(item.market), last_60_dict.get(item.market)) if item.market in last_1_dict and item.market in last_60_dict else None,
+            # 'ratio_10m_60m':get_volume_ratio(last_10_dict.get(item.market), last_60_dict.get(item.market)) if item.market in last_1_dict and item.market in last_60_dict else None,
             #next((get_volume_ratio(nu, de) for nu, de in zip(last_10_sum_data, last_60_sum_data) if de['market'] == item.market),None),
             
-            'amount_1m': next((d.amount for d in last_1_data if d.market == item.market), None),
-            
+            'amount_1m': next((d['total_amount'] for d in last_1_sum_data if d['market'] == item.market), None),
             'amount_5m': next((d['total_amount'] for d in last_5_sum_data if d['market'] == item.market), None),
+            'amount_10m': next((d['total_amount'] for d in last_10_sum_data if d['market'] == item.market), None),
             'amount_60m': next((d['total_amount'] for d in last_60_sum_data if d['market'] == item.market), None),
-            'amount_today': next((d['total_amount'] for d in last_today_sum_data if d['market'] == item.market), None)
+            'amount_today': next((d['total_amount'] for d in last_today_sum_data if d['market'] == item.market), None),
 
-
+            'count_1m': next((d['cnt'] for d in last_1_sum_data if d['market'] == item.market), None),
+            'count_5m': next((d['cnt'] for d in last_5_sum_data if d['market'] == item.market), None),
+            'count_10m': next((d['cnt'] for d in last_10_sum_data if d['market'] == item.market), None),
+            'count_60m': next((d['cnt'] for d in last_60_sum_data if d['market'] == item.market), None),
+            'count_today': next((d['cnt'] for d in last_today_sum_data if d['market'] == item.market), None)
 
         }
-        for item in market_info_list if item.market !='KRW-BTC'
+        for item in market_info_list
         ]
 
     #print(market_list)
