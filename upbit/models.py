@@ -14,6 +14,22 @@ class Market(models.Model):
         db_table = 'tb_market'
         unique_together = (('log_dt','market'),)
 
+class MarketHour(models.Model):
+    
+    log_dt = models.DateTimeField(primary_key = True)
+    market = models.CharField(max_length = 45)
+    opening_price = models.FloatField()
+    trade_price = models.FloatField()
+    high_price = models.FloatField()
+    low_price = models.FloatField()
+    volume = models.FloatField()
+    amount = models.FloatField()
+    
+    class Meta:
+        managed = False
+        db_table = 'tb_market_hour'
+        unique_together = (('log_dt','market'),)
+
 class MarketInfo(models.Model):
     
     

@@ -54,9 +54,15 @@
         </ul>
 
         <!-- 탭 컨텐츠 -->
+        <div class="timer-container" style="text-align: right; padding: 10px;">
+            다음 업데이트까지: <span id="countdownToday"></span>초
+        </div>
         <div class="tab-content" id="tradeTabContent">
             <div class="tab-pane fade show active" id="trade_day_contents" 
-                 role="tabpanel"></div>
+                 role="tabpanel">
+                
+                
+            </div>
             <div class="tab-pane fade" id="trade_swing_contents" 
                  role="tabpanel"></div>
             <div class="tab-pane fade" id="trade_time_contents" 
@@ -69,30 +75,96 @@
 <script type="text/javascript">
     let currentOrderTradeToday = [[14, 'desc']];
     let dataTableTradeToday ;
+    let updateInterval;
+    let timerInterval; 
+    let countDownToday = 10;
+
     $(document).ready(function() {
         // 페이지 로드시 첫 번째 탭 데이터 로드
         dataTableTradeToday = $('#dataTableTradeToday').DataTable({});     
-        refreshTradeToday('trade_day')
-        setInterval(function() { refreshTradeToday('trade_day')}, 10000);
+        
+        startAutoUpdate()
+
+        
+        
+        
+        //setInterval(function() { refreshTradeToday('trade_day')}, 10000);
 
         // 탭 클릭 이벤트
         $('#trade_day_tab').on('click', function() {
-            
+            startAutoUpdate();
         });
 
         $('#trade_swing_tab').on('click', function() {
+            stopAutoUpdate();
             loadTabContent('trade_swing');
         });
 
         $('#trade_time_tab').on('click', function() {
+            stopAutoUpdate();
             loadTabContent('trade_time');
         });
     
 
-
-       
+        
+        
     });
+
+    function startAutoUpdate() {
+        function getInitialDelay() {
+            const now = new Date();
+            const seconds = now.getSeconds() % 15;
+            
+            return seconds <= 5 ? 5 - seconds : 15 - seconds;
+        }
+
+        // 초기 카운트다운 설정
+        countDownToday = getInitialDelay();
+        $('#countdownToday').text(countDownToday);
+
+        // 초기 실행
+        refreshTradeToday('trade_day');
+        
+        if (updateInterval) {
+        clearInterval(updateInterval);
+        }
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
+
+        function updateTimer() {
+            $('#countdownToday').text(countDownToday);
+            countDownToday -= 1;
+            
+            if (countDownToday < 0) {
+                countDownToday = 10;
+            }
+        }
+        
+        // 1초마다 타이머 업데이트
+        setInterval(updateTimer, 1000);
+        
+        //첫 실행은 다음 5초에 맞추기
+        setTimeout(() => {
+            refreshTradeToday('trade_day');
+            countDownToday = 10;
+            
+            // 그 이후부터는 10초 간격으로 실행
+            updateInterval = setInterval(() => {
+                refreshTradeToday('trade_day');
+                countDownToday = 10;
+            }, 10000);
+        }, getInitialDelay() * 1000);
+
+        return { timerInterval, updateInterval }
+    }
     
+    function stopAutoUpdate() {
+        if (updateInterval) {
+            clearInterval(updateInterval);
+            updateInterval = null;
+        }
+    }
     
     function priceData(item) {
         item.price_ratio_5m = (((item.price_1m - item.price_5m) / item.price_5m)*100).toFixed(2)
@@ -115,18 +187,9 @@
         let nu_mean = 0;
         let de_mean = 0;
 
-        if(nu_cnt !== 0) {
-            nu_mean = nu_amount / nu_cnt;
-        }
-
-        if(de_cnt !== 0) {
-            de_mean = de_amount / de_cnt;
-        }
-
-        if(de_mean === 0) {
-            return 0;
-        }
-
+        if(nu_cnt !== 0) {nu_mean = nu_amount / nu_cnt;}
+        if(de_cnt !== 0) {de_mean = de_amount / de_cnt;}
+        if(de_mean === 0) {return 0;}
         return (nu_mean / de_mean) - 1;
     }
     function getVolumeRatio(item){
@@ -185,7 +248,10 @@
             success: function(response) {
                 console.log("데이터 수신:", response);  // 데이터 확인
                 const container = $(`#${tabType}_contents`);
-                
+
+                //html먼저 생성
+                dataTableTradeToday = container.html(response.html);
+
                 // 기본 정렬
                  if (dataTableTradeToday && typeof dataTableTradeToday.order === 'function') {
                     currentOrderTradeToday = dataTableTradeToday.order() || currentOrderTradeToday;
@@ -227,7 +293,7 @@
 
                 
                 
-                dataTableTradeToday = container.html(response.html);
+                
                 
                 $('#dataTableTradeToday').DataTable({
                     data: processedData, 
@@ -287,43 +353,21 @@
                         
                     },
                     {
-                        targets: 15, // 1분 거래대금 열 인덱스
+                        targets: [12, 13, 14], // 거래량 비율 컬럼들 (1분, 5분, 10분 거래량)
                         render: function(data, type, row) {
                             if (type === 'display') {
-                                return data + '억';
-                            } else if (type === 'sort') {
-                                return parseFloat(data);
+                                return data; // 원래 형식대로 표시
+                            }
+                            // 정렬을 위해 숫자로 변환
+                            if (type === 'sort') {
+                                const value = data.replace(/[^-\d.]/g, ''); // 숫자와 소수점, 마이너스 기호만 남김
+                                return value === '' ? -999999 : parseFloat(value); // NaN일 경우 가장 작은 값으로 처리
                             }
                             return data;
-                        },
-                        
+                        }
                     },
                     {
-                        targets: 16, // 5분 거래대금 열 인덱스
-                        render: function(data, type, row) {
-                            if (type === 'display') {
-                                return data + '억';
-                            } else if (type === 'sort') {
-                                return parseFloat(data);
-                            }
-                            return data;
-                        },
-                        
-                    },
-                    {
-                        targets: 17, // 60분 거래대금 열 인덱스
-                        render: function(data, type, row) {
-                            if (type === 'display') {
-                                return data + '억';
-                            } else if (type === 'sort') {
-                                return parseFloat(data);
-                            }
-                            return data;
-                        },
-                        
-                    },
-                    {
-                        targets: 18, // 오늘 전체 거래대금 열 인덱스
+                        targets: [15,16,17,18], // 1분 거래대금 열 인덱스
                         render: function(data, type, row) {
                             if (type === 'display') {
                                 return data + '억';
@@ -337,12 +381,7 @@
                     ],
                 
         });
-                
-                            
-                        
-                        
-                    
-                    
+
                     
                     
             },
