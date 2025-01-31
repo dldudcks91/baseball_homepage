@@ -1,34 +1,44 @@
  <!-- 네비게이션바 -->
 <nav class="navbar navbar-expand navbar-light bg-light">
-    <ul class="navbar-nav">
+    <div class="container-fluid">
+        <ul class="navbar-nav me-auto">
 
-        <li class="nav-item">
-            <a class="nav-link mb-0 h2" href="{%url 'main:index'%}" ><h>Home</h></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link mb-0 h2" href="{%url 'upbit:trade_list' %}" ><h>Upbit</h></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link mb-0 h2" href="{%url 'baseball:index' %}" ><h>Baseball</h></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link mb-0 h5" href="{% url 'baseball:team_info' %}" ><b>팀순위</b></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link mb-0 h5" href="{% url 'baseball:game_info' %}" ><b>게임정보</b></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link mb-0 h5" href="{% url 'baseball:board' %}" ><b>게시판</b></a>
-        </li>
-        <li class="nav-item">
-            {% if user.is_authenticated %}
-                <p class="nav-link mb-0 h5">Hello, {{ user.username }}! <a href="{% url 'accounts:logout' %}">Logout</a></p>
-            {% else %}
-                <p class="nav-link mb-0 h5"><a href="{% url 'accounts:login' %}">Login</a></p>
-            {% endif %}
-        </li>
-    </ul>
-   
+            <li class="nav-item">
+                <a class="nav-link mb-0 h2" href="{%url 'main:index'%}" ><h>Home</h></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mb-0 h2" href="{%url 'upbit:trade_list' %}" ><h>Upbit</h></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mb-0 h2" href="{%url 'baseball:index' %}" ><h>Baseball</h></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mb-0 h5" href="{% url 'baseball:team_info' %}" ><b>팀순위</b></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mb-0 h5" href="{% url 'baseball:game_info' %}" ><b>게임정보</b></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mb-0 h5" href="{% url 'baseball:board' %}" ><b>게시판</b></a>
+            </li>
+            <li class="nav-item">
+                {% if user.is_authenticated %}
+                    <p class="nav-link mb-0 h5">Hello, {{ user.username }}! <a href="{% url 'accounts:logout' %}">Logout</a></p>
+                {% else %}
+                    <p class="nav-link mb-0 h5"><a href="{% url 'accounts:login' %}">Login</a></p>
+                {% endif %}
+            </li>
+            
+        </ul>
+        
+        <div class="nav-item">
+            <span class="navbar-text">
+                {{active_users}}명
+            </span>
+        </div>
+        
+        
+    </div>
 </nav>
 
 

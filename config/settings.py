@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'baseball.apps.BaseballConfig',
     'main.apps.MainConfig',
     'upbit.apps.UpbitConfig',
-    'accounts'
+    'accounts',
+    'user_sessions'
     
 ]
 
@@ -67,6 +68,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'main.context_processors.active_users',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
