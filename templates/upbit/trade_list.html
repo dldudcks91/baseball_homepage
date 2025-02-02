@@ -103,16 +103,19 @@
 
         // 탭 클릭 이벤트
         $('#trade_day_tab').on('click', function() {
+            stopAutoUpdate()
             destroyTable();
             startAutoUpdateToday();
         });
 
         $('#trade_swing_tab').on('click', function() {
+            stopAutoUpdate()
             destroyTable();
             startAutoUpdateSwing();
         });
 
         $('#trade_timetable_tab').on('click', function() {
+            stopAutoUpdate()
             destroyTable();
 
             refreshTradeTimetable('trade_timetable',1)
@@ -122,7 +125,12 @@
         
         
     });
-
+    function stopAutoUpdate() {
+        if (updateInterval) {
+            clearInterval(updateInterval);
+            updateInterval = null;
+        }
+    }
     function startAutoUpdateToday() {
         function getInitialDelay() {
             const now = new Date();
@@ -170,12 +178,7 @@
         
     }
     
-    function stopAutoUpdate() {
-        if (updateInterval) {
-            clearInterval(updateInterval);
-            updateInterval = null;
-        }
-    }
+    
     
     function destroyTable() {
     if (dataTableTradeToday && typeof dataTableTradeToday.destroy === 'function') {

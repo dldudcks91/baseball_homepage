@@ -27,7 +27,7 @@ def trade_day(request):
         return rounded_time
     
     TEST_MINUTES= 0
-    current_time = datetime(2025, 1, 23, 9, 00, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
+    current_time = datetime(2025, 1, 18, 14, 35, 0, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
     #current_time = datetime.now(tz = timezone.utc)
     last_1_time = get_current_time(current_time, -(1+TEST_MINUTES))
     last_3_time = get_current_time(current_time, -(3+TEST_MINUTES))
@@ -241,7 +241,7 @@ def trade_swing(request):
         return rounded_time
     
     TEST_HOURS= 0
-    current_time = datetime(2025, 1, 23, 9, 00, 3, tzinfo = timezone.utc)
+    current_time = datetime(2025, 1, 22, 17, 0, 3, tzinfo = timezone.utc)
     current_hour = current_time.replace(minute =0, second= 0)
     #current_time = datetime.now(tz = timezone.utc).replace(minute= 0, second = 0)
     last_1_time = get_current_time(current_time, -(1+TEST_HOURS))
