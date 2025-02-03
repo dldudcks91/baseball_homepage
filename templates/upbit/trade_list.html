@@ -57,24 +57,18 @@
                 <a class="nav-link mb-0 h5"  id="trade_swing_tab" data-toggle="tab" href="#trade_swing_contents" role="tab"><h>스윙</h></a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link mb-0 h5"  id="trade_timetable_tab" data-toggle="tab" href="#trade_timetable_contents" role="tab"><h>시간대별</h></a>
+                <a class="nav-link mb-0 h5"  id="trade_timetable_tab" data-toggle="tab" href="#trade_timetable_contents" role="tab"><h>시간대별(수정중)</h></a>
             </li>
         </ul>
 
         <!-- 탭 컨텐츠 -->
-        <div class="timer-container" style="text-align: right; padding: 10px;">
+        <!-- <div class="timer-container" style="text-align: right; padding: 10px;">
             다음 업데이트까지: <span id="countdown"></span>초
-        </div>
+        </div> -->
         <div class="tab-content" id="tradeTabContent">
-            <div class="tab-pane fade show active" id="trade_day_contents" 
-                 role="tabpanel">
-                
-                
-            </div>
-            <div class="tab-pane fade" id="trade_swing_contents" 
-                 role="tabpanel"></div>
-            <div class="tab-pane fade" id="trade_timetable_contents" 
-                 role="tabpanel"></div>
+            <div class="tab-pane fade show active" id="trade_day_contents" role="tabpanel"></div>
+            <div class="tab-pane fade" id="trade_swing_contents" role="tabpanel"></div>
+            <div class="tab-pane fade" id="trade_timetable_contents" role="tabpanel"></div>
         </div>
     </div>
     
@@ -94,15 +88,14 @@
     
 
     $(document).ready(function() {
-        // 페이지 로드시 첫 번째 탭 데이터 로드
-        dataTableTradeToday = $('#dataTableTradeToday').DataTable({});     
-        dataTableTradeSwing = $('#dataTableTradeSwing').DataTable({});     
-        dataTableTradeTimetable = $('#dataTableTradeTimetable').DataTable({});
+        // // 페이지 로드시 첫 번째 탭 데이터 로드
+        // dataTableTradeToday = $('#dataTableTradeToday').DataTable({});     
+        // dataTableTradeSwing = $('#dataTableTradeSwing').DataTable({});     
+        // dataTableTradeTimetable = $('#dataTableTradeTimetable').DataTable({});
         
         
-        stopAutoUpdate();
-        destroyTable();
-        startAutoUpdate('trade_today');
+        
+        startAutoUpdate('trade_day');
 
         
         
@@ -111,19 +104,19 @@
 
         // 탭 클릭 이벤트
         $('#trade_day_tab').on('click', function() {
-            stopAutoUpdate()
             
-            startAutoUpdate('trade_today',0);
+            
+            startAutoUpdate('trade_day',0);
         });
 
         $('#trade_swing_tab').on('click', function() {
-            stopAutoUpdate()
+            
             
             startAutoUpdate('trade_swing',0);
         });
 
         $('#trade_timetable_tab').on('click', function() {
-            stopAutoUpdate()
+           
             
             startAutoUpdate('trade_timetable',1);
         });
@@ -135,12 +128,12 @@
     function stopAutoUpdate() {
         if (updateInterval) {
             clearInterval(updateInterval);
-            updateInterval = null; 
+            
             
         }
         if (updateTimer) {
             clearInterval(updateTimer);
-            updateTimer = null; 
+            
             
         }
         activeAutoUpdate = null;
@@ -151,87 +144,53 @@
 
         
 
-        function getInitialDelay() {
+        function getNextUpdateTime() {
             const now = new Date();
-            const seconds = now.getSeconds() % 15;
-            
-            return seconds <= 5 ? 5 - seconds : 15 - seconds;
+            const seconds = now.getSeconds();
+            const nextTick = Math.ceil(seconds / 10) * 10 - 5;
+            return ((nextTick - seconds + 60) % 60) * 1000;
         }
 
-        // 초기 카운트다운 설정
-        countDown = getInitialDelay();
-        $('#countdown').text(countDown);
-
-        
-        
-
-        function setTimer() {
+                // 초기 카운트다운 설정
+        function updateCountdown() {
+            const now = new Date();
+            const seconds = now.getSeconds();
+            countDown = 5 - (seconds % 10);
+            if (countDown <= 0) countDown += 10;
             $('#countdown').text(countDown);
-            countDown -= 1;
-            
-            if (countDown < 0) {
-                countDown = 10;
+        }
+        
+        
+
+        // 1초마다 타이머 업데이트
+        
+        
+        
+
+        function startPeriodicUpdate() {
+            if (url === 'trade_day') {
+                refreshTradeToday(url);
+                activeAutoUpdate = 'day';
+            } else if (url === 'trade_swing') {
+                refreshTradeSwing(url);
+                activeAutoUpdate = 'swing';
+            } else if (url === 'trade_timetable') {
+                refreshTradeTimetable(url, parameter);
+                activeAutoUpdate = 'time_table';
             }
         }
+
+        // 기존 Interval 정지
         
-        // 1초마다 타이머 업데이트
-        updateTimer = setInterval(setTimer, 1000);
+        stopAutoUpdate();
         
+        // 첫 실행
+        startPeriodicUpdate();
 
-        if (url === 'trade_today'){
-            //첫 실행은 다음 5초에 맞추기
-            
-            refreshTradeToday(url);
-            setTimeout(() => {
-                refreshTradeToday(url);
-                countDown = 10;
-                
-                // 그 이후부터는 10초 간격으로 실행
-                updateInterval = setInterval(() => {
-                    refreshTradeToday(url);
-                    countDown = 10;
-                }, 10000);
-            }, getInitialDelay() * 1000);
-
-            activeAutoUpdate = 'today'
-
-        }
-        else if (url === 'trade_swing'){
-            refreshTradeSwing(url);
-            setTimeout(() => {
-                refreshTradeSwing(url);
-                countDown = 10;
-                
-                // 그 이후부터는 10초 간격으로 실행
-                updateInterval = setInterval(() => {
-                    refreshTradeSwing(url);
-                    countDown = 10;
-                }, 10000);
-            }, getInitialDelay() * 1000);
-
-            activeAutoUpdate = 'swing'
-
-
-        }
-        else if (url === 'trade_timetable'){
-            refreshTradeTimetable(url,parameter);
-            
-            setTimeout(() => {
-                refreshTradeTimeTable(url,parameter);
-                countDown = 10;
-                
-                // 그 이후부터는 10초 간격으로 실행
-                updateInterval = setInterval(() => {
-                    refreshTradeTimetable(url,parameter);
-                    countDown = 10;
-                }, 10000);
-            }, getInitialDelay() * 1000);
-
-            activeAutoUpdate = 'time_table'
-
-
-        }
-        else {console.log('올바른 url을 입력해주세요요')}
+        // 다음 5초에 맞춰 실행 후 10초마다 반복
+        
+        updateInterval = setInterval(startPeriodicUpdate, 10000);
+        
         
     }
     
@@ -320,7 +279,7 @@
 
 
     function refreshTradeToday(tabType) {
-        console.log('AJAX 요청 발생: upbit:trade_day'); 
+        //console.log('AJAX 요청 발생: upbit:trade_day'); 
         $.ajax({
             url: "{% url 'upbit:trade_day' %}",
             method: 'GET',
@@ -328,18 +287,20 @@
             'X-Requested-With': 'XMLHttpRequest'
         },
             success: function(response) {
-                console.log("데이터 수신:", response);  // 데이터 확인
+                //console.log("데이터 수신:", response);  // 데이터 확인
                 const container = $(`#${tabType}_contents`);
 
                 //html먼저 생성
                 dataTableTradeToday = container.html(response.html);
 
                 // 기본 정렬
-                 if (dataTableTradeToday && typeof dataTableTradeToday.order === 'function') {
+                if (dataTableTradeToday && typeof dataTableTradeToday.order === 'function') {
                     currentOrderTradeToday = dataTableTradeToday.order() || currentOrderTradeToday;
                     dataTableTradeToday.destroy();
                 }
-            
+                
+                
+
                 const processedData = response['data'].map(item => {
                 item = getPriceRatioToday(item);
                 item = capitalizationData(item);
@@ -472,7 +433,7 @@
             },
             
             error: function(err) {
-                console.error("데이터 가져오기 실패:", err);
+                //console.error("데이터 가져오기 실패:", err);
             }
         });
     }
@@ -480,7 +441,7 @@
 
     function startAutoUpdateSwing() {
         if (activeAutoUpdate){
-            console.log(activeAutoUpdate)
+            //console.log(activeAutoUpdate)
             return
         }
         function getInitialDelay() {
@@ -552,7 +513,7 @@
 
 
     function refreshTradeSwing(tabType) {
-        console.log('AJAX 요청 발생: upbit:trade_swing'); 
+        //console.log('AJAX 요청 발생: upbit:trade_swing'); 
         $.ajax({
             url: "{% url 'upbit:trade_swing' %}",
             method: 'GET',
@@ -560,14 +521,14 @@
             'X-Requested-With': 'XMLHttpRequest'
         },
             success: function(response) {
-                console.log("데이터 수신:", response);  // 데이터 확인
+                //console.log("데이터 수신:", response);  // 데이터 확인
                 const container = $(`#${tabType}_contents`);
 
                 //html먼저 생성
                 dataTableTradeSwing = container.html(response.html);
 
                 // 기본 정렬
-                 if (dataTableTradeSwing && typeof dataTableTradeSwing.order === 'function') {
+                if (dataTableTradeSwing && typeof dataTableTradeSwing.order === 'function') {
                     currentOrderTradeSwing = dataTableTradeSwing.order() || currentOrderTradeSwing;
                     dataTableTradeSwing.destroy();
                 }
@@ -706,7 +667,7 @@
             },
             
             error: function(err) {
-                console.error("데이터 가져오기 실패:", err);
+                //console.error("데이터 가져오기 실패:", err);
             }
         });
     }
@@ -720,7 +681,7 @@
 
 
     function refreshTradeTimetable(tabType, hours) {
-        console.log('AJAX 요청 발생: upbit:trade_timetable'); 
+        //console.log('AJAX 요청 발생: upbit:trade_timetable'); 
         $.ajax({
             url: "{% url 'upbit:trade_timetable' %}",
             method: 'POST',
@@ -730,8 +691,9 @@
             data: {
                 'hours': hours  // 1, 4, 24 값이 들어갈 파라미터
             },
+            
             success: function(response) {
-                console.log("데이터 수신:", response);  // 데이터 확인
+                //console.log("데이터 수신:", response);  // 데이터 확인
                 const container = $(`#${tabType}_contents`);
 
                 //html먼저 생성
@@ -747,29 +709,27 @@
                 
                 return [
                     `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
-                    // item.korean_name, // 이름
-                    // item.capitalization, // 시총
+                     item.korean_name, // 이름
+                     item.price_1m, // 시총
                     // item.supply_ratio, // 발행률
                     // item.issue_month, // 발행일
                     // item.listing_month, //상장일
                     // //formatRatio(item.kimchi_premium), // 김프
                     // item.price_1m, //현재가
-                    1,
-                    1,
-                    1,
-                    
+                    item.d0,
+                    item.d1,
+                    item.d2,
+                    item.d3,
+                    item.d4,
+                    item.d5,
+                    item.d6,
+                    item.d7,
+                    item.d8,
+                    item.d9,
+                    item.d10,
+                    item.d11,
 
                     
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2,
-                    2
 
 
                     
@@ -810,7 +770,7 @@
             })},
             
             error: function(err) {
-                console.error("데이터 가져오기 실패:", err);
+                //console.error("데이터 가져오기 실패:", err);
             }
         });
     }

@@ -2,7 +2,11 @@ from django.shortcuts import render
 from .models import Market, MarketHour, MarketInfo, MarketSupply
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import DateTimeField, ExpressionWrapper, IntegerField
 from django.db.models import Sum, F, Count, Max, Min
+from django.db.models.functions import TruncHour, ExtractHour, Floor, TruncDate
+from django.db.models.expressions import F
+from django.db import connection
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 # Create your views here.
@@ -13,8 +17,7 @@ def trade_list(request):
     context = {'index': 'Hello'}
     return render(request,'upbit/trade_list.html',context)
 
-def trade_day(request):
-    def get_current_time(current_time: datetime, modify_minutes: int) -> str:   
+def get_current_time(current_time: datetime, modify_minutes: int) -> str:   
         '''
         현재시간 포맷에맞춰서 변화해주는 함수
         '''
@@ -25,10 +28,13 @@ def trade_day(request):
             rounded_time = current_time.replace(minute=rounded_minutes, second=0, microsecond=0) + timedelta(minutes = abs(modify_minutes))
         
         return rounded_time
+
+def trade_day(request):
+    
     
     TEST_MINUTES= 0
-    current_time = datetime(2025, 1, 18, 14, 35, 0, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
-    #current_time = datetime.now(tz = timezone.utc)
+    #current_time = datetime(2025, 1, 18, 14, 35, 0, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
+    current_time = datetime.now(tz = timezone.utc)
     last_1_time = get_current_time(current_time, -(1+TEST_MINUTES))
     last_3_time = get_current_time(current_time, -(3+TEST_MINUTES))
     last_5_time = get_current_time(current_time, -(5+TEST_MINUTES))
@@ -228,22 +234,13 @@ def trade_day(request):
 
 
 def trade_swing(request):
-    def get_current_time(current_time: datetime, modify_minutes: int) -> str:   
-        '''
-        현재시간 포맷에맞춰서 변화해주는 함수
-        '''
-        rounded_minutes = (current_time.minute)
-        if modify_minutes < 0:
-            rounded_time = current_time.replace(minute=rounded_minutes, second=0, microsecond=0) - timedelta(minutes = abs(modify_minutes))
-        else:
-            rounded_time = current_time.replace(minute=rounded_minutes, second=0, microsecond=0) + timedelta(minutes = abs(modify_minutes))
-        
-        return rounded_time
+   
     
     TEST_HOURS= 0
-    current_time = datetime(2025, 1, 22, 17, 0, 3, tzinfo = timezone.utc)
+    #current_time = datetime(2025, 1, 22, 17, 0, 3, tzinfo = timezone.utc)
+    current_time = datetime.now(tz = timezone.utc).replace(minute= 0, second = 0)
     current_hour = current_time.replace(minute =0, second= 0)
-    #current_time = datetime.now(tz = timezone.utc).replace(minute= 0, second = 0)
+    
     last_1_time = get_current_time(current_time, -(1+TEST_HOURS))
     last_day_time = get_current_time(current_hour, -((24 * 1) + TEST_HOURS)*60)
     last_3days_time = get_current_time(current_hour, -((24 * 3) + TEST_HOURS)*60)
@@ -382,10 +379,86 @@ def trade_swing(request):
 @csrf_exempt
 def trade_timetable(request):
 
-    market_list = [1,4,7,2,5,8]
+    HOURS_LEN = 12
+    TEST_HOURS= 0
+    #current_time = datetime(2025, 1, 23, 17, 0, 3, tzinfo = timezone.utc)
+    current_time = datetime.now(tz = timezone.utc).replace(minute= 0, second = 0)
+
+    current_hour = current_time.replace(minute =0, second= 0)
+    last_1_time = get_current_time(current_time, -(1+TEST_HOURS))
+    #시점데이터
+    last_1_data = Market.objects.filter(log_dt = last_1_time)
+
+
+    parameter_hour = int(request.POST.get('hours', 0))
+    group_interval = parameter_hour
+    hours_gap = parameter_hour * HOURS_LEN
+    min_hour = current_hour - timedelta(hours = hours_gap)
+    
+
+    
+
+    with connection.cursor() as cursor:
+        sql = """
+            WITH RAW_DATA as (
+            SELECT 
+                market,
+                log_dt,
+                (ROW_NUMBER() OVER (PARTITION BY market ORDER BY log_dt desc) -1) DIV %s AS row_num ,
+                amount
+            FROM upbit.tb_market_hour
+            
+            )
+            SELECT market, 
+                row_num,
+                
+                SUM(amount) as total_amount
+            FROM RAW_data
+            
+            WHERE log_dt >= %s
+            GROUP BY market, row_num
+            ORDER BY market, row_num
+            
+            """
+        cursor.execute(sql, [parameter_hour, min_hour])
+        hour_data = cursor.fetchall()
+
+
+    market_info_list = MarketInfo.objects.all().order_by('symbol')
+
+    market_list = [
+        {
+            'market': item.market[4:],
+            'korean_name':item.korean_name,
+            'price_1m': next((d.price for d in last_1_data if (d.market == item.market)), None),
+
+            'd0': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 0)), None),
+            'd1': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 1)), None),
+            'd2': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 2)), None),
+            'd3': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 3)), None),
+            'd4': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 4)), None),
+            'd5': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 5)), None),
+            'd6': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 6)), None),
+            'd7': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 7)), None),
+            'd8': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 8)), None),
+            'd9': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 9)), None),
+            'd10': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 10)), None),
+            'd11': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 11)), None),
+            
+
+
+            
+
+            
+            
+
+        }
+        for item in market_info_list if item.market != 'KRW-BTC'
+        ]
     context = {'trade_timetable_data': market_list
         # time trading 관련 데이터
     }
+    
     
     try:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
