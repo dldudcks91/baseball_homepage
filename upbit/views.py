@@ -378,6 +378,8 @@ def trade_swing(request):
     
     return render(request,'upbit/trade_swing.html', context)
 
+
+@csrf_exempt
 def trade_timetable(request):
 
     market_list = [1,4,7,2,5,8]
