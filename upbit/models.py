@@ -41,7 +41,13 @@ class MarketInfo(models.Model):
     gecko_id = models.CharField(max_length = 45)
     issue_month = models.CharField(max_length = 7)
     listing_month = models.CharField(max_length = 7)
-    capitalization = models.FloatField()
+    
+    chain = models.CharField(max_length = 45)
+    category = models.CharField(max_length = 45)
+    focus = models.CharField(max_length = 45)
+    country = models.CharField(max_length = 45)
+    etc = models.CharField(max_length = 45)
+
     class Meta:
         managed = False
         db_table = 'tb_market_info'

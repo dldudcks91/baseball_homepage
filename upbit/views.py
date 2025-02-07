@@ -16,18 +16,59 @@ def index(request):
 def trade_list(request):
     context = {'index': 'Hello'}
     return render(request,'upbit/trade_list.html',context)
+def trade_info(request):
 
-def get_current_time(current_time: datetime, modify_minutes: int) -> str:   
-        '''
-        현재시간 포맷에맞춰서 변화해주는 함수
-        '''
-        rounded_minutes = (current_time.minute)
-        if modify_minutes < 0:
-            rounded_time = current_time.replace(minute=rounded_minutes, second=0, microsecond=0) - timedelta(minutes = abs(modify_minutes))
-        else:
-            rounded_time = current_time.replace(minute=rounded_minutes, second=0, microsecond=0) + timedelta(minutes = abs(modify_minutes))
+    market_info_list = MarketInfo.objects.all().order_by('symbol')
+    market_supply_list = MarketSupply.objects.all().order_by('symbol')
+    market_list = [
+        {
+            'market': item.market[4:],
+            'korean_name':item.korean_name,
+            'english_name':item.english_name,
+            'issue_month': item.issue_month,
+            'listing_month': item.listing_month,
+
+            'capitalization':next((d.capitalization for d in market_supply_list if d.symbol == item.symbol), None),
+            'max_supply':next((d.max_supply for d in market_supply_list if d.symbol == item.symbol), None),
+            'now_supply':next((d.now_supply for d in market_supply_list if d.symbol == item.symbol), None),
+            'chain': item.chain,
+            'category': item.category,
+            'focus': item.focus,
+            'country': item.country,
+            'etc': item.etc
+            
+
+
+            
+
+        }
+        for item in market_info_list if item.market != 'KRW-BTC'
+        ]
+    context = {'trade_info_data': market_list}
+
+    try:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            html = render(request, 'upbit/trade_info.html', context).content
+            return JsonResponse({
+                'html': html.decode('utf-8'),
+                'data': market_list
+        })
         
-        return rounded_time
+    except Exception as e:
+        print(f"Error: {e}")
+        return JsonResponse({'error': str(e)}, status=500)
+    return render(request,'upbit/trade_info.html',context)
+def get_current_time(current_time: datetime, modify_minutes: int) -> str:   
+    '''
+    현재시간 포맷에맞춰서 변화해주는 함수
+    '''
+    rounded_minutes = (current_time.minute)
+    if modify_minutes < 0:
+        rounded_time = current_time.replace(minute=rounded_minutes, second=0, microsecond=0) - timedelta(minutes = abs(modify_minutes))
+    else:
+        rounded_time = current_time.replace(minute=rounded_minutes, second=0, microsecond=0) + timedelta(minutes = abs(modify_minutes))
+    
+    return rounded_time
 
 def trade_day(request):
     
@@ -238,7 +279,7 @@ def trade_swing(request):
     
     TEST_HOURS= 0
     #current_time = datetime(2025, 1, 22, 17, 0, 3, tzinfo = timezone.utc)
-    current_time = datetime.now(tz = timezone.utc).replace(minute= 0, second = 0)
+    current_time = datetime.now(tz = timezone.utc)
     current_hour = current_time.replace(minute =0, second= 0)
     
     last_1_time = get_current_time(current_time, -(1+TEST_HOURS))
@@ -329,6 +370,7 @@ def trade_swing(request):
 
             'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
             'price_day': next((d.trade_price for d in last_day_data if d.market == item.market), None),
+            'price_3days': next((d.trade_price for d in last_3days_data if d.market == item.market), None),
             'price_week': next((d.trade_price for d in last_week_data if d.market == item.market), None),
             'price_month': next((d.trade_price for d in last_month_data if d.market == item.market), None),
             'price_high': next((d['max_price'] for d in high_low_data if d['market'] == item.market), None),
