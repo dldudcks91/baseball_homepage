@@ -46,7 +46,7 @@ class MarketInfo(models.Model):
     category = models.CharField(max_length = 45)
     focus = models.CharField(max_length = 45)
     country = models.CharField(max_length = 45)
-    etc = models.CharField(max_length = 45)
+    description = models.CharField(max_length = 45)
 
     class Meta:
         managed = False

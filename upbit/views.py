@@ -35,7 +35,7 @@ def trade_info(request):
             'category': item.category,
             'focus': item.focus,
             'country': item.country,
-            'etc': item.etc
+            'description': item.description
             
 
 
@@ -74,8 +74,8 @@ def trade_day(request):
     
     
     TEST_MINUTES= 0
-    #current_time = datetime(2025, 1, 18, 14, 35, 0, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
-    current_time = datetime.now(tz = timezone.utc)
+    current_time = datetime(2025, 2, 7, 12, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
+    #current_time = datetime.now(tz = timezone.utc)
     last_1_time = get_current_time(current_time, -(1+TEST_MINUTES))
     last_3_time = get_current_time(current_time, -(3+TEST_MINUTES))
     last_5_time = get_current_time(current_time, -(5+TEST_MINUTES))
@@ -83,6 +83,7 @@ def trade_day(request):
     last_30_time = get_current_time(current_time, -(30+TEST_MINUTES))
     last_60_time = get_current_time(current_time, -(60+TEST_MINUTES))
     last_240_time = get_current_time(current_time, -(240+TEST_MINUTES))
+    last_1440_time = get_current_time(current_time, -(1440+TEST_MINUTES))
     utc_00_time = get_current_time(current_time.replace(hour= 0, minute = 0, second = 0 ,microsecond = 0) - timedelta(hours=9),0)
     
     #시점데이터
@@ -157,8 +158,9 @@ def trade_day(request):
     last_5_sum_data = Market.objects.filter(log_dt__gte= last_5_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
     last_10_sum_data = Market.objects.filter(log_dt__gte= last_10_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
     last_60_sum_data = Market.objects.filter(log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
+    last_1440_sum_data = Market.objects.filter(log_dt__gte= last_1440_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
     last_today_sum_data = Market.objects.filter(log_dt__gte= utc_00_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
-
+    
 
 
     #print(last_3_sum_data)
@@ -236,19 +238,21 @@ def trade_day(request):
             'amount_5m': next((d['total_amount'] for d in last_5_sum_data if d['market'] == item.market), None),
             'amount_10m': next((d['total_amount'] for d in last_10_sum_data if d['market'] == item.market), None),
             'amount_60m': next((d['total_amount'] for d in last_60_sum_data if d['market'] == item.market), None),
+            'amount_1440m': next((d['total_amount'] for d in last_1440_sum_data if d['market'] == item.market), None),
             'amount_today': next((d['total_amount'] for d in last_today_sum_data if d['market'] == item.market), None),
 
             'count_1m': next((d['cnt'] for d in last_1_sum_data if d['market'] == item.market), None),
             'count_5m': next((d['cnt'] for d in last_5_sum_data if d['market'] == item.market), None),
             'count_10m': next((d['cnt'] for d in last_10_sum_data if d['market'] == item.market), None),
             'count_60m': next((d['cnt'] for d in last_60_sum_data if d['market'] == item.market), None),
+            'count_1440m': next((d['cnt'] for d in last_1440_sum_data if d['market'] == item.market), None),
             'count_today': next((d['cnt'] for d in last_today_sum_data if d['market'] == item.market), None),
             'rsi_5m': rsi_5_results[item.market] if rsi_5_results.get(item.market) != None else 0,
             'rsi_15m': rsi_15_results[item.market] if rsi_15_results.get(item.market) != None else 0,
             'rsi_60m': rsi_60_results[item.market] if rsi_60_results.get(item.market) != None else 0
 
         }
-        for item in market_info_list if item.market != 'KRW-BTC'
+        for item in market_info_list if (item.market != 'KRW-BTC')
         ]
 
     #print(market_list)
