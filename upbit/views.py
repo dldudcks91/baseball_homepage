@@ -70,6 +70,55 @@ def get_current_time(current_time: datetime, modify_minutes: int) -> str:
     
     return rounded_time
 
+def calculate_rsi(price_list, period=15):
+
+        len_price_list = len(price_list)
+        if len_price_list < 10:
+            return None
+
+        price_changes = [price_list[i] - price_list[i-1] for i in range(1, len_price_list)]
+        
+        gains = [change for change in price_changes if change > 0]
+        losses = [abs(change) for change in price_changes if change < 0]
+
+        avg_gain = sum(gains) / min(period, len_price_list) if len(gains) > 0 else 0
+        avg_loss = sum(losses) / min(period, len_price_list) if len(losses) > 0 else 0
+
+        if avg_loss == 0:
+            return 100 if avg_gain > 0 else 50
+        else:
+            rs = avg_gain / avg_loss
+            return 100 - (100 / (1 + rs))
+
+
+def get_rsi_results_today(rsi_data):
+    rsi_market_dic = defaultdict(lambda: defaultdict(float))
+    for data in rsi_data:
+        rsi_market_dic[data['market']][data['log_dt']] = data['price']
+    
+    rsi_results = {}
+    for market, price_data in rsi_market_dic.items():
+        price_list = [price for log_dt, price in sorted(price_data.items())]
+        rsi = calculate_rsi(price_list)
+        if rsi is not None:
+            rsi_results[market] = rsi
+    return rsi_results
+
+def get_rsi_results_swing(rsi_data):
+    rsi_market_dic = defaultdict(lambda: defaultdict(float))
+    for data in rsi_data:
+        rsi_market_dic[data['market']][data['log_dt']] = data['trade_price']
+    
+    rsi_results = {}
+    for market, price_data in rsi_market_dic.items():
+        price_list = [price for log_dt, price in price_data.items()]
+        
+        rsi = calculate_rsi(price_list)
+        if rsi is not None:
+            rsi_results[market] = rsi
+    return rsi_results
+
+
 def trade_day(request):
     
     
@@ -93,49 +142,31 @@ def trade_day(request):
     last_60_data = Market.objects.filter(log_dt = last_60_time)
     last_240_data = Market.objects.filter(log_dt = last_240_time)
 
-    def calculate_rsi(price_list, period=14):
-        if len(price_list) != 14:
-            return None
+    
 
-        price_changes = [price_list[i] - price_list[i-1] for i in range(1, len(price_list))]
-        gains = [change for change in price_changes if change > 0]
-        losses = [abs(change) for change in price_changes if change < 0]
+    #rsi 구하기
 
-        avg_gain = sum(gains) / min(period, len(gains)) if len(gains) > 0 else 0
-        avg_loss = sum(losses) / min(period, len(losses)) if len(losses) > 0 else 0
-
-        if avg_loss == 0:
-            return 100 if avg_gain > 0 else 50
-        else:
-            rs = avg_gain / avg_loss
-            return 100 - (100 / (1 + rs))
-    def get_rsi_results(rsi_data):
-        rsi_market_dic = defaultdict(lambda: defaultdict(float))
-        for data in rsi_data:
-            rsi_market_dic[data['market']][data['log_dt']] = data['price']
-        
-        rsi_results = {}
-        for market, price_data in rsi_market_dic.items():
-            price_list = [price for log_dt, price in sorted(price_data.items())]
-            rsi = calculate_rsi(price_list)
-            if rsi is not None:
-                rsi_results[market] = rsi
-        return rsi_results
+    RSI_PERIOD = 15
     
     #rsi 5분봉
-    rsi_5_time_list = [get_current_time(current_time, -(1 + i * 5)) for i in range(14)]
+    rsi_5_time_list = [get_current_time(current_time, -(1 + i * 5)) for i in range(RSI_PERIOD)]
     rsi_5_data = Market.objects.filter(log_dt__in=rsi_5_time_list).values('market', 'log_dt', 'price').order_by('log_dt')
-    rsi_5_results = get_rsi_results(rsi_5_data)
+    rsi_5_list = list(rsi_5_data)
+    rsi_5_list = [rsi for rsi in rsi_5_list if rsi['market'] == 'KRW-QKC']
+    
+    rsi_5_results = get_rsi_results_today(rsi_5_data)
+    
+
 
     #rsi 15분봉
-    rsi_15_time_list = [get_current_time(current_time, -(1 + i * 15)) for i in range(14)]
+    rsi_15_time_list = [get_current_time(current_time, -(1 + i * 15)) for i in range(RSI_PERIOD)]
     rsi_15_data = Market.objects.filter(log_dt__in=rsi_15_time_list).values('market', 'log_dt', 'price').order_by('log_dt')
-    rsi_15_results = get_rsi_results(rsi_15_data)
+    rsi_15_results = get_rsi_results_today(rsi_15_data)
 
     #rsi 60분봉
-    rsi_60_time_list = [get_current_time(current_time, -(1 + i * 60)) for i in range(14)]
+    rsi_60_time_list = [get_current_time(current_time, -(1 + i * 60)) for i in range(RSI_PERIOD)]
     rsi_60_data = Market.objects.filter(log_dt__in=rsi_60_time_list).values('market', 'log_dt', 'price').order_by('log_dt')
-    rsi_60_results = get_rsi_results(rsi_60_data)
+    rsi_60_results = get_rsi_results_today(rsi_60_data)
     
     
 
@@ -283,7 +314,8 @@ def trade_swing(request):
     
     TEST_HOURS= 0
     #current_time = datetime(2025, 1, 22, 17, 0, 3, tzinfo = timezone.utc)
-    current_time = datetime.now(tz = timezone.utc)
+    current_time = datetime(2025, 2, 7, 2, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
+    #current_time = datetime.now(tz = timezone.utc)
     current_hour = current_time.replace(minute =0, second= 0)
     
     last_1_time = get_current_time(current_time, -(1+TEST_HOURS))
@@ -311,50 +343,30 @@ def trade_swing(request):
     market_info_list = MarketInfo.objects.all().order_by('symbol')
     market_supply_list = MarketSupply.objects.all().order_by('symbol')
     
-    def calculate_rsi(price_list, period=14):
-        if len(price_list) != 14:
-            return None
+    #rsi 구하기
+    RSI_PERIOD = 15
 
-        price_changes = [price_list[i] - price_list[i-1] for i in range(1, len(price_list))]
-        gains = [change for change in price_changes if change > 0]
-        losses = [abs(change) for change in price_changes if change < 0]
-
-        avg_gain = sum(gains) / min(period, len(gains)) if len(gains) > 0 else 0
-        avg_loss = sum(losses) / min(period, len(losses)) if len(losses) > 0 else 0
-
-        if avg_loss == 0:
-            return 100 if avg_gain > 0 else 50
-        else:
-            rs = avg_gain / avg_loss
-            return 100 - (100 / (1 + rs))
-        
-    def get_rsi_results(rsi_data):
-        rsi_market_dic = defaultdict(lambda: defaultdict(float))
-        for data in rsi_data:
-            rsi_market_dic[data['market']][data['log_dt']] = data['trade_price']
-        
-        rsi_results = {}
-        for market, price_data in rsi_market_dic.items():
-            price_list = [price for log_dt, price in sorted(price_data.items())]
-            rsi = calculate_rsi(price_list)
-            if rsi is not None:
-                rsi_results[market] = rsi
-        return rsi_results
-    
     #rsi 4시간봉
-    rsi_240_time_list = [get_current_time(current_hour, -(i * 60)) for i in range(14)]
+    rsi_240_time_list = [get_current_time(current_hour, -(i * 60 * 4)) for i in range(RSI_PERIOD)]
     rsi_240_data = MarketHour.objects.filter(log_dt__in=rsi_240_time_list).values('market', 'log_dt', 'trade_price').order_by('log_dt')
-    rsi_240_results = get_rsi_results(rsi_240_data)
+    rsi_240_results = get_rsi_results_swing(rsi_240_data)
+
+    rsi_240_list =list(rsi_240_data)
+    rsi_240_list = [rsi for rsi in rsi_240_list if rsi['market'] == 'KRW-JUP']
+    print(rsi_240_list)
+    print(rsi_240_results['KRW-JUP'])
+    
 
     #rsi 1일봉
-    rsi_day_time_list = [get_current_time(current_hour, -(i * 60 * 24)) for i in range(14)]
+    rsi_day_time_list = [get_current_time(current_hour, -(i * 60 * 24)) for i in range(RSI_PERIOD)]
     rsi_day_data = MarketHour.objects.filter(log_dt__in=rsi_day_time_list).values('market', 'log_dt', 'trade_price').order_by('log_dt')
-    rsi_day_results = get_rsi_results(rsi_day_data)
-
+    rsi_day_results = get_rsi_results_swing(rsi_day_data)
+    
+    
     #rsi 3일봉
-    rsi_3days_time_list = [get_current_time(current_hour, -(i * 60 * 72)) for i in range(14)]
+    rsi_3days_time_list = [get_current_time(current_hour, -(i * 60 * 72)) for i in range(RSI_PERIOD)]
     rsi_3days_data = MarketHour.objects.filter(log_dt__in=rsi_3days_time_list).values('market', 'log_dt', 'trade_price').order_by('log_dt')
-    rsi_3days_results = get_rsi_results(rsi_3days_data)
+    rsi_3days_results = get_rsi_results_swing(rsi_3days_data)
 
 
     market_list = [
