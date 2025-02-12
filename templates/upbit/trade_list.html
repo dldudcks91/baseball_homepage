@@ -48,7 +48,27 @@
         width: 100% !important;
         font-size: 13px;
     }
+     /* 로딩 컨테이너 스타일 추가 */
+     .loading-container {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        text-align: center;
+    }
     
+    .loading-spinner {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .loading-text {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #666;
+    }
 </style>
 
 <div id="upbit-contents">
@@ -69,10 +89,18 @@
             </li>
         </ul>
 
+        
+        <div class="loading-container">
+            <img src="/static/images/loading/upbit_loading.gif" alt="로딩중" class="loading-spinner">
+            <div class="loading-text">데이터를 불러오는 중입니다...</div>
+        </div>
         <!-- 탭 컨텐츠 -->
-        <!-- <div class="timer-container" style="text-align: right; padding: 10px;">
-            다음 업데이트까지: <span id="countdown"></span>초
-        </div> -->
+        <div class="timer-container" style="text-align: right; padding: 10px; font-size: 15px;">
+            데이터는 10초에 한번씩 자동으로 업데이트됩니다.
+        </div> 
+        <div class="update-info" style="text-align: right; padding: 10px; font-size: 14px; color: #666;">
+            마지막 업데이트: <span id="lastUpdateTime">-</span>
+        </div>
         <div class="tab-content" id="tradeTabContent">
             <div class="tab-pane fade" id="trade_info_contents" role="tabpanel"></div>
             <div class="tab-pane fade show active" id="trade_day_contents" role="tabpanel"></div>
@@ -160,8 +188,26 @@
 
 
     function startAutoUpdate(url, parameter) {
-
         
+        if (url === 'trade_day') {
+            if ($('#dataTableTradeToday').length === 0){
+                console.log($('#dataTableTradeToday').length)
+                showLoading()
+            }
+                
+            } else if (url === 'trade_swing') {
+                if ($('#dataTableTradeSwing').length === 0){
+                showLoading()
+            }
+                
+            } else if (url === 'trade_timetable') {
+                if ($('#dataTableTradeInfo').length === 0){
+                showLoading()
+            }
+                
+            }
+
+        //showLoading()
 
         function startPeriodicUpdate() {
             if (url === 'trade_day') {
@@ -184,7 +230,7 @@
         
         // 첫 실행
         startPeriodicUpdate();
-
+        
         // 다음 5초에 맞춰 실행 후 10초마다 반복
         
         updateInterval = setInterval(startPeriodicUpdate, 10000);
@@ -192,19 +238,22 @@
         
     }
     
-    
-//     function destroyTable() {
-//     if (dataTableTradeToday && typeof dataTableTradeToday.destroy === 'function') {
-//         dataTableTradeToday.destroy();
-//     }
-//     if (dataTableTradeSwing && typeof dataTableTradeSwing.destroy === 'function') {
-//         dataTableTradeSwing.destroy();
-//     }
-//     if (dataTableTradeTimetable && typeof dataTableTradeTimetable.destroy === 'function') {
-//         dataTableTradeTimetable.destroy();
-//     }
-// }
+    function showLoading() {
+    $('.loading-container').show();
+    }
 
+    function hideLoading() {
+        $('.loading-container').hide();
+    }
+    function updateLastUpdateTime(){
+        const now = new Date();
+        const timeString = now.getHours().toString().padStart(2, '0') + ':' +
+                            now.getMinutes().toString().padStart(2, '0') + ':' +
+                            now.getSeconds().toString().padStart(2, '0');
+        $('#lastUpdateTime').text(timeString);
+    }
+
+    // 계산 및 테이블 불러오는 function
     function getPriceRatioToday(item) {
         item.price_ratio_5m = (((item.price_1m - item.price_5m) / item.price_5m)*100).toFixed(2)
         item.price_ratio_30m = (((item.price_1m - item.price_30m) / item.price_30m)*100).toFixed(2)
@@ -341,8 +390,8 @@
 
                 
                 
-                
-                
+                hideLoading();
+                updateLastUpdateTime();
                 $('#dataTableTradeToday').DataTable({
                     data: processedData, 
                     
@@ -538,8 +587,8 @@
                 });
 
                 
-                
-                
+                hideLoading();
+                updateLastUpdateTime();
                 
                 $('#dataTableTradeSwing').DataTable({
                     data: processedData, 
@@ -706,8 +755,9 @@
 
                 
                 
-                
-                
+                hideLoading();
+                updateLastUpdateTime();
+
                 $('#dataTableTradeTimetable').DataTable({
                     data: processedData, 
                     
@@ -761,7 +811,7 @@
 
                 // 기본 정렬
 
-            
+                
                 const processedData = response['data'].map(item => {
                 item = getSupplyRatio(item)
                 return [

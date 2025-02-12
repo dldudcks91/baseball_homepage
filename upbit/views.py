@@ -127,7 +127,8 @@ def trade_day(request):
     
     TEST_MINUTES= 0
     #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
-    current_time = datetime.now(tz = timezone.utc)
+    #current_time = datetime.now(tz = timezone.utc)
+    current_time = datetime(2025, 2, 12, 8, 2, 33, tzinfo = timezone.utc)
     last_1_time = get_current_time(current_time, -(1+TEST_MINUTES))
     last_3_time = get_current_time(current_time, -(3+TEST_MINUTES))
     last_5_time = get_current_time(current_time, -(5+TEST_MINUTES))
@@ -172,13 +173,13 @@ def trade_day(request):
 
     
 
-    # #딕셔너리로처리 -> next방식과 큰차이 없어서 잠궈놈
-    # price_data = Market.objects.filter(log_dt__in = [last_1_time, last_5_time, last_30_time, last_60_time, last_240_time]).values('market','log_dt','price')
-    # price_market_dic = {}
-    # for data in price_data:
-    #     if data['market'] not in price_market_dic:
-    #         price_market_dic[data['market']] = {}
-    #     price_market_dic[data['market']][data['log_dt']] = data
+    #딕셔너리로처리 -> next방식과 큰차이 없어서 잠궈놈
+    price_data = Market.objects.filter(log_dt__in = [last_1_time, last_5_time, last_30_time, last_60_time, last_240_time]).values('market','log_dt','price')
+    price_market_dic = {}
+    for data in price_data:
+        if data['market'] not in price_market_dic:
+            price_market_dic[data['market']] = {}
+        price_market_dic[data['market']][data['log_dt']] = data
 
     
     #고점데이터
@@ -204,21 +205,21 @@ def trade_day(request):
     market_info_list = MarketInfo.objects.all().order_by('symbol')
     market_supply_list = MarketSupply.objects.all().order_by('symbol')
     
-    # #딕셔너리로처리 -> next방식과 큰차이 없어서 잠궈놈
-    # volume_market_dic = {}
-    # for data in market_info_list:
-    #     volume_market_dic[data.market] = {
-    #         'count': {}, 
-    #         'sum': {}
-    #     }
+    #딕셔너리로처리 -> next방식과 큰차이 없어서 잠궈놈
+    volume_market_dic = {}
+    for data in market_info_list:
+        volume_market_dic[data.market] = {
+            'count': {}, 
+            'sum': {}
+        }
 
-    # for time_data, log_dt in zip([last_1_sum_data, last_5_sum_data, last_10_sum_data, last_60_sum_data, last_today_sum_data], [last_1_time, last_5_time, last_30_time, last_60_time, last_240_time]):
-    #     for row in time_data:
-    #         market = row['market']
-    #         if volume_market_dic.get(market) == None:
-    #             continue
-    #         volume_market_dic[market]['count'][log_dt] = row['cnt']
-    #         volume_market_dic[market]['sum'][log_dt] = row['total_amount']
+    for time_data, log_dt in zip([last_1_sum_data, last_5_sum_data, last_10_sum_data, last_60_sum_data, last_today_sum_data], [last_1_time, last_5_time, last_30_time, last_60_time, last_240_time]):
+        for row in time_data:
+            market = row['market']
+            if volume_market_dic.get(market) == None:
+                continue
+            volume_market_dic[market]['count'][log_dt] = row['cnt']
+            volume_market_dic[market]['sum'][log_dt] = row['total_amount']
         
 
     
@@ -236,48 +237,51 @@ def trade_day(request):
             'now_supply':next((d.now_supply for d in market_supply_list if d.symbol == item.symbol), None),
 
 
-            'kimchi_premium':next((round(((d.price/d.price_foreign)-1)*100,2) if d.price_foreign !=None else 0 for d in last_1_data if d.market == item.market), None),
+            'kimchi_premium': next((round(((d.price/d.price_foreign)-1)*100,2) if (d.price !=None) & (d.price_foreign != None) else 0 for d in last_1_data if d.market == item.market), None),
 
             
-            'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
-            'price_5m': next((d.price for d in last_5_data if d.market == item.market), None),
-            'price_30m': next((d.price for d in last_30_data if d.market == item.market), None),
-            'price_60m': next((d.price for d in last_60_data if d.market == item.market), None),
-            'price_240m': next((d.price for d in last_240_data if d.market == item.market), None),
-            # 'price_1m': price_market_dic[item.market][last_1_time]['price'],
-            # 'price_5m': price_market_dic[item.market][last_5_time]['price'],
-            # 'price_60m': price_market_dic[item.market][last_60_time]['price'],
-            # 'price_240m': price_market_dic[item.market][last_240_time]['price'],
+            # 'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
+            # 'price_5m': next((d.price for d in last_5_data if d.market == item.market), None),
+            # 'price_30m': next((d.price for d in last_30_data if d.market == item.market), None),
+            # 'price_60m': next((d.price for d in last_60_data if d.market == item.market), None),
+            # 'price_240m': next((d.price for d in last_240_data if d.market == item.market), None),
+            'price_1m': price_market_dic[item.market][last_1_time]['price'],
+            'price_5m': price_market_dic[item.market][last_5_time]['price'],
+            'price_30m': price_market_dic[item.market][last_30_time]['price'],
+            'price_60m': price_market_dic[item.market][last_60_time]['price'],
+            'price_240m': price_market_dic[item.market][last_240_time]['price'],
 
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item.market), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item.market), None),
             
-            # 'amount_1m': volume_market_dic[item.market]['sum'].get(last_1_time, None),
-            # 'amount_5m': volume_market_dic[item.market]['sum'].get(last_5_time, None),
-            # 'amount_10m': volume_market_dic[item.market]['sum'].get(last_10_time, None), 
-            # 'amount_60m': volume_market_dic[item.market]['sum'].get(last_60_time, None),
-            # 'amount_today': volume_market_dic[item.market]['sum'].get(utc_00_time, None),
+            'amount_1m': volume_market_dic[item.market]['sum'].get(last_1_time, None),
+            'amount_5m': volume_market_dic[item.market]['sum'].get(last_5_time, None),
+            'amount_10m': volume_market_dic[item.market]['sum'].get(last_10_time, None), 
+            'amount_60m': volume_market_dic[item.market]['sum'].get(last_60_time, None),
+            'amount_today': volume_market_dic[item.market]['sum'].get(utc_00_time, None),
 
-            # 'count_1m': volume_market_dic[item.market]['count'].get(last_1_time, None),
-            # 'count_5m': volume_market_dic[item.market]['count'].get(last_5_time, None),
-            # 'count_10m': volume_market_dic[item.market]['count'].get(last_10_time, None),
-            # 'count_60m': volume_market_dic[item.market]['count'].get(last_60_time, None),
-            # 'count_today': volume_market_dic[item.market]['count'].get(utc_00_time, None)
+            'count_1m': volume_market_dic[item.market]['count'].get(last_1_time, None),
+            'count_5m': volume_market_dic[item.market]['count'].get(last_5_time, None),
+            'count_10m': volume_market_dic[item.market]['count'].get(last_10_time, None),
+            'count_60m': volume_market_dic[item.market]['count'].get(last_60_time, None),
+            'count_today': volume_market_dic[item.market]['count'].get(utc_00_time, None),
 
 
-            'amount_1m': next((d['total_amount'] for d in last_1_sum_data if d['market'] == item.market), None),
-            'amount_5m': next((d['total_amount'] for d in last_5_sum_data if d['market'] == item.market), None),
-            'amount_10m': next((d['total_amount'] for d in last_10_sum_data if d['market'] == item.market), None),
-            'amount_60m': next((d['total_amount'] for d in last_60_sum_data if d['market'] == item.market), None),
-            'amount_1440m': next((d['total_amount'] for d in last_1440_sum_data if d['market'] == item.market), None),
-            'amount_today': next((d['total_amount'] for d in last_today_sum_data if d['market'] == item.market), None),
+            # 'amount_1m': next((d['total_amount'] for d in last_1_sum_data if d['market'] == item.market), None),
+            # 'amount_5m': next((d['total_amount'] for d in last_5_sum_data if d['market'] == item.market), None),
+            # 'amount_10m': next((d['total_amount'] for d in last_10_sum_data if d['market'] == item.market), None),
+            # 'amount_60m': next((d['total_amount'] for d in last_60_sum_data if d['market'] == item.market), None),
+            # 'amount_1440m': next((d['total_amount'] for d in last_1440_sum_data if d['market'] == item.market), None),
+            # 'amount_today': next((d['total_amount'] for d in last_today_sum_data if d['market'] == item.market), None),
 
-            'count_1m': next((d['cnt'] for d in last_1_sum_data if d['market'] == item.market), None),
-            'count_5m': next((d['cnt'] for d in last_5_sum_data if d['market'] == item.market), None),
-            'count_10m': next((d['cnt'] for d in last_10_sum_data if d['market'] == item.market), None),
-            'count_60m': next((d['cnt'] for d in last_60_sum_data if d['market'] == item.market), None),
-            'count_1440m': next((d['cnt'] for d in last_1440_sum_data if d['market'] == item.market), None),
-            'count_today': next((d['cnt'] for d in last_today_sum_data if d['market'] == item.market), None),
+            # 'count_1m': next((d['cnt'] for d in last_1_sum_data if d['market'] == item.market), None),
+            # 'count_5m': next((d['cnt'] for d in last_5_sum_data if d['market'] == item.market), None),
+            # 'count_10m': next((d['cnt'] for d in last_10_sum_data if d['market'] == item.market), None),
+            # 'count_60m': next((d['cnt'] for d in last_60_sum_data if d['market'] == item.market), None),
+            # 'count_1440m': next((d['cnt'] for d in last_1440_sum_data if d['market'] == item.market), None),
+            # 'count_today': next((d['cnt'] for d in last_today_sum_data if d['market'] == item.market), None),
+
+
             'rsi_5m': rsi_5_results[item.market] if rsi_5_results.get(item.market) != None else 0,
             'rsi_15m': rsi_15_results[item.market] if rsi_15_results.get(item.market) != None else 0,
             'rsi_60m': rsi_60_results[item.market] if rsi_60_results.get(item.market) != None else 0
@@ -313,9 +317,9 @@ def trade_swing(request):
    
     
     TEST_HOURS= 0
-    #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)
+    current_time = datetime(2025, 2, 12, 8, 2, 33, tzinfo = timezone.utc)
     #current_time = datetime(2025, 2, 7, 2, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
-    current_time = datetime.now(tz = timezone.utc)
+    #current_time = datetime.now(tz = timezone.utc)
     current_hour = current_time.replace(minute =0, second= 0)
     
     last_1_time = get_current_time(current_time, -(1+TEST_HOURS))
@@ -380,7 +384,7 @@ def trade_swing(request):
             'now_supply':next((d.now_supply for d in market_supply_list if d.symbol == item.symbol), None),
 
 
-            'kimchi_premium':next((round(((d.price/d.price_foreign)-1)*100,2) if d.price_foreign != None else 0 for d in last_1_data if d.market == item.market), None),
+            'kimchi_premium':next((round(((d.price/d.price_foreign)-1)*100,2) if (d.price !=None) & (d.price_foreign != None) else 0 for d in last_1_data if d.market == item.market), None),
 
             'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
             'price_day': next((d.trade_price for d in last_day_data if d.market == item.market), None),
