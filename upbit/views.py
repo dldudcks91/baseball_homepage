@@ -94,7 +94,10 @@ def calculate_rsi(price_list, period=15):
 def get_rsi_results_today(rsi_data):
     rsi_market_dic = defaultdict(lambda: defaultdict(float))
     for data in rsi_data:
-        rsi_market_dic[data['market']][data['log_dt']] = data['price']
+        if data['price'] != None:
+            rsi_market_dic[data['market']][data['log_dt']] = data['price']
+        
+            
     
     rsi_results = {}
     for market, price_data in rsi_market_dic.items():
@@ -123,8 +126,8 @@ def trade_day(request):
     
     
     TEST_MINUTES= 0
-    current_time = datetime(2025, 2, 7, 12, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
-    #current_time = datetime.now(tz = timezone.utc)
+    #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
+    current_time = datetime.now(tz = timezone.utc)
     last_1_time = get_current_time(current_time, -(1+TEST_MINUTES))
     last_3_time = get_current_time(current_time, -(3+TEST_MINUTES))
     last_5_time = get_current_time(current_time, -(5+TEST_MINUTES))
@@ -151,9 +154,6 @@ def trade_day(request):
     #rsi 5분봉
     rsi_5_time_list = [get_current_time(current_time, -(1 + i * 5)) for i in range(RSI_PERIOD)]
     rsi_5_data = Market.objects.filter(log_dt__in=rsi_5_time_list).values('market', 'log_dt', 'price').order_by('log_dt')
-    rsi_5_list = list(rsi_5_data)
-    rsi_5_list = [rsi for rsi in rsi_5_list if rsi['market'] == 'KRW-QKC']
-    
     rsi_5_results = get_rsi_results_today(rsi_5_data)
     
 
@@ -182,15 +182,15 @@ def trade_day(request):
 
     
     #고점데이터
-    today_high_low_data = Market.objects.filter(log_dt__gte= utc_00_time, volume__gt = 0, price__gt = 0).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
+    today_high_low_data = Market.objects.filter(log_dt__gte= utc_00_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
     
     #거래량,거래대금
-    last_1_sum_data = Market.objects.filter(log_dt__gte= last_1_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
-    last_5_sum_data = Market.objects.filter(log_dt__gte= last_5_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
-    last_10_sum_data = Market.objects.filter(log_dt__gte= last_10_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
-    last_60_sum_data = Market.objects.filter(log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
-    last_1440_sum_data = Market.objects.filter(log_dt__gte= last_1440_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
-    last_today_sum_data = Market.objects.filter(log_dt__gte= utc_00_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
+    last_1_sum_data = Market.objects.filter(log_dt__gte= last_1_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    last_5_sum_data = Market.objects.filter(log_dt__gte= last_5_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    last_10_sum_data = Market.objects.filter(log_dt__gte= last_10_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    last_60_sum_data = Market.objects.filter(log_dt__gte= last_60_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    last_1440_sum_data = Market.objects.filter(log_dt__gte= last_1440_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    last_today_sum_data = Market.objects.filter(log_dt__gte= utc_00_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     
 
 
@@ -236,7 +236,7 @@ def trade_day(request):
             'now_supply':next((d.now_supply for d in market_supply_list if d.symbol == item.symbol), None),
 
 
-            'kimchi_premium':next((round(((d.price/d.price_foreign)-1)*100,2) if d.price_foreign !=0 else 0 for d in last_1_data if d.market == item.market), None),
+            'kimchi_premium':next((round(((d.price/d.price_foreign)-1)*100,2) if d.price_foreign !=None else 0 for d in last_1_data if d.market == item.market), None),
 
             
             'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
@@ -313,9 +313,9 @@ def trade_swing(request):
    
     
     TEST_HOURS= 0
-    #current_time = datetime(2025, 1, 22, 17, 0, 3, tzinfo = timezone.utc)
-    current_time = datetime(2025, 2, 7, 2, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
-    #current_time = datetime.now(tz = timezone.utc)
+    #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)
+    #current_time = datetime(2025, 2, 7, 2, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
+    current_time = datetime.now(tz = timezone.utc)
     current_hour = current_time.replace(minute =0, second= 0)
     
     last_1_time = get_current_time(current_time, -(1+TEST_HOURS))
@@ -332,14 +332,14 @@ def trade_swing(request):
     last_month_data = MarketHour.objects.filter(log_dt = last_month_time)
 
     #고점데이터
-    high_low_data = MarketHour.objects.filter(log_dt__gte= last_month_time, volume__gt = 0, low_price__gt = 0).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
+    high_low_data = MarketHour.objects.filter(log_dt__gte= last_month_time, low_price__gt = 0).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
     
     #거래량,거래대금
     
-    last_day_sum_data = MarketHour.objects.filter(log_dt__gte= last_day_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
-    last_3days_sum_data = MarketHour.objects.filter(log_dt__gte= last_3days_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
-    last_week_sum_data = MarketHour.objects.filter(log_dt__gte= last_week_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
-    last_month_sum_data = MarketHour.objects.filter(log_dt__gte= last_month_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume'))
+    last_day_sum_data = MarketHour.objects.filter(log_dt__gte= last_day_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    last_3days_sum_data = MarketHour.objects.filter(log_dt__gte= last_3days_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    last_week_sum_data = MarketHour.objects.filter(log_dt__gte= last_week_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    last_month_sum_data = MarketHour.objects.filter(log_dt__gte= last_month_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     market_info_list = MarketInfo.objects.all().order_by('symbol')
     market_supply_list = MarketSupply.objects.all().order_by('symbol')
     
@@ -351,10 +351,8 @@ def trade_swing(request):
     rsi_240_data = MarketHour.objects.filter(log_dt__in=rsi_240_time_list).values('market', 'log_dt', 'trade_price').order_by('log_dt')
     rsi_240_results = get_rsi_results_swing(rsi_240_data)
 
-    rsi_240_list =list(rsi_240_data)
-    rsi_240_list = [rsi for rsi in rsi_240_list if rsi['market'] == 'KRW-JUP']
-    print(rsi_240_list)
-    print(rsi_240_results['KRW-JUP'])
+    
+    
     
 
     #rsi 1일봉
@@ -382,7 +380,7 @@ def trade_swing(request):
             'now_supply':next((d.now_supply for d in market_supply_list if d.symbol == item.symbol), None),
 
 
-            'kimchi_premium':next((round(((d.price/d.price_foreign)-1)*100,2) if d.price_foreign !=0 else 0 for d in last_1_data if d.market == item.market), None),
+            'kimchi_premium':next((round(((d.price/d.price_foreign)-1)*100,2) if d.price_foreign != None else 0 for d in last_1_data if d.market == item.market), None),
 
             'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
             'price_day': next((d.trade_price for d in last_day_data if d.market == item.market), None),
