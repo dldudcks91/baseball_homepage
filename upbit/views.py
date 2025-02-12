@@ -58,17 +58,27 @@ def trade_info(request):
         print(f"Error: {e}")
         return JsonResponse({'error': str(e)}, status=500)
     return render(request,'upbit/trade_info.html',context)
-def get_current_time(current_time: datetime, modify_minutes: int) -> str:   
+
+def get_current_time(current_time: datetime, modify_seconds: int) -> str:   
     '''
-    현재시간 포맷에맞춰서 변화해주는 함수
+    현재시간을 10초 단위로 맞춰서 변화해주는 함수
     '''
-    rounded_minutes = (current_time.minute)
-    if modify_minutes < 0:
-        rounded_time = current_time.replace(minute=rounded_minutes, second=0, microsecond=0) - timedelta(minutes = abs(modify_minutes))
-    else:
-        rounded_time = current_time.replace(minute=rounded_minutes, second=0, microsecond=0) + timedelta(minutes = abs(modify_minutes))
+    # 10초 단위로 내림
+    rounded_seconds = (current_time.second // 10) * 10
     
-    return rounded_time
+    # 기본 시간 설정 (초만 변경)
+    base_time = current_time.replace(
+        second=rounded_seconds, 
+        microsecond=0
+    )
+    
+    # 양수/음수에 따라 시간 조정
+    if modify_seconds < 0:
+        adjusted_time = base_time - timedelta(seconds=abs(modify_seconds))
+    else:
+        adjusted_time = base_time + timedelta(seconds=abs(modify_seconds))
+    
+    return adjusted_time
 
 def calculate_rsi(price_list, period=15):
 
@@ -127,24 +137,24 @@ def trade_day(request):
     
     TEST_MINUTES= 0
     #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
-    #current_time = datetime.now(tz = timezone.utc)
-    current_time = datetime(2025, 2, 12, 8, 2, 33, tzinfo = timezone.utc)
-    last_1_time = get_current_time(current_time, -(1+TEST_MINUTES))
-    last_3_time = get_current_time(current_time, -(3+TEST_MINUTES))
-    last_5_time = get_current_time(current_time, -(5+TEST_MINUTES))
-    last_10_time = get_current_time(current_time, -(10+TEST_MINUTES))
-    last_30_time = get_current_time(current_time, -(30+TEST_MINUTES))
-    last_60_time = get_current_time(current_time, -(60+TEST_MINUTES))
-    last_240_time = get_current_time(current_time, -(240+TEST_MINUTES))
-    last_1440_time = get_current_time(current_time, -(1440+TEST_MINUTES))
+    current_time = datetime.now(tz = timezone.utc)
+    #current_time = datetime(2025, 2, 12, 8, 1, 33, tzinfo = timezone.utc)
+    last_time = get_current_time(current_time, -(10 + TEST_MINUTES))
+    last_1_time = get_current_time(current_time, -(10 + 60 + TEST_MINUTES))
+    last_5_time = get_current_time(current_time, -(10 + 300 + TEST_MINUTES))
+    last_10_time = get_current_time(current_time, -(10 + 600 + TEST_MINUTES))
+    last_30_time = get_current_time(current_time, -(10 + 1800 + TEST_MINUTES))
+    last_60_time = get_current_time(current_time, -(10 + 3600 + TEST_MINUTES))
+    last_240_time = get_current_time(current_time, -(10 + 14400 + TEST_MINUTES))
+    last_1440_time = get_current_time(current_time, -(10 + 86400 +TEST_MINUTES))
     utc_00_time = get_current_time(current_time.replace(hour= 0, minute = 0, second = 0 ,microsecond = 0) - timedelta(hours=9),0)
     
     #시점데이터
-    last_1_data = Market.objects.filter(log_dt = last_1_time)
-    last_5_data = Market.objects.filter(log_dt = last_5_time)
-    last_30_data = Market.objects.filter(log_dt = last_30_time)
-    last_60_data = Market.objects.filter(log_dt = last_60_time)
-    last_240_data = Market.objects.filter(log_dt = last_240_time)
+    last_data = Market.objects.filter(log_dt = last_time)
+    # last_5_data = Market.objects.filter(log_dt = last_5_time)
+    # last_30_data = Market.objects.filter(log_dt = last_30_time)
+    # last_60_data = Market.objects.filter(log_dt = last_60_time)
+    # last_240_data = Market.objects.filter(log_dt = last_240_time)
 
     
 
@@ -174,13 +184,15 @@ def trade_day(request):
     
 
     #딕셔너리로처리 -> next방식과 큰차이 없어서 잠궈놈
-    price_data = Market.objects.filter(log_dt__in = [last_1_time, last_5_time, last_30_time, last_60_time, last_240_time]).values('market','log_dt','price')
+    price_data = Market.objects.filter(log_dt__in = [last_time, last_5_time, last_30_time, last_60_time, last_240_time]).values('market','log_dt','price')
     price_market_dic = {}
     for data in price_data:
         if data['market'] not in price_market_dic:
             price_market_dic[data['market']] = {}
         price_market_dic[data['market']][data['log_dt']] = data
 
+    print(price_market_dic['KRW-XRP'].keys())
+    print(last_time, last_5_time, last_30_time, last_60_time,last_240_time)
     
     #고점데이터
     today_high_low_data = Market.objects.filter(log_dt__gte= utc_00_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
@@ -190,7 +202,7 @@ def trade_day(request):
     last_5_sum_data = Market.objects.filter(log_dt__gte= last_5_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     last_10_sum_data = Market.objects.filter(log_dt__gte= last_10_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     last_60_sum_data = Market.objects.filter(log_dt__gte= last_60_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
-    last_1440_sum_data = Market.objects.filter(log_dt__gte= last_1440_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    #last_1440_sum_data = Market.objects.filter(log_dt__gte= last_1440_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     last_today_sum_data = Market.objects.filter(log_dt__gte= utc_00_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     
 
@@ -213,14 +225,23 @@ def trade_day(request):
             'sum': {}
         }
 
-    for time_data, log_dt in zip([last_1_sum_data, last_5_sum_data, last_10_sum_data, last_60_sum_data, last_today_sum_data], [last_1_time, last_5_time, last_30_time, last_60_time, last_240_time]):
+    for time_data, log_dt in zip([last_1_sum_data, last_5_sum_data, last_10_sum_data, last_60_sum_data, last_today_sum_data], [last_time, last_5_time, last_30_time, last_60_time, last_240_time]):
         for row in time_data:
             market = row['market']
             if volume_market_dic.get(market) == None:
                 continue
             volume_market_dic[market]['count'][log_dt] = row['cnt']
             volume_market_dic[market]['sum'][log_dt] = row['total_amount']
-        
+    
+    def try_get_price(price_dic, market, time):
+        """
+        가격 정보를 안전하게 가져오는 함수
+        에러 발생시 None 반환
+        """
+        try:
+            return price_dic[market][time]['price']
+        except (KeyError, TypeError, ValueError):
+            return None
 
     
 
@@ -237,7 +258,7 @@ def trade_day(request):
             'now_supply':next((d.now_supply for d in market_supply_list if d.symbol == item.symbol), None),
 
 
-            'kimchi_premium': next((round(((d.price/d.price_foreign)-1)*100,2) if (d.price !=None) & (d.price_foreign != None) else 0 for d in last_1_data if d.market == item.market), None),
+            'kimchi_premium': next((d.price_foreign for d in last_data if d.market == item.market), None),
 
             
             # 'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
@@ -245,11 +266,11 @@ def trade_day(request):
             # 'price_30m': next((d.price for d in last_30_data if d.market == item.market), None),
             # 'price_60m': next((d.price for d in last_60_data if d.market == item.market), None),
             # 'price_240m': next((d.price for d in last_240_data if d.market == item.market), None),
-            'price_1m': price_market_dic[item.market][last_1_time]['price'],
-            'price_5m': price_market_dic[item.market][last_5_time]['price'],
-            'price_30m': price_market_dic[item.market][last_30_time]['price'],
-            'price_60m': price_market_dic[item.market][last_60_time]['price'],
-            'price_240m': price_market_dic[item.market][last_240_time]['price'],
+            'price_last': try_get_price(price_market_dic, item.market, last_time),
+            'price_5m': try_get_price(price_market_dic, item.market, last_5_time),
+            'price_30m': try_get_price(price_market_dic, item.market, last_30_time),
+            'price_60m': try_get_price(price_market_dic, item.market, last_60_time),
+            'price_240m': try_get_price(price_market_dic, item.market, last_240_time),
 
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item.market), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item.market), None),
@@ -317,19 +338,20 @@ def trade_swing(request):
    
     
     TEST_HOURS= 0
-    current_time = datetime(2025, 2, 12, 8, 2, 33, tzinfo = timezone.utc)
+    #current_time = datetime(2025, 2, 12, 8, 1, 33, tzinfo = timezone.utc)
     #current_time = datetime(2025, 2, 7, 2, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
-    #current_time = datetime.now(tz = timezone.utc)
+    current_time = datetime.now(tz = timezone.utc)
     current_hour = current_time.replace(minute =0, second= 0)
     
-    last_1_time = get_current_time(current_time, -(1+TEST_HOURS))
-    last_day_time = get_current_time(current_hour, -((24 * 1) + TEST_HOURS)*60)
-    last_3days_time = get_current_time(current_hour, -((24 * 3) + TEST_HOURS)*60)
-    last_week_time = get_current_time(current_hour, -((24 * 7) + TEST_HOURS)*60)
-    last_month_time = get_current_time(current_hour, -((24 * 28) + TEST_HOURS)*60)
+    last_time = get_current_time(current_time, -(10 + TEST_HOURS))
+    last_day_time = get_current_time(current_hour, -((24 * 1) + TEST_HOURS)*3600)
+    last_3days_time = get_current_time(current_hour, -((24 * 3) + TEST_HOURS)*3600)
+    last_week_time = get_current_time(current_hour, -((24 * 7) + TEST_HOURS)*3600)
+    last_month_time = get_current_time(current_hour, -((24 * 28) + TEST_HOURS)*3600)
     
+    print(last_time, last_day_time)
     #시점데이터
-    last_1_data = Market.objects.filter(log_dt = last_1_time)
+    last_1_data = Market.objects.filter(log_dt = last_time)
     last_day_data = MarketHour.objects.filter(log_dt = last_day_time)
     last_3days_data = MarketHour.objects.filter(log_dt = last_3days_time)
     last_week_data = MarketHour.objects.filter(log_dt = last_week_time)

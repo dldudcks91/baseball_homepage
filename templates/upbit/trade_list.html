@@ -112,8 +112,8 @@
 </div>
 
 <script type="text/javascript">
-    let currentOrderTradeToday = [[14, 'desc']];
-    let currentOrderTradeSwing = [[14, 'desc']];
+    let currentOrderTradeToday = [[16, 'desc']];
+    let currentOrderTradeSwing = [[16, 'desc']];
     let dataTableTradeInfo;
     let dataTableTradeToday ;
     let dataTableTradeSwing ;
@@ -255,12 +255,12 @@
 
     // 계산 및 테이블 불러오는 function
     function getPriceRatioToday(item) {
-        item.price_ratio_5m = (((item.price_1m - item.price_5m) / item.price_5m)*100).toFixed(2)
-        item.price_ratio_30m = (((item.price_1m - item.price_30m) / item.price_30m)*100).toFixed(2)
-        item.price_ratio_60m = (((item.price_1m - item.price_60m) / item.price_60m)*100).toFixed(2)
-        item.price_ratio_240m = (((item.price_1m - item.price_240m)/ item.price_240m)*100).toFixed(2)
-        item.price_ratio_high = (((item.price_1m - item.price_today_high)/ item.price_today_high)*100).toFixed(2)
-        item.price_ratio_low = (((item.price_1m - item.price_today_low)/ item.price_today_low)*100).toFixed(2)
+        item.price_ratio_5m = (((item.price_last - item.price_5m) / item.price_5m)*100).toFixed(2)
+        item.price_ratio_30m = (((item.price_last - item.price_30m) / item.price_30m)*100).toFixed(2)
+        item.price_ratio_60m = (((item.price_last - item.price_60m) / item.price_60m)*100).toFixed(2)
+        item.price_ratio_240m = (((item.price_last - item.price_240m)/ item.price_240m)*100).toFixed(2)
+        item.price_ratio_high = (((item.price_last - item.price_today_high)/ item.price_today_high)*100).toFixed(2)
+        item.price_ratio_low = (((item.price_last - item.price_today_low)/ item.price_today_low)*100).toFixed(2)
         item.price_ratio_range = (((item.price_today_high - item.price_today_low)/ item.price_today_low)*100).toFixed(2)
 
 
@@ -362,7 +362,7 @@
                     //item.issue_month, // 발행일
                     //item.listing_month, //상장일
                     formatRatio(item.kimchi_premium), // 김프
-                    item.price_1m, //현재가
+                    item.price_last, //현재가
                     
                     item.price_ratio_5m, // 5분
                     item.price_ratio_30m, // 30분
