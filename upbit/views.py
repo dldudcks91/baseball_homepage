@@ -42,7 +42,7 @@ def trade_info(request):
             
 
         }
-        for item in market_info_list if item.market != 'KRW-BTC'
+        for item in market_info_list
         ]
     context = {'trade_info_data': market_list}
 
@@ -191,8 +191,7 @@ def trade_day(request):
             price_market_dic[data['market']] = {}
         price_market_dic[data['market']][data['log_dt']] = data
 
-    print(price_market_dic['KRW-XRP'].keys())
-    print(last_time, last_5_time, last_30_time, last_60_time,last_240_time)
+    
     
     #고점데이터
     today_high_low_data = Market.objects.filter(log_dt__gte= utc_00_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
@@ -233,15 +232,7 @@ def trade_day(request):
             volume_market_dic[market]['count'][log_dt] = row['cnt']
             volume_market_dic[market]['sum'][log_dt] = row['total_amount']
     
-    def try_get_price(price_dic, market, time):
-        """
-        가격 정보를 안전하게 가져오는 함수
-        에러 발생시 None 반환
-        """
-        try:
-            return price_dic[market][time]['price']
-        except (KeyError, TypeError, ValueError):
-            return None
+    
 
     
 
@@ -266,26 +257,27 @@ def trade_day(request):
             # 'price_30m': next((d.price for d in last_30_data if d.market == item.market), None),
             # 'price_60m': next((d.price for d in last_60_data if d.market == item.market), None),
             # 'price_240m': next((d.price for d in last_240_data if d.market == item.market), None),
-            'price_last': try_get_price(price_market_dic, item.market, last_time),
-            'price_5m': try_get_price(price_market_dic, item.market, last_5_time),
-            'price_30m': try_get_price(price_market_dic, item.market, last_30_time),
-            'price_60m': try_get_price(price_market_dic, item.market, last_60_time),
-            'price_240m': try_get_price(price_market_dic, item.market, last_240_time),
+            'price_last': price_market_dic.get(item.market, {}).get(last_time, {}).get('price'),
+            'price_5m': price_market_dic.get(item.market, {}).get(last_5_time, {}).get('price'),
+            'price_30m': price_market_dic.get(item.market, {}).get(last_30_time, {}).get('price'),
+            'price_60m': price_market_dic.get(item.market, {}).get(last_60_time, {}).get('price'),
+            'price_240m': price_market_dic.get(item.market, {}).get(last_240_time, {}).get('price'),
 
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item.market), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item.market), None),
             
-            'amount_1m': volume_market_dic[item.market]['sum'].get(last_1_time, None),
-            'amount_5m': volume_market_dic[item.market]['sum'].get(last_5_time, None),
-            'amount_10m': volume_market_dic[item.market]['sum'].get(last_10_time, None), 
-            'amount_60m': volume_market_dic[item.market]['sum'].get(last_60_time, None),
-            'amount_today': volume_market_dic[item.market]['sum'].get(utc_00_time, None),
+            'amount_1m': volume_market_dic.get(item.market, {}).get('sum', {}).get(last_1_time),
+            'amount_5m': volume_market_dic.get(item.market, {}).get('sum', {}).get(last_5_time),
+            'amount_10m': volume_market_dic.get(item.market, {}).get('sum', {}).get(last_10_time),
+            'amount_60m': volume_market_dic.get(item.market, {}).get('sum', {}).get(last_60_time),
+            'amount_today': volume_market_dic.get(item.market, {}).get('sum', {}).get(utc_00_time),
 
-            'count_1m': volume_market_dic[item.market]['count'].get(last_1_time, None),
-            'count_5m': volume_market_dic[item.market]['count'].get(last_5_time, None),
-            'count_10m': volume_market_dic[item.market]['count'].get(last_10_time, None),
-            'count_60m': volume_market_dic[item.market]['count'].get(last_60_time, None),
-            'count_today': volume_market_dic[item.market]['count'].get(utc_00_time, None),
+            'count_1m': volume_market_dic.get(item.market, {}).get('count', {}).get(last_1_time),
+            'count_5m': volume_market_dic.get(item.market, {}).get('count', {}).get(last_5_time),
+            'count_10m': volume_market_dic.get(item.market, {}).get('count', {}).get(last_10_time),
+            'count_60m': volume_market_dic.get(item.market, {}).get('count', {}).get(last_60_time),
+            'count_today': volume_market_dic.get(item.market, {}).get('count', {}).get(utc_00_time),
+
 
 
             # 'amount_1m': next((d['total_amount'] for d in last_1_sum_data if d['market'] == item.market), None),
@@ -308,7 +300,7 @@ def trade_day(request):
             'rsi_60m': rsi_60_results[item.market] if rsi_60_results.get(item.market) != None else 0
 
         }
-        for item in market_info_list if (item.market != 'KRW-BTC')
+        for item in market_info_list
         ]
 
     #print(market_list)
@@ -349,7 +341,7 @@ def trade_swing(request):
     last_week_time = get_current_time(current_hour, -((24 * 7) + TEST_HOURS)*3600)
     last_month_time = get_current_time(current_hour, -((24 * 28) + TEST_HOURS)*3600)
     
-    print(last_time, last_day_time)
+    
     #시점데이터
     last_1_data = Market.objects.filter(log_dt = last_time)
     last_day_data = MarketHour.objects.filter(log_dt = last_day_time)
@@ -433,7 +425,7 @@ def trade_swing(request):
             'rsi_3days': rsi_3days_results[item.market] if rsi_3days_results.get(item.market) != None else 0
 
         }
-        for item in market_info_list if item.market != 'KRW-BTC'
+        for item in market_info_list
         ]
 
     #print(market_list)
@@ -535,7 +527,7 @@ def trade_timetable(request):
             
 
         }
-        for item in market_info_list if item.market != 'KRW-BTC'
+        for item in market_info_list
         ]
     context = {'trade_timetable_data': market_list
         # time trading 관련 데이터
