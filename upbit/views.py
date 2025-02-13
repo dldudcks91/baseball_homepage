@@ -249,7 +249,7 @@ def trade_day(request):
             'now_supply':next((d.now_supply for d in market_supply_list if d.symbol == item.symbol), None),
 
 
-            'kimchi_premium': next((d.price_foreign for d in last_data if d.market == item.market), None),
+            'price_foreign': next((d.price_foreign for d in last_data if d.market == item.market), None),
 
             
             # 'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
@@ -343,7 +343,7 @@ def trade_swing(request):
     
     
     #시점데이터
-    last_1_data = Market.objects.filter(log_dt = last_time)
+    last_data = Market.objects.filter(log_dt = last_time)
     last_day_data = MarketHour.objects.filter(log_dt = last_day_time)
     last_3days_data = MarketHour.objects.filter(log_dt = last_3days_time)
     last_week_data = MarketHour.objects.filter(log_dt = last_week_time)
@@ -397,10 +397,10 @@ def trade_swing(request):
             'max_supply':next((d.max_supply for d in market_supply_list if d.symbol == item.symbol), None),
             'now_supply':next((d.now_supply for d in market_supply_list if d.symbol == item.symbol), None),
 
+            'price_foreign': next((d.price_foreign for d in last_data if d.market == item.market), None),
+            
 
-            'kimchi_premium':next((round(((d.price/d.price_foreign)-1)*100,2) if (d.price !=None) & (d.price_foreign != None) else 0 for d in last_1_data if d.market == item.market), None),
-
-            'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
+            'price_last': next((d.price for d in last_data if d.market == item.market), None),
             'price_day': next((d.trade_price for d in last_day_data if d.market == item.market), None),
             'price_3days': next((d.trade_price for d in last_3days_data if d.market == item.market), None),
             'price_week': next((d.trade_price for d in last_week_data if d.market == item.market), None),

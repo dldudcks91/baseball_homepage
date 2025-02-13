@@ -263,7 +263,7 @@
         item.price_ratio_low = (((item.price_last - item.price_today_low)/ item.price_today_low)*100).toFixed(2)
         item.price_ratio_range = (((item.price_today_high - item.price_today_low)/ item.price_today_low)*100).toFixed(2)
 
-
+        item.kimchi_premium = (((item.price_last - item.price_foreign) / item.price_foreign)*100).toFixed(2)
         item.supply_ratio = !item.max_supply ? '-' : `${((item.now_supply / item.max_supply)*100).toFixed(1)}%`
         return item
     }
@@ -294,6 +294,8 @@
 
         return item
     }
+
+
 
     function formatRatio(ratio) {
         const value = parseFloat(ratio).toFixed(1)
@@ -361,7 +363,7 @@
                     //item.supply_ratio, // 발행률
                     //item.issue_month, // 발행일
                     //item.listing_month, //상장일
-                    formatRatio(item.kimchi_premium), // 김프
+                    item.kimchi_premium, // 김프
                     item.price_last, //현재가
                     
                     item.price_ratio_5m, // 5분
@@ -497,15 +499,14 @@
 
 
     function getPriceRatioSwing(item) {
-        item.price_ratio_day = (((item.price_1m - item.price_day) / item.price_day)*100).toFixed(2)
-        item.price_ratio_3days = (((item.price_1m - item.price_3days) / item.price_3days)*100).toFixed(2)
-        item.price_ratio_week = (((item.price_1m - item.price_week) / item.price_week)*100).toFixed(2)
-        item.price_ratio_month = (((item.price_1m - item.price_month) / item.price_month)*100).toFixed(2)
-        item.price_ratio_high = (((item.price_1m - item.price_high)/ item.price_high)*100).toFixed(2)
-        item.price_ratio_low = (((item.price_1m - item.price_low)/ item.price_low)*100).toFixed(2)
+        item.price_ratio_day = (((item.price_last - item.price_day) / item.price_day)*100).toFixed(2)
+        item.price_ratio_3days = (((item.price_last - item.price_3days) / item.price_3days)*100).toFixed(2)
+        item.price_ratio_week = (((item.price_last - item.price_week) / item.price_week)*100).toFixed(2)
+        item.price_ratio_month = (((item.price_last - item.price_month) / item.price_month)*100).toFixed(2)
+        item.price_ratio_high = (((item.price_last - item.price_high)/ item.price_high)*100).toFixed(2)
+        item.price_ratio_low = (((item.price_last - item.price_low)/ item.price_low)*100).toFixed(2)
         item.price_ratio_range = (((item.price_high - item.price_low)/ item.price_low)*100).toFixed(2)
-
-
+        item.kimchi_premium= (((item.price_last - item.price_foreign) / item.price_foreign)*100).toFixed(2)
         
         return item
     }
@@ -558,8 +559,8 @@
                     //item.supply_ratio, // 발행률
                     //item.issue_month, // 발행일
                     //item.listing_month, //상장일
-                    formatRatio(item.kimchi_premium), // 김프
-                    item.price_1m, //현재가
+                    item.kimchi_premium, // 김프
+                    item.price_last, //현재가
                     
                     item.price_ratio_day, // 하루
                     item.price_ratio_3days, // 3일
@@ -726,7 +727,7 @@
                 return [
                     `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
                      item.korean_name, // 이름
-                     item.price_1m, // 시총
+                     item.price_last, // 시총
                     // item.supply_ratio, // 발행률
                     // item.issue_month, // 발행일
                     // item.listing_month, //상장일
