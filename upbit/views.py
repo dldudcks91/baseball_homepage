@@ -163,19 +163,19 @@ def trade_day(request):
     RSI_PERIOD = 15
     
     #rsi 5분봉
-    rsi_5_time_list = [get_current_time(current_time, -(1 + i * 5)) for i in range(RSI_PERIOD)]
+    rsi_5_time_list = [get_current_time(current_time, -(10 + (i * 5)*60)) for i in range(RSI_PERIOD)]
     rsi_5_data = Market.objects.filter(log_dt__in=rsi_5_time_list).values('market', 'log_dt', 'price').order_by('log_dt')
     rsi_5_results = get_rsi_results_today(rsi_5_data)
     
 
 
     #rsi 15분봉
-    rsi_15_time_list = [get_current_time(current_time, -(1 + i * 15)) for i in range(RSI_PERIOD)]
+    rsi_15_time_list = [get_current_time(current_time, -(10 + (i * 15)*60)) for i in range(RSI_PERIOD)]
     rsi_15_data = Market.objects.filter(log_dt__in=rsi_15_time_list).values('market', 'log_dt', 'price').order_by('log_dt')
     rsi_15_results = get_rsi_results_today(rsi_15_data)
 
     #rsi 60분봉
-    rsi_60_time_list = [get_current_time(current_time, -(1 + i * 60)) for i in range(RSI_PERIOD)]
+    rsi_60_time_list = [get_current_time(current_time, -(10 + (i * 60)*60)) for i in range(RSI_PERIOD)]
     rsi_60_data = Market.objects.filter(log_dt__in=rsi_60_time_list).values('market', 'log_dt', 'price').order_by('log_dt')
     rsi_60_results = get_rsi_results_today(rsi_60_data)
     
@@ -201,7 +201,7 @@ def trade_day(request):
     last_5_sum_data = Market.objects.filter(log_dt__gte= last_5_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     last_10_sum_data = Market.objects.filter(log_dt__gte= last_10_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     last_60_sum_data = Market.objects.filter(log_dt__gte= last_60_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
-    #last_1440_sum_data = Market.objects.filter(log_dt__gte= last_1440_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
+    last_1440_sum_data = Market.objects.filter(log_dt__gte= last_1440_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     last_today_sum_data = Market.objects.filter(log_dt__gte= utc_00_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     
 
@@ -224,7 +224,7 @@ def trade_day(request):
             'sum': {}
         }
 
-    for time_data, log_dt in zip([last_1_sum_data, last_5_sum_data, last_10_sum_data, last_60_sum_data, last_today_sum_data], [last_time, last_5_time, last_30_time, last_60_time, last_240_time]):
+    for time_data, log_dt in zip([last_1_sum_data, last_5_sum_data, last_10_sum_data, last_60_sum_data, last_1440_sum_data,last_today_sum_data], [last_1_time, last_5_time, last_30_time, last_60_time, last_1440_time,last_today_sum_data]):
         for row in time_data:
             market = row['market']
             if volume_market_dic.get(market) == None:
@@ -270,12 +270,14 @@ def trade_day(request):
             'amount_5m': volume_market_dic.get(item.market, {}).get('sum', {}).get(last_5_time),
             'amount_10m': volume_market_dic.get(item.market, {}).get('sum', {}).get(last_10_time),
             'amount_60m': volume_market_dic.get(item.market, {}).get('sum', {}).get(last_60_time),
+            'amount_1440m': volume_market_dic.get(item.market, {}).get('sum', {}).get(last_1440_time),
             'amount_today': volume_market_dic.get(item.market, {}).get('sum', {}).get(utc_00_time),
 
             'count_1m': volume_market_dic.get(item.market, {}).get('count', {}).get(last_1_time),
             'count_5m': volume_market_dic.get(item.market, {}).get('count', {}).get(last_5_time),
             'count_10m': volume_market_dic.get(item.market, {}).get('count', {}).get(last_10_time),
             'count_60m': volume_market_dic.get(item.market, {}).get('count', {}).get(last_60_time),
+            'count_1440m': volume_market_dic.get(item.market, {}).get('count', {}).get(last_1440_time),
             'count_today': volume_market_dic.get(item.market, {}).get('count', {}).get(utc_00_time),
 
 
@@ -365,7 +367,7 @@ def trade_swing(request):
     RSI_PERIOD = 15
 
     #rsi 4시간봉
-    rsi_240_time_list = [get_current_time(current_hour, -(i * 60 * 4)) for i in range(RSI_PERIOD)]
+    rsi_240_time_list = [get_current_time(current_hour, -(i * 4)*3600) for i in range(RSI_PERIOD)]
     rsi_240_data = MarketHour.objects.filter(log_dt__in=rsi_240_time_list).values('market', 'log_dt', 'trade_price').order_by('log_dt')
     rsi_240_results = get_rsi_results_swing(rsi_240_data)
 
@@ -374,13 +376,13 @@ def trade_swing(request):
     
 
     #rsi 1일봉
-    rsi_day_time_list = [get_current_time(current_hour, -(i * 60 * 24)) for i in range(RSI_PERIOD)]
+    rsi_day_time_list = [get_current_time(current_hour, -(i * 24)*3600) for i in range(RSI_PERIOD)]
     rsi_day_data = MarketHour.objects.filter(log_dt__in=rsi_day_time_list).values('market', 'log_dt', 'trade_price').order_by('log_dt')
     rsi_day_results = get_rsi_results_swing(rsi_day_data)
     
     
     #rsi 3일봉
-    rsi_3days_time_list = [get_current_time(current_hour, -(i * 60 * 72)) for i in range(RSI_PERIOD)]
+    rsi_3days_time_list = [get_current_time(current_hour, -(i * 72)*3600) for i in range(RSI_PERIOD)]
     rsi_3days_data = MarketHour.objects.filter(log_dt__in=rsi_3days_time_list).values('market', 'log_dt', 'trade_price').order_by('log_dt')
     rsi_3days_results = get_rsi_results_swing(rsi_3days_data)
 
