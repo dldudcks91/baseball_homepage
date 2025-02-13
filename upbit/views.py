@@ -147,7 +147,7 @@ def trade_day(request):
     last_60_time = get_current_time(current_time, -(10 + 3600 + TEST_MINUTES))
     last_240_time = get_current_time(current_time, -(10 + 14400 + TEST_MINUTES))
     last_1440_time = get_current_time(current_time, -(10 + 86400 +TEST_MINUTES))
-    utc_00_time = get_current_time(current_time.replace(hour= 0, minute = 0, second = 0 ,microsecond = 0) - timedelta(hours=9),0)
+    utc_00_time = get_current_time(current_time.replace(hour= 0, minute = 0, second = 0 ,microsecond = 0),0)
     
     #시점데이터
     last_data = Market.objects.filter(log_dt = last_time)
@@ -224,7 +224,7 @@ def trade_day(request):
             'sum': {}
         }
 
-    for time_data, log_dt in zip([last_1_sum_data, last_5_sum_data, last_10_sum_data, last_60_sum_data, last_1440_sum_data,last_today_sum_data], [last_1_time, last_5_time, last_30_time, last_60_time, last_1440_time,last_today_sum_data]):
+    for time_data, log_dt in zip([last_1_sum_data, last_5_sum_data, last_10_sum_data, last_60_sum_data, last_1440_sum_data,last_today_sum_data], [last_1_time, last_5_time, last_30_time, last_60_time, last_1440_time,utc_00_time]):
         for row in time_data:
             market = row['market']
             if volume_market_dic.get(market) == None:
