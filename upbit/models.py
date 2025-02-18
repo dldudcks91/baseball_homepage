@@ -67,3 +67,15 @@ class MarketSupply(models.Model):
         managed = False
         db_table = 'tb_market_supply'
         
+class MarketNow(models.Model):
+    
+    market = models.CharField(max_length = 45, primary_key = True)
+    symbol = models.CharField(max_length = 45)
+    korean_name = models.CharField(max_length = 45)
+    
+    
+    
+    
+    class Meta:
+        managed = False
+        db_table = 'tb_market_now'

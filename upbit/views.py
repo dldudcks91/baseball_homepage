@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Market, MarketHour, MarketInfo, MarketSupply
+from .models import Market, MarketHour, MarketInfo, MarketSupply, MarketNow
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import DateTimeField, ExpressionWrapper, IntegerField
@@ -134,7 +134,10 @@ def get_rsi_results_swing(rsi_data):
 
 def trade_day(request):
     
-    
+    market_info_list = MarketInfo.objects.all()
+    market_supply_list = MarketSupply.objects.all()
+    market_now_list = MarketNow.objects.all()
+
     TEST_MINUTES= 0
     #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
     current_time = datetime.now(tz = timezone.utc)
@@ -213,8 +216,7 @@ def trade_day(request):
     # last_5_60_sum_data = Market.objects.filter(log_dt__lt= last_5_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     # last_10_60_sum_data = Market.objects.filter(log_dt__lt= last_10_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
 
-    market_info_list = MarketInfo.objects.all().order_by('symbol')
-    market_supply_list = MarketSupply.objects.all().order_by('symbol')
+    
     
     #딕셔너리로처리 -> next방식과 큰차이 없어서 잠궈놈
     volume_market_dic = {}
@@ -240,9 +242,9 @@ def trade_day(request):
         {
             'market': item.market[4:],
             'korean_name':item.korean_name,
-            'english_name':item.english_name,
-            'issue_month': item.issue_month,
-            'listing_month': item.listing_month,
+            'english_name':next((d.english_name for d in market_info_list if d.symbol == item.symbol), None),
+            'issue_month': next((d.issue_month for d in market_info_list if d.symbol == item.symbol), None),
+            'listing_month': next((d.listing_month for d in market_info_list if d.symbol == item.symbol), None),
 
             'capitalization':next((d.capitalization for d in market_supply_list if d.symbol == item.symbol), None),
             'max_supply':next((d.max_supply for d in market_supply_list if d.symbol == item.symbol), None),
@@ -302,7 +304,7 @@ def trade_day(request):
             'rsi_60m': rsi_60_results[item.market] if rsi_60_results.get(item.market) != None else 0
 
         }
-        for item in market_info_list
+        for item in market_now_list
         ]
 
     #print(market_list)
@@ -330,7 +332,10 @@ def trade_day(request):
 
 def trade_swing(request):
    
-    
+    market_info_list = MarketInfo.objects.all().order_by('symbol')
+    market_supply_list = MarketSupply.objects.all().order_by('symbol')
+    market_now_list = MarketNow.objects.all()
+
     TEST_HOURS= 0
     #current_time = datetime(2025, 2, 12, 8, 1, 33, tzinfo = timezone.utc)
     #current_time = datetime(2025, 2, 7, 2, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
@@ -360,8 +365,6 @@ def trade_swing(request):
     last_3days_sum_data = MarketHour.objects.filter(log_dt__gte= last_3days_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     last_week_sum_data = MarketHour.objects.filter(log_dt__gte= last_week_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
     last_month_sum_data = MarketHour.objects.filter(log_dt__gte= last_month_time).values('market').annotate(total_amount = Sum('amount'), cnt = Count('amount'))
-    market_info_list = MarketInfo.objects.all().order_by('symbol')
-    market_supply_list = MarketSupply.objects.all().order_by('symbol')
     
     #rsi 구하기
     RSI_PERIOD = 15
@@ -391,9 +394,9 @@ def trade_swing(request):
         {
             'market': item.market[4:],
             'korean_name':item.korean_name,
-            'english_name':item.english_name,
-            'issue_month': item.issue_month,
-            'listing_month': item.listing_month,
+            'english_name':next((d.english_name for d in market_info_list if d.symbol == item.symbol), None),
+            'issue_month': next((d.issue_month for d in market_info_list if d.symbol == item.symbol), None),
+            'listing_month': next((d.listing_month for d in market_info_list if d.symbol == item.symbol), None),
 
             'capitalization':next((d.capitalization for d in market_supply_list if d.symbol == item.symbol), None),
             'max_supply':next((d.max_supply for d in market_supply_list if d.symbol == item.symbol), None),
@@ -427,7 +430,7 @@ def trade_swing(request):
             'rsi_3days': rsi_3days_results[item.market] if rsi_3days_results.get(item.market) != None else 0
 
         }
-        for item in market_info_list
+        for item in market_now_list
         ]
 
     #print(market_list)
@@ -476,21 +479,19 @@ def trade_timetable(request):
 
     with connection.cursor() as cursor:
         sql = """
-            WITH RAW_DATA as (
+            WITH RAW_DATA AS (
             SELECT 
                 market,
                 log_dt,
                 (ROW_NUMBER() OVER (PARTITION BY market ORDER BY log_dt desc) -1) DIV %s AS row_num ,
                 amount
             FROM upbit.tb_market_hour
-            
             )
             SELECT market, 
                 row_num,
                 
                 SUM(amount) as total_amount
-            FROM RAW_data
-            
+            FROM RAW_DATA
             WHERE log_dt >= %s
             GROUP BY market, row_num
             ORDER BY market, row_num
@@ -506,7 +507,7 @@ def trade_timetable(request):
         {
             'market': item.market[4:],
             'korean_name':item.korean_name,
-            'price_1m': next((d.price for d in last_1_data if (d.market == item.market)), None),
+            'price_last': next((d.price for d in last_1_data if (d.market == item.market)), None),
 
             'd0': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 0)), None),
             'd1': next((d[2] for d in hour_data if (d[0] == item.market) & (d[1] == 1)), None),

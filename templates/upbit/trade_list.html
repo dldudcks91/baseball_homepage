@@ -112,13 +112,16 @@
 </div>
 
 <script type="text/javascript">
-    let currentOrderTradeToday = [[16, 'desc']];
-    let currentOrderTradeSwing = [[16, 'desc']];
+    
     let dataTableTradeInfo;
     let dataTableTradeToday ;
     let dataTableTradeSwing ;
     let dataTableTradeTimetable ;
     
+    let currentOrderTradeToday = [[16, 'desc']];
+    let currentOrderTradeSwing = [[16, 'desc']];
+    let searchValue = '';
+    let scrollPosition = 0;
 
     let updateInterval;
     let updateTimer;
@@ -340,14 +343,22 @@
                 //console.log("데이터 수신:", response);  // 데이터 확인
                 const container = $(`#${tabType}_contents`);
 
+                
+
                 //html먼저 생성
                 dataTableTradeToday = container.html(response.html);
+                // 검색 저장
+                
+                
 
                 // 기본 정렬
                 if (dataTableTradeToday && typeof dataTableTradeToday.order === 'function') {
                     currentOrderTradeToday = dataTableTradeToday.order() || currentOrderTradeToday;
                     dataTableTradeToday.destroy();
                 }
+                
+                
+                
                 
                 
 
@@ -357,7 +368,7 @@
                 item = getVolumeRatioToday(item)
                 return [
                     
-                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.KRW-${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
                     item.korean_name, // 이름
                     item.capitalization, // 시총
                     //item.supply_ratio, // 발행률
@@ -400,9 +411,9 @@
                     pageLength: 200,            // 페이지당 10개 표시
                     order: currentOrderTradeToday,      // 1분 거래대금 기준 내림차순 정렬
                     responsive: true, // 반응형 디자인 활성화
-                    
+                    stateSave:true,
                     language: {
-                        search: "검색:",
+                        search: "검색: ",
                         //lengthMenu: "페이지당 _MENU_ 개",
                         
                         info: "_TOTAL_개 중 _START_ - _END_",
@@ -553,7 +564,7 @@
                 item = getVolumeRatioSwing(item);
                 item = getSupplyRatio(item);
                 return [
-                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.KRW-${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
                     item.korean_name, // 이름
                     item.capitalization, // 시총
                     //item.supply_ratio, // 발행률
@@ -712,7 +723,7 @@
             success: function(response) {
                 //console.log("데이터 수신:", response);  // 데이터 확인
                 const container = $(`#${tabType}_contents`);
-
+                console.log(response['data'])
                 //html먼저 생성
                 dataTableTradeTimetable = container.html(response.html);
 
@@ -725,7 +736,7 @@
                 const processedData = response['data'].map(item => {
                 
                 return [
-                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.KRW-${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
                      item.korean_name, // 이름
                      item.price_last, // 시총
                     // item.supply_ratio, // 발행률
@@ -744,7 +755,8 @@
                     item.d8,
                     item.d9,
                     item.d10,
-                    item.d11,
+                    item.d11
+                    
 
                     
 
