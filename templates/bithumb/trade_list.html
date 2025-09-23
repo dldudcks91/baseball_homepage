@@ -1,0 +1,884 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .table-container {
+        margin: 20px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    table.dataTable thead th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+
+    .highlight {
+        background-color: #ffeeba;
+        transition: background-color 2s;
+    }
+    .positive {
+        color: #FF3B30;  /* 빨간색 */
+    }
+    .negative {
+        
+        color: #0a60ff;  /* 파란색 */
+    }
+    
+   .dataTables_wrapper {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+    #dataTableTradeInfo {
+        width: 100% !important;
+        font-size: 13px;
+    }
+    #dataTableTradeToday {
+        width: 100% !important;
+        font-size: 13px;
+    }
+    #dataTableTradeSwing {
+        width: 100% !important;
+        font-size: 13px;
+    }
+    #dataTableTradeTimeTable {
+        width: 100% !important;
+        font-size: 13px;
+    }
+     /* 로딩 컨테이너 스타일 추가 */
+     .loading-container {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        text-align: center;
+    }
+    
+    .loading-spinner {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .loading-text {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #666;
+    }
+</style>
+
+<div id="upbit-contents">
+    <div id="trade_list">
+        <!-- 탭 메뉴 -->
+        <ul class="nav nav-tabs" id="tradeTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link mb-0 h5"  id="trade_info_tab" data-toggle="tab" href="#trade_info_contents" role="tab"><h>기본정보</h></a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active mb-0 h5"  id="trade_day_tab" data-toggle="tab" href="#trade_day_contents" role="tab"><h>단타</h></a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link mb-0 h5"  id="trade_swing_tab" data-toggle="tab" href="#trade_swing_contents" role="tab"><h>스윙</h></a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link mb-0 h5"  id="trade_timetable_tab" data-toggle="tab" href="#trade_timetable_contents" role="tab"><h>시간대별(수정중)</h></a>
+            </li>
+        </ul>
+
+        
+        <div class="loading-container">
+            <img src="/static/images/loading/upbit_loading.gif" alt="로딩중" class="loading-spinner">
+            <div class="loading-text">데이터를 불러오는 중입니다...</div>
+        </div>
+        <!-- 탭 컨텐츠 -->
+        <div class="timer-container" style="text-align: right; padding: 10px; font-size: 15px;">
+            데이터는 10초에 한번씩 자동으로 업데이트됩니다.
+        </div> 
+        <div class="update-info" style="text-align: right; padding: 10px; font-size: 14px; color: #666;">
+            마지막 업데이트: <span id="lastUpdateTime">-</span>
+        </div>
+        <div class="tab-content" id="tradeTabContent">
+            <div class="tab-pane fade" id="trade_info_contents" role="tabpanel"></div>
+            <div class="tab-pane fade show active" id="trade_day_contents" role="tabpanel"></div>
+            <div class="tab-pane fade" id="trade_swing_contents" role="tabpanel"></div>
+            <div class="tab-pane fade" id="trade_timetable_contents" role="tabpanel"></div>
+        </div>
+    </div>
+    
+</div>
+
+<script type="text/javascript">
+    let currentOrderTradeToday = [[16, 'desc']];
+    let currentOrderTradeSwing = [[16, 'desc']];
+    let dataTableTradeInfo;
+    let dataTableTradeToday ;
+    let dataTableTradeSwing ;
+    let dataTableTradeTimetable ;
+    
+
+    let updateInterval;
+    let updateTimer;
+    let countDown = 10;
+    
+
+    $(document).ready(function() {
+        // // 페이지 로드시 첫 번째 탭 데이터 로드
+        // dataTableTradeToday = $('#dataTableTradeToday').DataTable({});     
+        // dataTableTradeSwing = $('#dataTableTradeSwing').DataTable({});     
+        // dataTableTradeTimetable = $('#dataTableTradeTimetable').DataTable({});
+        
+        
+        
+        startAutoUpdate('trade_day');
+
+        
+        
+        
+        //setInterval(function() { refreshTradeToday('trade_day')}, 10000);
+
+        // 탭 클릭 이벤트
+        $('#trade_info_tab').on('click', function() {
+            
+            
+            stopAutoUpdate();
+            
+            refreshTradeInfo('trade_info')
+
+        });
+
+        $('#trade_day_tab').on('click', function() {
+            
+            
+            startAutoUpdate('trade_day',0);
+        });
+
+        $('#trade_swing_tab').on('click', function() {
+            
+            
+            startAutoUpdate('trade_swing',0);
+        });
+
+        $('#trade_timetable_tab').on('click', function() {
+           
+            
+            startAutoUpdate('trade_timetable',1);
+        });
+    
+
+        
+        
+    });
+    function stopAutoUpdate() {
+        if (updateInterval) {
+            clearInterval(updateInterval);
+            
+            
+        }
+        if (updateTimer) {
+            clearInterval(updateTimer);
+            
+            
+        }
+        
+    }
+
+
+    function startAutoUpdate(url, parameter) {
+        
+        if (url === 'trade_day') {
+            if ($('#dataTableTradeToday').length === 0){
+                console.log($('#dataTableTradeToday').length)
+                showLoading()
+            }
+                
+            } else if (url === 'trade_swing') {
+                if ($('#dataTableTradeSwing').length === 0){
+                showLoading()
+            }
+                
+            } else if (url === 'trade_timetable') {
+                if ($('#dataTableTradeInfo').length === 0){
+                showLoading()
+            }
+                
+            }
+
+        //showLoading()
+
+        function startPeriodicUpdate() {
+            if (url === 'trade_day') {
+                refreshTradeToday(url);
+                
+            } else if (url === 'trade_swing') {
+                refreshTradeSwing(url);
+                
+            } else if (url === 'trade_timetable') {
+                refreshTradeTimetable(url, parameter);
+                
+            }
+        }
+
+        // 기존 Interval 정지
+        
+        
+        stopAutoUpdate();
+        
+        
+        // 첫 실행
+        startPeriodicUpdate();
+        
+        // 다음 5초에 맞춰 실행 후 10초마다 반복
+        
+        updateInterval = setInterval(startPeriodicUpdate, 10000);
+        
+        
+    }
+    
+    function showLoading() {
+    $('.loading-container').show();
+    }
+
+    function hideLoading() {
+        $('.loading-container').hide();
+    }
+    function updateLastUpdateTime(){
+        const now = new Date();
+        const timeString = now.getHours().toString().padStart(2, '0') + ':' +
+                            now.getMinutes().toString().padStart(2, '0') + ':' +
+                            now.getSeconds().toString().padStart(2, '0');
+        $('#lastUpdateTime').text(timeString);
+    }
+
+    // 계산 및 테이블 불러오는 function
+    function getPriceRatioToday(item) {
+        item.price_ratio_5m = (((item.price_last - item.price_5m) / item.price_5m)*100).toFixed(2)
+        item.price_ratio_30m = (((item.price_last - item.price_30m) / item.price_30m)*100).toFixed(2)
+        item.price_ratio_60m = (((item.price_last - item.price_60m) / item.price_60m)*100).toFixed(2)
+        item.price_ratio_240m = (((item.price_last - item.price_240m)/ item.price_240m)*100).toFixed(2)
+        item.price_ratio_high = (((item.price_last - item.price_today_high)/ item.price_today_high)*100).toFixed(2)
+        item.price_ratio_low = (((item.price_last - item.price_today_low)/ item.price_today_low)*100).toFixed(2)
+        item.price_ratio_range = (((item.price_today_high - item.price_today_low)/ item.price_today_low)*100).toFixed(2)
+
+
+        item.supply_ratio = !item.max_supply ? '-' : `${((item.now_supply / item.max_supply)*100).toFixed(1)}%`
+        return item
+    }
+
+
+    
+
+    function calVolumeRatio(nu_amount, nu_cnt, de_amount, de_cnt) {
+        let nu_mean = 0;
+        let de_mean = 0;
+
+        if(nu_cnt !== 0) {nu_mean = nu_amount / nu_cnt;}
+        if(de_cnt !== 0) {de_mean = de_amount / de_cnt;}
+        if(de_mean === 0) {return 0;}
+        return (nu_mean / de_mean) - 1;
+    }
+    function getVolumeRatioToday(item){
+        
+        item.volume_ratio_1m_60m = (calVolumeRatio(item.amount_1m, item.count_1m, item.amount_60m, item.count_60m)*100).toFixed(1)
+        item.volume_ratio_5m_60m = (calVolumeRatio(item.amount_5m, item.count_5m, item.amount_60m, item.count_60m)*100).toFixed(1)
+        item.volume_ratio_10m_60m = (calVolumeRatio(item.amount_10m, item.count_10m, item.amount_60m, item.count_60m)*100).toFixed(1)
+        item.volume_ratio_60m_1440m = (calVolumeRatio(item.amount_60m, item.count_60m, item.amount_1440m, item.count_1440m)*100).toFixed(1)
+        return item
+    }
+    
+    function capitalizationData(item){
+        item.capitalization = (item.capitalization / 100000000).toFixed(0)
+
+        return item
+    }
+
+    function formatRatio(ratio) {
+        const value = parseFloat(ratio).toFixed(1)
+        if (value > 0) {
+            return `<span class="positive">+${ratio}%</span>`;
+        } else if (value < 0) {
+            return `<span class="negative">${ratio}%</span>`;
+        }
+        return `${ratio}%`;
+    }
+    function formatBillions(number, decimal_place) {
+         return (number / 100000000).toFixed(decimal_place);
+    }
+    function formatMillions(number, decimal_place) {
+         return (number / 1000000).toFixed(decimal_place);
+    }
+    function calculateAverages(data) {
+        const averages = {
+            market: '평균',
+            korean_name: '',
+            ratio_5m: data.reduce((sum, item) => sum + parseFloat(item.ratio_5m), 0) / data.length,
+            ratio_30m: data.reduce((sum, item) => sum + parseFloat(item.ratio_30m), 0) / data.length,
+            ratio_60m: data.reduce((sum, item) => sum + parseFloat(item.ratio_60m), 0) / data.length,
+            ratio_240m: data.reduce((sum, item) => sum + parseFloat(item.ratio_240m), 0) / data.length,
+            ratio_1m_60m: data.reduce((sum, item) => sum + parseFloat(item.ratio_1m_60m), 0) / data.length,
+            ratio_5m_60m: data.reduce((sum, item) => sum + parseFloat(item.ratio_5m_60m), 0) / data.length,
+            ratio_10m_60m: data.reduce((sum, item) => sum + parseFloat(item.ratio_10m_60m), 0) / data.length,
+        };
+        return averages;
+    }
+
+
+    function refreshTradeToday(tabType) {
+        //console.log('AJAX 요청 발생: upbit:trade_day'); 
+        $.ajax({
+            url: "{% url 'upbit:trade_day' %}",
+            method: 'GET',
+            headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+            success: function(response) {
+                //console.log("데이터 수신:", response);  // 데이터 확인
+                const container = $(`#${tabType}_contents`);
+
+                //html먼저 생성
+                dataTableTradeToday = container.html(response.html);
+
+                // 기본 정렬
+                if (dataTableTradeToday && typeof dataTableTradeToday.order === 'function') {
+                    currentOrderTradeToday = dataTableTradeToday.order() || currentOrderTradeToday;
+                    dataTableTradeToday.destroy();
+                }
+                
+                
+
+                const processedData = response['data'].map(item => {
+                item = getPriceRatioToday(item);
+                item = capitalizationData(item);
+                item = getVolumeRatioToday(item)
+                return [
+                    
+                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    item.korean_name, // 이름
+                    item.capitalization, // 시총
+                    //item.supply_ratio, // 발행률
+                    //item.issue_month, // 발행일
+                    //item.listing_month, //상장일
+                    formatRatio(item.kimchi_premium), // 김프
+                    item.price_last, //현재가
+                    
+                    item.price_ratio_5m, // 5분
+                    item.price_ratio_30m, // 30분
+                    item.price_ratio_60m, // 60분
+                    item.price_ratio_240m, // 240분
+                    item.price_ratio_high, // 고점
+                    item.price_ratio_low, // 저점
+                    item.price_ratio_range, //범위
+
+
+                    item.volume_ratio_1m_60m, //1분
+                    item.volume_ratio_5m_60m, // 5분
+                    //item.volume_ratio_10m_60m, // 10분
+                    item.volume_ratio_60m_1440m, // 10분
+
+                    formatBillions(item.amount_1m,1), // 1분
+                    formatBillions(item.amount_5m,1), //5분
+                    formatBillions(item.amount_60m,1), // 60분
+                    formatBillions(item.amount_today,1), // 하루
+                    item.rsi_5m.toFixed(1),
+                    item.rsi_15m.toFixed(1),
+                    item.rsi_60m.toFixed(1)
+                ];
+                });
+
+                
+                
+                hideLoading();
+                updateLastUpdateTime();
+                $('#dataTableTradeToday').DataTable({
+                    data: processedData, 
+                    
+                    pageLength: 200,            // 페이지당 10개 표시
+                    order: currentOrderTradeToday,      // 1분 거래대금 기준 내림차순 정렬
+                    responsive: true, // 반응형 디자인 활성화
+                    
+                    language: {
+                        search: "검색:",
+                        //lengthMenu: "페이지당 _MENU_ 개",
+                        
+                        info: "_TOTAL_개 중 _START_ - _END_",
+                        paginate: {
+                            first: "처음",
+                            last: "마지막",
+                            next: "다음",
+                            previous: "이전"
+                        },
+                        zeroRecords: "검색 결과가 없습니다."
+                    },
+                    
+
+                    columnDefs: [ 
+                    
+
+                    {
+                        targets: '_all', // 모든 컬럼에 적용
+                        orderSequence: ['desc', 'asc'],
+                      
+                    },
+                    {
+                        targets: 2, // 시가총액 인덱스
+                        render: function(data, type, row) {
+                            if (type === 'display') {
+                                if (data == null || isNaN(data)) return '0억';
+                                    return Number(data).toLocaleString() + '억';
+                            } else if (type === 'sort') {
+                                return parseFloat(data);
+                            }
+                            return data;
+                        },
+                        
+                    },
+                
+                    {
+                        targets: 4, // 현재가격 인덱스
+                        render: function(data, type, row) {
+                            if (type === 'display') {
+                                
+                                return Number(data).toLocaleString();
+                            } else if (type === 'sort') {
+                                return parseFloat(data);
+                            }
+                            return data;
+                        },
+                        
+                    },
+                    {
+                        targets: [5,6,7,8,9,10,12,13,14], // 거래량 비율 컬럼들 (1분, 5분, 10분 거래량)
+                        render: function(data, type, row) {
+                            
+                            let value = data.replace(/[^-\d.]/g, '')
+                            if (value === "") {value = 0}
+                            value = formatRatio(value)    
+                            return value
+
+                            
+                        }
+                    },
+                    {
+                        targets: [11], // 거래량 비율 컬럼들 (1분, 5분, 10분 거래량)
+                        render: function(data, type, row) {
+                            return data + '%'
+                        }
+                    },
+                    
+                    {
+                        targets: [15,16,17,18], // 1분 거래대금 열 인덱스
+                        render: function(data, type, row) {
+                            
+                            if (type === 'display') {
+                                return data + '억';
+                            } else if (type === 'sort') {
+                                return parseFloat(data);
+                            }
+                            return data;
+                        },
+                        
+                    }
+                    ],
+                
+        });
+
+                    
+                    
+            },
+            
+            error: function(err) {
+                //console.error("데이터 가져오기 실패:", err);
+            }
+        });
+    }
+
+
+    function getPriceRatioSwing(item) {
+        item.price_ratio_day = (((item.price_1m - item.price_day) / item.price_day)*100).toFixed(2)
+        item.price_ratio_3days = (((item.price_1m - item.price_3days) / item.price_3days)*100).toFixed(2)
+        item.price_ratio_week = (((item.price_1m - item.price_week) / item.price_week)*100).toFixed(2)
+        item.price_ratio_month = (((item.price_1m - item.price_month) / item.price_month)*100).toFixed(2)
+        item.price_ratio_high = (((item.price_1m - item.price_high)/ item.price_high)*100).toFixed(2)
+        item.price_ratio_low = (((item.price_1m - item.price_low)/ item.price_low)*100).toFixed(2)
+        item.price_ratio_range = (((item.price_high - item.price_low)/ item.price_low)*100).toFixed(2)
+
+
+        
+        return item
+    }
+    function getSupplyRatio(item){
+        item.supply_ratio = !item.max_supply ? '-' : `${((item.now_supply / item.max_supply)*100).toFixed(1)}%`
+        return item
+
+    }
+
+    function getVolumeRatioSwing(item){
+        
+        item.volume_ratio_day_month = (calVolumeRatio(item.amount_day, item.count_day, item.amount_month, item.count_month)*100).toFixed(1)
+        item.volume_ratio_3days_month = (calVolumeRatio(item.amount_3days, item.count_3days, item.amount_month, item.count_month)*100).toFixed(1)
+        item.volume_ratio_week_month = (calVolumeRatio(item.amount_week, item.count_week, item.amount_month, item.count_month)*100).toFixed(1)
+        
+        return item
+    }
+
+
+    function refreshTradeSwing(tabType) {
+        //console.log('AJAX 요청 발생: upbit:trade_swing'); 
+        $.ajax({
+            url: "{% url 'upbit:trade_swing' %}",
+            method: 'GET',
+            headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+            success: function(response) {
+                //console.log("데이터 수신:", response);  // 데이터 확인
+                const container = $(`#${tabType}_contents`);
+
+                //html먼저 생성
+                dataTableTradeSwing = container.html(response.html);
+
+                // 기본 정렬
+                if (dataTableTradeSwing && typeof dataTableTradeSwing.order === 'function') {
+                    currentOrderTradeSwing = dataTableTradeSwing.order() || currentOrderTradeSwing;
+                    dataTableTradeSwing.destroy();
+                }
+            
+                const processedData = response['data'].map(item => {
+                item = getPriceRatioSwing(item);
+                item = capitalizationData(item);
+                item = getVolumeRatioSwing(item);
+                item = getSupplyRatio(item);
+                return [
+                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    item.korean_name, // 이름
+                    item.capitalization, // 시총
+                    //item.supply_ratio, // 발행률
+                    //item.issue_month, // 발행일
+                    //item.listing_month, //상장일
+                    formatRatio(item.kimchi_premium), // 김프
+                    item.price_1m, //현재가
+                    
+                    item.price_ratio_day, // 하루
+                    item.price_ratio_3days, // 3일
+                    item.price_ratio_week, // 일주일
+                    item.price_ratio_month, // 한달
+                    //formatRatio(item.price_ratio_240m), // 240분
+                    item.price_ratio_high, // 고점(한달기준)
+                    item.price_ratio_low, // 저점(한달기준)
+                    item.price_ratio_range, //범위(한달기준)
+
+
+                    item.volume_ratio_day_month, // 하루
+                    item.volume_ratio_3days_month, // 3일
+                    item.volume_ratio_week_month, // 7일
+
+                    formatBillions(item.amount_day,1), // 하루
+                    formatBillions(item.amount_3days,1), // 3일
+                    formatBillions(item.amount_week,1), // 7일
+                    //formatBillions(item.amount_month,1), // 한달
+
+                    item.rsi_240m.toFixed(1),
+                    item.rsi_day.toFixed(1),
+                    item.rsi_3days.toFixed(1)
+                ];
+                });
+
+                
+                hideLoading();
+                updateLastUpdateTime();
+                
+                $('#dataTableTradeSwing').DataTable({
+                    data: processedData, 
+                    
+                    pageLength: 200,            // 페이지당 10개 표시
+                    order: currentOrderTradeSwing,      // 1분 거래대금 기준 내림차순 정렬
+                    responsive: true, // 반응형 디자인 활성화
+                    
+                    language: {
+                        search: "검색:",
+                        //lengthMenu: "페이지당 _MENU_ 개",
+                        
+                        info: "_TOTAL_개 중 _START_ - _END_",
+                        paginate: {
+                            first: "처음",
+                            last: "마지막",
+                            next: "다음",
+                            previous: "이전"
+                        },
+                        zeroRecords: "검색 결과가 없습니다."
+                    },
+                    
+
+                    columnDefs: [ 
+                    
+
+                    {
+                        targets: '_all', // 모든 컬럼에 적용
+                        orderSequence: ['desc', 'asc'],
+                      
+                    },
+                    {
+                        targets: 2, // 시가총액 인덱스
+                        render: function(data, type, row) {
+                            if (type === 'display') {
+                                if (data == null || isNaN(data)) return '0억';
+                                    return Number(data).toLocaleString() + '억';
+                            } else if (type === 'sort') {
+                                return parseFloat(data);
+                            }
+                            return data;
+                        },
+                        
+                    },
+                
+                    {
+                        targets: 4, // 현재가격 인덱스
+                        render: function(data, type, row) {
+                            if (type === 'display') {
+                                
+                                return Number(data).toLocaleString();
+                            } else if (type === 'sort') {
+                                return parseFloat(data);
+                            }
+                            return data;
+                        },
+                        
+                    },
+                    {
+                        targets: [5,6,7,8,9,10,12,13,14], // 거래량 비율 컬럼들 (1분, 5분, 10분 거래량)
+                        render: function(data, type, row) {
+                            let value = data.replace(/[^-\d.]/g, '')
+                            if (value === "") {value = 0}
+                            value = formatRatio(value)
+                            return value
+                        }
+                    },
+                    {
+                        targets: [11], // 거래량 비율 컬럼들 (1분, 5분, 10분 거래량)
+                        render: function(data, type, row) {
+                            return data + '%'
+                        }
+                    },
+                    {
+                        targets: [15,16,17], // 1분 거래대금 열 인덱스
+                        render: function(data, type, row) {
+                            if (type === 'display') {
+                                return data + '억';
+                            } else if (type === 'sort') {
+                                return parseFloat(data);
+                            }
+                            return data;
+                        },
+                        
+                    }
+                    ],
+                
+        });
+
+                    
+                    
+            },
+            
+            error: function(err) {
+                //console.error("데이터 가져오기 실패:", err);
+            }
+        });
+    }
+
+    //3. 타임테이블
+
+    
+    
+
+
+
+
+    function refreshTradeTimetable(tabType, hours) {
+        //console.log('AJAX 요청 발생: upbit:trade_timetable'); 
+        $.ajax({
+            url: "{% url 'upbit:trade_timetable' %}",
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            data: {
+                'hours': hours  // 1, 4, 24 값이 들어갈 파라미터
+            },
+            
+            success: function(response) {
+                //console.log("데이터 수신:", response);  // 데이터 확인
+                const container = $(`#${tabType}_contents`);
+
+                //html먼저 생성
+                dataTableTradeTimetable = container.html(response.html);
+
+                // 기본 정렬
+                 if (dataTableTradeTimetable && typeof dataTableTradeTimetable.order === 'function') {
+                    currentOrderTradeTimetable = dataTableTradeTimetable.order() || currentOrderTradeTimetable;
+                    dataTableTradeTimetable.destroy();
+                }
+            
+                const processedData = response['data'].map(item => {
+                
+                return [
+                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                     item.korean_name, // 이름
+                     item.price_1m, // 시총
+                    // item.supply_ratio, // 발행률
+                    // item.issue_month, // 발행일
+                    // item.listing_month, //상장일
+                    // //formatRatio(item.kimchi_premium), // 김프
+                    // item.price_1m, //현재가
+                    item.d0,
+                    item.d1,
+                    item.d2,
+                    item.d3,
+                    item.d4,
+                    item.d5,
+                    item.d6,
+                    item.d7,
+                    item.d8,
+                    item.d9,
+                    item.d10,
+                    item.d11,
+
+                    
+
+
+                    
+                    
+                ];
+                });
+
+                
+                
+                hideLoading();
+                updateLastUpdateTime();
+
+                $('#dataTableTradeTimetable').DataTable({
+                    data: processedData, 
+                    
+                    pageLength: 200,            // 페이지당 10개 표시
+                    // 1분 거래대금 기준 내림차순 정렬
+                    responsive: true, // 반응형 디자인 활성화
+                    
+                    language: {
+                        search: "검색:",
+                        //lengthMenu: "페이지당 _MENU_ 개",
+                        
+                        info: "_TOTAL_개 중 _START_ - _END_",
+                        paginate: {
+                            first: "처음",
+                            last: "마지막",
+                            next: "다음",
+                            previous: "이전"
+                        },
+                        zeroRecords: "검색 결과가 없습니다."
+                    }
+                    
+
+                    
+
+                    
+                    
+            })},
+            
+            error: function(err) {
+                //console.error("데이터 가져오기 실패:", err);
+            }
+        });
+    }
+
+    function refreshTradeInfo(tabType) {
+        //console.log('AJAX 요청 발생: upbit:trade_info'); 
+        $.ajax({
+            url: "{% url 'upbit:trade_info' %}",
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            
+            
+            success: function(response) {
+                //console.log("데이터 수신:", response);  // 데이터 확인
+                const container = $(`#${tabType}_contents`);
+
+                //html먼저 생성
+                dataTableTradeInfo = container.html(response.html);
+
+                // 기본 정렬
+
+                
+                const processedData = response['data'].map(item => {
+                item = getSupplyRatio(item)
+                return [
+                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    item.korean_name, // 이름
+                    formatBillions(item.capitalization), // 이름
+                    item.supply_ratio,
+                    item.issue_month, // 발행일
+                    item.listing_month, //상장일
+                    item.chain,
+                    item.category,
+                    item.focus,
+                    item.country,
+                    item.description
+                    
+                ];
+                });
+
+                
+                
+                
+                
+                $('#dataTableTradeInfo').DataTable({
+                    data: processedData, 
+                    
+                    pageLength: 200,            // 페이지당 10개 표시
+                    // 1분 거래대금 기준 내림차순 정렬
+                    responsive: true, // 반응형 디자인 활성화
+                    
+                    language: {
+                        search: "검색:",
+                        //lengthMenu: "페이지당 _MENU_ 개",
+                        
+                        info: "_TOTAL_개 중 _START_ - _END_",
+                        paginate: {
+                            first: "처음",
+                            last: "마지막",
+                            next: "다음",
+                            previous: "이전"
+                        },
+                        zeroRecords: "검색 결과가 없습니다."
+                    },
+                    
+
+                    columnDefs: [ 
+                    {
+                        targets: 2, // 시가총액 인덱스
+                        render: function(data, type, row) {
+                            if (type === 'display') {
+                                if (data == null || isNaN(data)) return '0억';
+                                    return Number(data).toLocaleString() + '억';
+                            } else if (type === 'sort') {
+                                return parseFloat(data);
+                            }
+                            return data;
+                        },
+                        
+                    }],
+                    
+                    
+                    
+            })},
+            
+            error: function(err) {
+                //console.error("데이터 가져오기 실패:", err);
+            }
+        });
+    }
+</script>
+{% endblock %}

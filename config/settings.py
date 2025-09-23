@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'baseball.apps.BaseballConfig',
     'main.apps.MainConfig',
     'upbit.apps.UpbitConfig',
+    'bithumb.apps.BithumbConfig',
     'accounts',
     'user_sessions'
     
@@ -92,6 +93,7 @@ with open('./config/db_settings.yml') as f:
     db_yaml = yaml.full_load(f)
 baseball_dic = db_yaml['BASEBALL']
 upbit_dic = db_yaml['UPBIT']
+bithumb_dic = db_yaml['BITHUMB']
 
 DATABASES = {
     'default': {
@@ -110,6 +112,16 @@ DATABASES = {
         'PASSWORD': upbit_dic['PASSWORD'],
         'HOST': upbit_dic['HOST'],
         'PORT': upbit_dic['PORT'],
+        
+    },
+
+    'bithumb': {
+        'ENGINE': bithumb_dic['ENGINE'],
+        'NAME': bithumb_dic['NAME'],
+        'USER': bithumb_dic['USER'],
+        'PASSWORD': bithumb_dic['PASSWORD'],
+        'HOST': bithumb_dic['HOST'],
+        'PORT': bithumb_dic['PORT'],
         
     }
     
