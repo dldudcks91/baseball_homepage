@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Market, MarketHour
+from .models import Market, MarketHour, MarketInfo
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import DateTimeField, ExpressionWrapper, IntegerField
@@ -48,7 +48,7 @@ def trade_info(request):
 
     try:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            html = render(request, 'upbit/trade_info.html', context).content
+            html = render(request, 'bithumb/trade_info.html', context).content
             return JsonResponse({
                 'html': html.decode('utf-8'),
                 'data': market_list
@@ -57,7 +57,7 @@ def trade_info(request):
     except Exception as e:
         print(f"Error: {e}")
         return JsonResponse({'error': str(e)}, status=500)
-    return render(request,'upbit/trade_info.html',context)
+    return render(request,'bithumb/trade_info.html',context)
 
 def get_current_time(current_time: datetime, modify_seconds: int) -> str:   
     '''
@@ -117,7 +117,8 @@ def trade_day(request):
     # last_5_60_sum_data = Market.objects.filter(log_dt__lt= last_5_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     # last_10_60_sum_data = Market.objects.filter(log_dt__lt= last_10_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
 
-    market_info_list = last_data.values_list('market')
+    market_info_list = MarketInfo.objects.all().order_by('market')
+    
     
     
     
@@ -302,7 +303,7 @@ def trade_swing(request):
     #추가로 요청받았을때
     try:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            html = render(request, 'upbit/trade_swing.html', context).content
+            html = render(request, 'bithumb/trade_swing.html', context).content
             return JsonResponse({
                 'html': html.decode('utf-8'),
                 'data': market_list
@@ -314,7 +315,7 @@ def trade_swing(request):
     
 
     
-    return render(request,'upbit/trade_swing.html', context)
+    return render(request,'bithumb/trade_swing.html', context)
 
 
 @csrf_exempt
@@ -347,7 +348,7 @@ def trade_timetable(request):
                 log_dt,
                 (ROW_NUMBER() OVER (PARTITION BY market ORDER BY log_dt desc) -1) DIV %s AS row_num ,
                 amount
-            FROM upbit.tb_market_hour
+            FROM bithumb.tb_market_hour
             
             )
             SELECT market, 
@@ -403,13 +404,13 @@ def trade_timetable(request):
     
     try:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            html = render(request, 'upbit/trade_timetable.html', context).content
+            html = render(request, 'bithumb/trade_timetable.html', context).content
             return JsonResponse({
                 'html': html.decode('utf-8'),
                 'data': market_list
             })
             
-        return render(request, 'upbit/trade_timetable.html', context)
+        return render(request, 'bithumb/trade_timetable.html', context)
         
     except Exception as e:
         print(f"Error: {e}")

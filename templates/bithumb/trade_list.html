@@ -71,7 +71,7 @@
     }
 </style>
 
-<div id="upbit-contents">
+<div id="bithumb-contents">
     <div id="trade_list">
         <!-- 탭 메뉴 -->
         <ul class="nav nav-tabs" id="tradeTab" role="tablist">
@@ -91,7 +91,7 @@
 
         
         <div class="loading-container">
-            <img src="/static/images/loading/upbit_loading.gif" alt="로딩중" class="loading-spinner">
+            <img src="/static/images/loading/bithumb_loading.gif" alt="로딩중" class="loading-spinner">
             <div class="loading-text">데이터를 불러오는 중입니다...</div>
         </div>
         <!-- 탭 컨텐츠 -->
@@ -327,9 +327,9 @@
 
 
     function refreshTradeToday(tabType) {
-        //console.log('AJAX 요청 발생: upbit:trade_day'); 
+        //console.log('AJAX 요청 발생: bithumb:trade_day'); 
         $.ajax({
-            url: "{% url 'upbit:trade_day' %}",
+            url: "{% url 'bithumb:trade_day' %}",
             method: 'GET',
             headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -355,7 +355,7 @@
                 item = getVolumeRatioToday(item)
                 return [
                     
-                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    `<a href="https://www.bithumb.com/exchange?code=CRIX.bithumb.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
                     item.korean_name, // 이름
                     item.capitalization, // 시총
                     //item.supply_ratio, // 발행률
@@ -526,9 +526,9 @@
 
 
     function refreshTradeSwing(tabType) {
-        //console.log('AJAX 요청 발생: upbit:trade_swing'); 
+        //console.log('AJAX 요청 발생: bithumb:trade_swing'); 
         $.ajax({
-            url: "{% url 'upbit:trade_swing' %}",
+            url: "{% url 'bithumb:trade_swing' %}",
             method: 'GET',
             headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -552,7 +552,7 @@
                 item = getVolumeRatioSwing(item);
                 item = getSupplyRatio(item);
                 return [
-                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    `<a href="https://www.bithumb.com/exchange?code=CRIX.bithumb.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
                     item.korean_name, // 이름
                     item.capitalization, // 시총
                     //item.supply_ratio, // 발행률
@@ -697,9 +697,9 @@
 
 
     function refreshTradeTimetable(tabType, hours) {
-        //console.log('AJAX 요청 발생: upbit:trade_timetable'); 
+        //console.log('AJAX 요청 발생: bithumb:trade_timetable'); 
         $.ajax({
-            url: "{% url 'upbit:trade_timetable' %}",
+            url: "{% url 'bithumb:trade_timetable' %}",
             method: 'POST',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -724,7 +724,7 @@
                 const processedData = response['data'].map(item => {
                 
                 return [
-                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    `<a href="https://www.bithumb.com/exchange?code=CRIX.bithumb.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
                      item.korean_name, // 이름
                      item.price_1m, // 시총
                     // item.supply_ratio, // 발행률
@@ -793,9 +793,9 @@
     }
 
     function refreshTradeInfo(tabType) {
-        //console.log('AJAX 요청 발생: upbit:trade_info'); 
+        //console.log('AJAX 요청 발생: bithumb:trade_info'); 
         $.ajax({
-            url: "{% url 'upbit:trade_info' %}",
+            url: "{% url 'bithumb:trade_info' %}",
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -815,7 +815,7 @@
                 const processedData = response['data'].map(item => {
                 item = getSupplyRatio(item)
                 return [
-                    `<a href="https://www.upbit.com/exchange?code=CRIX.UPBIT.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
+                    `<a href="https://www.bithumb.com/exchange?code=CRIX.bithumb.${item.market}" target="_blank" style="color: #000000; text-decoration: none;">${item.market}</a>`, //종목
                     item.korean_name, // 이름
                     formatBillions(item.capitalization), // 이름
                     item.supply_ratio,
