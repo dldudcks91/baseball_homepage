@@ -120,14 +120,14 @@ def trade_day(request):
     # last_10_60_sum_data = Market.objects.filter(log_dt__lt= last_10_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     
     
-    last_hour = last_time.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)
+    last_hour = (last_time.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
     last_day = (last_time- timedelta(days=1)).date()
     
     ma_60_data = MA60Minutes.objects.filter(log_dt = last_hour).order_by('market')
     ma_day_data = MADays.objects.filter(date = last_day).order_by('market')
 
     print(last_hour, last_day)
-    print(ma_60_data, ma_day_data)
+    print(last_data, ma_60_data, ma_day_data)
 
 
     market_info_list = MarketInfo.objects.all().order_by('market')
@@ -158,22 +158,21 @@ def trade_day(request):
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item.market), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item.market), None),
             
-            'ma_60_10': next((d['ma_10'] for d in ma_60_data if d['market'] == item.market), None),
-            'ma_60_20': next((d['ma_20'] for d in ma_60_data if d['market'] == item.market), None),
-            'ma_60_34': next((d['ma_34'] for d in ma_60_data if d['market'] == item.market), None),
-            'ma_60_50': next((d['ma_50'] for d in ma_60_data if d['market'] == item.market), None),
-            'ma_60_100': next((d['ma_100'] for d in ma_60_data if d['market'] == item.market), None),
-            'ma_60_200': next((d['ma_200'] for d in ma_60_data if d['market'] == item.market), None),
-            'ma_60_400': next((d['ma_400'] for d in ma_60_data if d['market'] == item.market), None),
-            'ma_60_800': next((d['ma_800'] for d in ma_60_data if d['market'] == item.market), None),
+            'ma_60_10': next((d['ma_10'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_20': next((d['ma_20'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_34': next((d['ma_34'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_50': next((d['ma_50'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_100': next((d['ma_100'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_200': next((d['ma_200'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_400': next((d['ma_400'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_800': next((d['ma_800'] for d in ma_60_data if d.market == item.market), None),
 
-            'ma_day_10': next((d['ma_10'] for d in ma_day_data if d['market'] == item.market), None),
-            'ma_day_20': next((d['ma_20'] for d in ma_day_data if d['market'] == item.market), None),
-            'ma_day_34': next((d['ma_34'] for d in ma_day_data if d['market'] == item.market), None),
-            'ma_day_50': next((d['ma_50'] for d in ma_day_data if d['market'] == item.market), None),
-            'ma_day_100': next((d['ma_100'] for d in ma_day_data if d['market'] == item.market), None),
-            'ma_day_200': next((d['ma_200'] for d in ma_day_data if d['market'] == item.market), None),
-            'ma_day_400': next((d['ma_400'] for d in ma_day_data if d['market'] == item.market), None),
+            'ma_day_10': next((d['ma_10'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_20': next((d['ma_20'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_34': next((d['ma_34'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_50': next((d['ma_50'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_100': next((d['ma_100'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_200': next((d['ma_200'] for d in ma_day_data if d.market == item.market), None),
             
             
             

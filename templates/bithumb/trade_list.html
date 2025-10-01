@@ -373,25 +373,17 @@
             type: 'numericColumn'
         },
         { 
-            field: 'volume_ratio_1m_60m', 
-            headerName: '1분 거래량', 
+            field: 'ma_ratio_60_10', 
+            headerName: 'MA_60_10', 
             width: 120,
             cellRenderer: PercentCellRenderer,
             sortable: true,
             type: 'numericColumn'
         },
         { 
-            field: 'volume_ratio_5m_60m', 
-            headerName: '5분 거래량', 
+            field: 'ma_ratio_60_20', 
+            headerName: 'MA_60_20', 
             width: 120,
-            cellRenderer: PercentCellRenderer,
-            sortable: true,
-            type: 'numericColumn'
-        },
-        { 
-            field: 'volume_ratio_10m_60m', 
-            headerName: '10분 거래량', 
-            width: 130,
             cellRenderer: PercentCellRenderer,
             sortable: true,
             type: 'numericColumn'
@@ -695,6 +687,31 @@
         return item;
     }
 
+    function getMARatioToday(item) {
+        // ma_ratio_60_10을 8가지 기간으로 확장
+        item.ma_ratio_60_10 = (((item.price_last - item.ma_60_10) / item.ma_60_10) * 100).toFixed(2);
+        item.ma_ratio_60_20 = (((item.price_last - item.ma_60_20) / item.ma_60_20) * 100).toFixed(2);
+        item.ma_ratio_60_34 = (((item.price_last - item.ma_60_34) / item.ma_60_34) * 100).toFixed(2);
+        item.ma_ratio_60_50 = (((item.price_last - item.ma_60_50) / item.ma_60_50) * 100).toFixed(2);
+        item.ma_ratio_60_100 = (((item.price_last - item.ma_60_100) / item.ma_60_100) * 100).toFixed(2);
+        item.ma_ratio_60_200 = (((item.price_last - item.ma_60_200) / item.ma_60_200) * 100).toFixed(2);
+        item.ma_ratio_60_400 = (((item.price_last - item.ma_60_400) / item.ma_60_400) * 100).toFixed(2);
+        item.ma_ratio_60_800 = (((item.price_last - item.ma_60_800) / item.ma_60_800) * 100).toFixed(2);
+
+
+        // ma_ratio_day_10을 6가지 기간으로 확장 (200까지만)
+        item.ma_ratio_day_10 = (((item.price_last - item.ma_day_10) / item.day_10) * 100).toFixed(2);
+        item.ma_ratio_day_20 = (((item.price_last - item.ma_day_20) / item.day_20) * 100).toFixed(2);
+        item.ma_ratio_day_34 = (((item.price_last - item.ma_day_34) / item.day_34) * 100).toFixed(2);
+        item.ma_ratio_day_50 = (((item.price_last - item.ma_day_50) / item.day_50) * 100).toFixed(2);
+        item.ma_ratio_day_100 = (((item.price_last - item.ma_day_100) / item.day_100) * 100).toFixed(2);
+        item.ma_ratio_day_200 = (((item.price_last - item.ma_day_200) / item.day_200) * 100).toFixed(2);
+        
+
+        
+        return item;
+    }
+
     function calVolumeRatio(nu_amount, nu_cnt, de_amount, de_cnt) {
         let nu_mean = 0;
         let de_mean = 0;
@@ -724,6 +741,7 @@
                 console.log(response['data'])
                 const processedData = response['data'].map(item => {
                     item = getPriceRatioToday(item);
+                    item = getMARatioToday(item);
                     item = getVolumeRatioToday(item);
                     return {
                         market: item.market,
@@ -734,6 +752,24 @@
                         price_ratio_240m: parseFloat(item.price_ratio_240m),
                         price_ratio_high: parseFloat(item.price_ratio_high),
                         price_ratio_low: parseFloat(item.price_ratio_low),
+                        // ma_ratio_60_N 비율 변환
+                        ma_ratio_60_10: parseFloat(item.ma_ratio_60_10),
+                        ma_ratio_60_20: parseFloat(item.ma_ratio_60_20),
+                        ma_ratio_60_34: parseFloat(item.ma_ratio_60_34),
+                        ma_ratio_60_50: parseFloat(item.ma_ratio_60_50),
+                        ma_ratio_60_100: parseFloat(item.ma_ratio_60_100),
+                        ma_ratio_60_200: parseFloat(item.ma_ratio_60_200),
+                        ma_ratio_60_400: parseFloat(item.ma_ratio_60_400),
+                        ma_ratio_60_800: parseFloat(item.ma_ratio_60_800),
+
+                        // ma_ratio_day_N 비율 변환 (200까지만)
+                        ma_ratio_day_10: parseFloat(item.ma_ratio_day_10),
+                        ma_ratio_day_20: parseFloat(item.ma_ratio_day_20),
+                        ma_ratio_day_34: parseFloat(item.ma_ratio_day_34),
+                        ma_ratio_day_50: parseFloat(item.ma_ratio_day_50),
+                        ma_ratio_day_100: parseFloat(item.ma_ratio_day_100),
+                        ma_ratio_day_200: parseFloat(item.ma_ratio_day_200),
+
                     };
                 });
 
