@@ -84,7 +84,7 @@ def get_current_time(current_time: datetime, modify_seconds: int) -> str:
 def trade_day(request):
     
     
-    TEST_SECONDS=1200
+    TEST_SECONDS= 0
     #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_SECONDS)
     current_time = datetime.now(tz = timezone.utc)
     #current_time = datetime(2025, 2, 12, 8, 1, 33, tzinfo = timezone.utc)
@@ -158,21 +158,21 @@ def trade_day(request):
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item.market), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item.market), None),
             
-            'ma_60_10': next((d['ma_10'] for d in ma_60_data if d.market == item.market), None),
-            'ma_60_20': next((d['ma_20'] for d in ma_60_data if d.market == item.market), None),
-            'ma_60_34': next((d['ma_34'] for d in ma_60_data if d.market == item.market), None),
-            'ma_60_50': next((d['ma_50'] for d in ma_60_data if d.market == item.market), None),
-            'ma_60_100': next((d['ma_100'] for d in ma_60_data if d.market == item.market), None),
-            'ma_60_200': next((d['ma_200'] for d in ma_60_data if d.market == item.market), None),
-            'ma_60_400': next((d['ma_400'] for d in ma_60_data if d.market == item.market), None),
-            'ma_60_800': next((d['ma_800'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_10': next((d.ma_10 for d in ma_60_data if d.market == item.market), None),
+            'ma_60_20': next((d.ma_20 for d in ma_60_data if d.market == item.market), None),
+            'ma_60_34': next((d.ma_34 for d in ma_60_data if d.market == item.market), None),
+            'ma_60_50': next((d.ma_50 for d in ma_60_data if d.market == item.market), None),
+            'ma_60_100': next((d.ma_100 for d in ma_60_data if d.market == item.market), None),
+            'ma_60_200': next((d.ma_200 for d in ma_60_data if d.market == item.market), None),
+            'ma_60_400': next((d.ma_400 for d in ma_60_data if d.market == item.market), None),
+            'ma_60_800': next((d.ma_800 for d in ma_60_data if d.market == item.market), None),
 
-            'ma_day_10': next((d['ma_10'] for d in ma_day_data if d.market == item.market), None),
-            'ma_day_20': next((d['ma_20'] for d in ma_day_data if d.market == item.market), None),
-            'ma_day_34': next((d['ma_34'] for d in ma_day_data if d.market == item.market), None),
-            'ma_day_50': next((d['ma_50'] for d in ma_day_data if d.market == item.market), None),
-            'ma_day_100': next((d['ma_100'] for d in ma_day_data if d.market == item.market), None),
-            'ma_day_200': next((d['ma_200'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_10': next((d.ma_10 for d in ma_day_data if d.market == item.market), None),
+            'ma_day_20': next((d.ma_20 for d in ma_day_data if d.market == item.market), None),
+            'ma_day_34': next((d.ma_34 for d in ma_day_data if d.market == item.market), None),
+            'ma_day_50': next((d.ma_50 for d in ma_day_data if d.market == item.market), None),
+            'ma_day_100': next((d.ma_100 for d in ma_day_data if d.market == item.market), None),
+            'ma_day_200': next((d.ma_200 for d in ma_day_data if d.market == item.market), None),
             
             
             
