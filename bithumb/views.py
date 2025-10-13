@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Market, MarketHour, MarketInfo
+from .models import Market, MarketHour, MarketDay, MarketInfo, MADays, MA60Minutes
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import DateTimeField, ExpressionWrapper, IntegerField
@@ -84,21 +84,23 @@ def get_current_time(current_time: datetime, modify_seconds: int) -> str:
 def trade_day(request):
     
     
-    TEST_MINUTES= 0
-    #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
+    TEST_SECONDS=1200
+    #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_SECONDS)
     current_time = datetime.now(tz = timezone.utc)
     #current_time = datetime(2025, 2, 12, 8, 1, 33, tzinfo = timezone.utc)
-    last_time = get_current_time(current_time, -(10 + TEST_MINUTES))
-    last_5_time = get_current_time(current_time, -(10 + 300 + TEST_MINUTES))
-    last_10_time = get_current_time(current_time, -(10 + 600 + TEST_MINUTES))
-    last_30_time = get_current_time(current_time, -(10 + 1800 + TEST_MINUTES))
-    last_60_time = get_current_time(current_time, -(10 + 3600 + TEST_MINUTES))
-    last_240_time = get_current_time(current_time, -(10 + 14400 + TEST_MINUTES))
-    last_1440_time = get_current_time(current_time, -(10 + 86400 +TEST_MINUTES))
+    last_time = get_current_time(current_time, -(10 + TEST_SECONDS))
+    last_1_time = get_current_time(current_time, -(10 + 60 + TEST_SECONDS))
+    last_5_time = get_current_time(current_time, -(10 + 300 + TEST_SECONDS))
+    last_10_time = get_current_time(current_time, -(10 + 600 + TEST_SECONDS))
+    last_30_time = get_current_time(current_time, -(10 + 1800 + TEST_SECONDS))
+    last_60_time = get_current_time(current_time, -(10 + 3600 + TEST_SECONDS))
+    last_240_time = get_current_time(current_time, -(10 + 14400 + TEST_SECONDS))
+    last_1440_time = get_current_time(current_time, -(10 + 86400 +TEST_SECONDS))
     utc_00_time = get_current_time(current_time.replace(hour= 0, minute = 0, second = 0 ,microsecond = 0),0)
     
     #시점데이터
     last_data = Market.objects.filter(log_dt = last_time)
+    last_1_data = Market.objects.filter(log_dt = last_1_time)
     last_5_data = Market.objects.filter(log_dt = last_5_time)
     last_30_data = Market.objects.filter(log_dt = last_30_time)
     last_60_data = Market.objects.filter(log_dt = last_60_time)
@@ -116,15 +118,20 @@ def trade_day(request):
     # last_3_60_sum_data = Market.objects.filter(log_dt__lt= last_3_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     # last_5_60_sum_data = Market.objects.filter(log_dt__lt= last_5_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
     # last_10_60_sum_data = Market.objects.filter(log_dt__lt= last_10_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
+    
+    
+    last_hour = (last_time.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+    last_day = (last_time- timedelta(days=1)).date()
+    
+    ma_60_data = MA60Minutes.objects.filter(log_dt = last_hour).order_by('market')
+    ma_day_data = MADays.objects.filter(date = last_day).order_by('market')
+
+    print(last_hour, last_day)
+    print(last_data, ma_60_data, ma_day_data)
+
 
     market_info_list = MarketInfo.objects.all().order_by('market')
     
-    
-    
-    
-
-    
-
     market_list = [
         {
             'market': item.market[4:],
@@ -140,7 +147,8 @@ def trade_day(request):
 
             # 'kimchi_premium': next((d.price_foreign for d in last_data if d.market == item.market), None),
 
-            'price': next((d.price for d in last_data if d.market == item.market), None),
+            'price_last': next((d.price for d in last_data if d.market == item.market), None),
+            'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
             'price_5m': next((d.price for d in last_5_data if d.market == item.market), None),
             'price_30m': next((d.price for d in last_30_data if d.market == item.market), None),
             'price_60m': next((d.price for d in last_60_data if d.market == item.market), None),
@@ -150,8 +158,24 @@ def trade_day(request):
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item.market), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item.market), None),
             
+            'ma_60_10': next((d['ma_10'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_20': next((d['ma_20'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_34': next((d['ma_34'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_50': next((d['ma_50'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_100': next((d['ma_100'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_200': next((d['ma_200'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_400': next((d['ma_400'] for d in ma_60_data if d.market == item.market), None),
+            'ma_60_800': next((d['ma_800'] for d in ma_60_data if d.market == item.market), None),
 
-
+            'ma_day_10': next((d['ma_10'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_20': next((d['ma_20'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_34': next((d['ma_34'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_50': next((d['ma_50'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_100': next((d['ma_100'] for d in ma_day_data if d.market == item.market), None),
+            'ma_day_200': next((d['ma_200'] for d in ma_day_data if d.market == item.market), None),
+            
+            
+            
 
             # 'amount_1m': next((d['total_amount'] for d in last_1_sum_data if d['market'] == item.market), None),
             # 'amount_5m': next((d['total_amount'] for d in last_5_sum_data if d['market'] == item.market), None),
@@ -171,7 +195,7 @@ def trade_day(request):
         for item in market_info_list
         ]
 
-    #print(market_list)
+    print(market_list[0])
     context = {'trade_day_data': market_list}
     
 
@@ -199,7 +223,7 @@ def trade_swing(request):
     
     TEST_HOURS= 0
     #current_time = datetime(2025, 2, 12, 8, 1, 33, tzinfo = timezone.utc)
-    #current_time = datetime(2025, 2, 7, 2, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_MINUTES)
+    #current_time = datetime(2025, 2, 7, 2, 56, 3, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_SECONDS)
     current_time = datetime.now(tz = timezone.utc)
     current_hour = current_time.replace(minute =0, second= 0)
     
@@ -415,3 +439,4 @@ def trade_timetable(request):
     except Exception as e:
         print(f"Error: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+    
