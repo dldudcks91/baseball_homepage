@@ -114,10 +114,10 @@ def trade_day(request):
     last_7d_data = Market.objects.filter(log_dt = last_7d_time)
 
 
-    market_info_data = MarketInfo.objects.all()
+    market_info_data = MarketInfo.objects.all().order_by('market')
     
     #고점데이터
-    today_high_low_data = Market.objects.filter(log_dt__lte= last_1d_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
+    today_high_low_data = Market.objects.filter(log_dt__gte= last_1d_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
     
     #print(last_3_sum_data)
     # 직전 n~60분 데이터 -> 나중에 수정해보자 좋은값찾아서
@@ -137,7 +137,6 @@ def trade_day(request):
     print(last_data, ma_60_data, ma_day_data)
 
 
-    market_info_list = MarketInfo.objects.all().order_by('market')
     
     market_list = [
         {
