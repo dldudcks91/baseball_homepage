@@ -5,12 +5,12 @@ class MarketInfo(models.Model):
     
     
     market = models.CharField(primary_key = True, max_length = 45)
-    
+    capitalization = models.FloatField()
     
     class Meta:
         managed = False
         db_table = 'tb_market_info'
-        unique_together = (('market'),)
+        unique_together = (('market'))
 
 class Market(models.Model):
     

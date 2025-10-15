@@ -59,6 +59,7 @@ def trade_info(request):
         return JsonResponse({'error': str(e)}, status=500)
     return render(request,'bithumb/trade_info.html',context)
 
+
 def get_current_time(current_time: datetime, modify_seconds: int) -> str:   
     '''
     현재시간을 10초 단위로 맞춰서 변화해주는 함수
@@ -86,16 +87,20 @@ def trade_day(request):
     
     TEST_SECONDS= 0
     #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_SECONDS)
-    current_time = datetime.now(tz = timezone.utc)
+    current_time = datetime.now(tz = timezone.utc) - timedelta(seconds = 10)
     #current_time = datetime(2025, 2, 12, 8, 1, 33, tzinfo = timezone.utc)
-    last_time = get_current_time(current_time, -(10 + TEST_SECONDS))
-    last_1_time = get_current_time(current_time, -(10 + 60 + TEST_SECONDS))
-    last_5_time = get_current_time(current_time, -(10 + 300 + TEST_SECONDS))
-    last_10_time = get_current_time(current_time, -(10 + 600 + TEST_SECONDS))
-    last_30_time = get_current_time(current_time, -(10 + 1800 + TEST_SECONDS))
-    last_60_time = get_current_time(current_time, -(10 + 3600 + TEST_SECONDS))
-    last_240_time = get_current_time(current_time, -(10 + 14400 + TEST_SECONDS))
-    last_1440_time = get_current_time(current_time, -(10 + 86400 +TEST_SECONDS))
+    last_time = get_current_time(current_time, -(TEST_SECONDS))
+    last_1_time = get_current_time(current_time, -(60 + TEST_SECONDS))
+    last_5_time = get_current_time(current_time, -(300 + TEST_SECONDS))
+    last_10_time = get_current_time(current_time, -(600 + TEST_SECONDS))
+    last_30_time = get_current_time(current_time, -(1800 + TEST_SECONDS))
+    last_60_time = get_current_time(current_time, -(3600 + TEST_SECONDS))
+    last_240_time = get_current_time(current_time, -(14400 + TEST_SECONDS))
+    
+    
+    last_1d_time = get_current_time(current_time, -(60 * 60 * 24 +TEST_SECONDS))
+    last_7d_time = get_current_time(current_time, -(60 * 60 * 24 * 7 +TEST_SECONDS))
+    
     utc_00_time = get_current_time(current_time.replace(hour= 0, minute = 0, second = 0 ,microsecond = 0),0)
     
     #시점데이터
@@ -105,12 +110,14 @@ def trade_day(request):
     last_30_data = Market.objects.filter(log_dt = last_30_time)
     last_60_data = Market.objects.filter(log_dt = last_60_time)
     last_240_data = Market.objects.filter(log_dt = last_240_time)
+    last_1d_data = Market.objects.filter(log_dt = last_1d_time)
+    last_7d_data = Market.objects.filter(log_dt = last_7d_time)
 
-    
 
+    market_info_data = MarketInfo.objects.all()
     
     #고점데이터
-    today_high_low_data = Market.objects.filter(log_dt__gte= utc_00_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
+    today_high_low_data = Market.objects.filter(log_dt__lte= last_1d_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
     
     #print(last_3_sum_data)
     # 직전 n~60분 데이터 -> 나중에 수정해보자 좋은값찾아서
@@ -146,17 +153,22 @@ def trade_day(request):
 
 
             # 'kimchi_premium': next((d.price_foreign for d in last_data if d.market == item.market), None),
-
+            'capitalization': next((d.capitalization for d in market_info_data if d.market == item.market), None),
             'price_last': next((d.price for d in last_data if d.market == item.market), None),
             'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
             'price_5m': next((d.price for d in last_5_data if d.market == item.market), None),
             'price_30m': next((d.price for d in last_30_data if d.market == item.market), None),
             'price_60m': next((d.price for d in last_60_data if d.market == item.market), None),
             'price_240m': next((d.price for d in last_240_data if d.market == item.market), None),
+            'price_1d': next((d.price for d in last_1d_data if d.market == item.market), None),
+            'price_7d': next((d.price for d in last_7d_data if d.market == item.market), None),
             
 
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item.market), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item.market), None),
+            
+            
+            
             
             'ma_60_10': next((d.ma_10 for d in ma_60_data if d.market == item.market), None),
             'ma_60_20': next((d.ma_20 for d in ma_60_data if d.market == item.market), None),

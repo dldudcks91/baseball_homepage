@@ -317,6 +317,14 @@
             filter: true
         },
         { 
+            field: 'capitalization', 
+            headerName: '시가총액', 
+            width: 100,
+            cellRenderer: MarketCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
             field: 'price', 
             headerName: '현재가', 
             width: 120,
@@ -324,6 +332,7 @@
             sortable: true,
             type: 'numericColumn'
         },
+        
         { 
             field: 'price_ratio_5m', 
             headerName: '5분', 
@@ -357,9 +366,25 @@
             type: 'numericColumn'
         },
         { 
+            field: 'price_ratio_1d', 
+            headerName: '1일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_7d', 
+            headerName: '7일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
             field: 'price_ratio_high', 
             headerName: '고점대비', 
-            width: 110,
+            width: 100,
             cellRenderer: PercentCellRenderer,
             sortable: true,
             type: 'numericColumn'
@@ -367,7 +392,7 @@
         { 
             field: 'price_ratio_low', 
             headerName: '저점대비', 
-            width: 110,
+            width: 100,
             cellRenderer: PercentCellRenderer,
             sortable: true,
             type: 'numericColumn'
@@ -375,15 +400,47 @@
         { 
             field: 'ma_ratio_60_10', 
             headerName: 'MA_60_10', 
-            width: 120,
+            width: 100,
             cellRenderer: PercentCellRenderer,
             sortable: true,
             type: 'numericColumn'
         },
         { 
-            field: 'ma_ratio_60_20', 
-            headerName: 'MA_60_20', 
-            width: 120,
+            field: 'ma_ratio_60_50', 
+            headerName: 'MA_60_50', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_200', 
+            headerName: 'MA_60_200', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_day_10', 
+            headerName: 'MA_1d_10', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_day_50', 
+            headerName: 'MA_1d_50', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_day_200', 
+            headerName: 'MA_1d_200', 
+            width: 100,
             cellRenderer: PercentCellRenderer,
             sortable: true,
             type: 'numericColumn'
@@ -682,6 +739,8 @@
         item.price_ratio_240m = (((item.price_last - item.price_240m) / item.price_240m) * 100).toFixed(2);
         item.price_ratio_high = (((item.price_last - item.price_today_high) / item.price_today_high) * 100).toFixed(2);
         item.price_ratio_low = (((item.price_last - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
+        item.price_ratio_1d = (((item.price_last - item.price_1d) / item.price_today_low) * 100).toFixed(2);
+        item.price_ratio_7d= (((item.price_last - item.price_7d) / item.price_today_low) * 100).toFixed(2);
 
         
         return item;
@@ -746,6 +805,7 @@
                     return {
                         market: item.market,
                         price: item.price_last,
+                        capitalization: item.capitalization,
                         price_ratio_5m: parseFloat(item.price_ratio_5m),
                         price_ratio_30m: parseFloat(item.price_ratio_30m),
                         price_ratio_60m: parseFloat(item.price_ratio_60m),
