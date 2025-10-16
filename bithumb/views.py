@@ -94,8 +94,11 @@ def trade_bithumb(request):
     ma_60_data = MA60Minutes.objects.filter(log_dt = last_hour).order_by('market')
     ma_day_data = MADays.objects.filter(date = last_day).order_by('market')
 
-    print(last_hour, last_day)
-    print(last_data, ma_60_data, ma_day_data)
+
+    print('last_time:', last_time, len(last_data))
+    print('last_hour:', last_hour, len(ma_60_data))
+    print('last_day:', last_day, len(ma_day_data))
+    
 
 
     
@@ -174,7 +177,7 @@ def trade_bithumb(request):
     #추가로 요청받았을때
     try:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            html = render(request, 'bithumb/trade_bithumb.html', context).content
+            html = render(request, 'bithumb/trade_list.html', context).content
             return JsonResponse({
                 'html': html.decode('utf-8'),
                 'data': market_list
@@ -186,7 +189,7 @@ def trade_bithumb(request):
     
 
     
-    return render(request,'bithumb/trade_bithumb.html', context)
+    return render(request,'bithumb/trade_list.html', context)
 
 def trade_bitget(request):
     
@@ -246,18 +249,22 @@ def trade_bitget(request):
     
     market_list = [
         {
-            'market': item.market[4:],
+            'market': item['market'][:-4],
             
-            'volume': next((d.volume for d in last_data if d.market == item.market), None),
-            'funding_rate':next((d.funding_rate for d in last_data if d.market == item.market), None),
-            'price_last': next((d.price for d in last_data if d.market == item.market), None),
-            'price_1m': next((d.price for d in last_1_data if d.market == item.market), None),
-            'price_5m': next((d.price for d in last_5_data if d.market == item.market), None),
-            'price_30m': next((d.price for d in last_30_data if d.market == item.market), None),
-            'price_60m': next((d.price for d in last_60_data if d.market == item.market), None),
-            'price_240m': next((d.price for d in last_240_data if d.market == item.market), None),
-            'price_1d': next((d.price for d in last_1d_data if d.market == item.market), None),
-            'price_7d': next((d.price for d in last_7d_data if d.market == item.market), None),
+            'volume': next((d.volume for d in last_data if d.market == item['market']), None),
+            'funding_rate':next((d.funding_rate for d in last_data if d.market == item['market']), None),
+            'price_last': next((d.price for d in last_data if d.market == item['market']), None),
+            'price_1m': next((d.price for d in last_1_data if d.market == item['market']), None),
+            'price_5m': next((d.price for d in last_5_data if d.market == item['market']), None),
+            'price_15m': next((d.price for d in last_15_data if d.market == item['market']), None),
+            'price_30m': next((d.price for d in last_30_data if d.market == item['market']), None),
+            'price_60m': next((d.price for d in last_60_data if d.market == item['market']), None),
+            'price_240m': next((d.price for d in last_240_data if d.market == item['market']), None),
+            'price_1d': next((d.price for d in last_1d_data if d.market == item['market']), None),
+            'price_3d': next((d.price for d in last_3d_data if d.market == item['market']), None),
+            'price_7d': next((d.price for d in last_7d_data if d.market == item['market']), None),
+            
+            'price_14d': next((d.price for d in last_14d_data if d.market == item['market']), None),
 
             
             
@@ -273,7 +280,7 @@ def trade_bitget(request):
     #추가로 요청받았을때
     try:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            html = render(request, 'bithumb/trade_bitget.html', context).content
+            html = render(request, 'bithumb/trade_list.html', context).content
             return JsonResponse({
                 'html': html.decode('utf-8'),
                 'data': market_list
@@ -285,4 +292,4 @@ def trade_bitget(request):
     
 
     
-    return render(request,'bithumb/trade_bitget.html', context)
+    return render(request,'bithumb/trade_list.html', context)
