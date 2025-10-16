@@ -10,7 +10,7 @@ class MarketInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'tb_market_info'
-        unique_together = (('market'))
+        unique_together = (('market'),)
 
 class Market(models.Model):
     
@@ -22,7 +22,21 @@ class Market(models.Model):
         managed = False
         db_table = 'tb_market'
         unique_together = (('log_dt','market'),)
-
+        
+class MarketBitget(models.Model):
+    
+    log_dt = models.DateTimeField(primary_key = True)
+    market = models.CharField(max_length = 45)
+    price = models.FloatField()
+    volume = models.FloatField()
+    funding_rate = models.FloatField()
+    
+    
+    class Meta:
+        managed = False
+        db_table = 'tb_market_bitget'
+        unique_together = (('log_dt','market'),)
+        
 class MarketHour(models.Model):
     
     log_dt = models.DateTimeField(primary_key = True)

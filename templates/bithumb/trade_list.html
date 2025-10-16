@@ -202,26 +202,18 @@
     <div id="trade_list">
         <!-- 탭 메뉴 -->
         <ul class="nav nav-tabs" id="tradeTab" role="tablist">
+            
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="trade_info_tab" data-toggle="tab" href="#trade_info_contents" role="tab">
-                    기본정보
+                <a class="nav-link active" id="trade_bithumb_tab" data-toggle="tab" href="#trade_bithumb_contents" role="tab">
+                    Bithumb
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="trade_day_tab" data-toggle="tab" href="#trade_day_contents" role="tab">
-                    단타
+                <a class="nav-link" id="trade_bitget_tab" data-toggle="tab" href="#trade_bitget_contents" role="tab">
+                    Bitget
                 </a>
             </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" id="trade_swing_tab" data-toggle="tab" href="#trade_swing_contents" role="tab">
-                    스윙
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" id="trade_timetable_tab" data-toggle="tab" href="#trade_timetable_contents" role="tab">
-                    시간대별(수정중)
-                </a>
-            </li>
+            
         </ul>
 
         <!-- 로딩 컨테이너 -->
@@ -240,18 +232,14 @@
 
         <!-- 탭 컨텐츠 -->
         <div class="tab-content" id="tradeTabContent">
-            <div class="tab-pane fade" id="trade_info_contents" role="tabpanel">
-                <div id="gridTradeInfo" class="ag-theme-alpine-dark ag-grid-container"></div>
+            
+            <div class="tab-pane fade show active" id="trade_bithumb_contents" role="tabpanel">
+                <div id="gridtradeBithumb" class="ag-theme-alpine-dark ag-grid-container"></div>
             </div>
-            <div class="tab-pane fade show active" id="trade_day_contents" role="tabpanel">
-                <div id="gridTradeToday" class="ag-theme-alpine-dark ag-grid-container"></div>
+            <div class="tab-pane fade" id="trade_bitget_contents" role="tabpanel">
+                <div id="gridtradeBitget" class="ag-theme-alpine-dark ag-grid-container"></div>
             </div>
-            <div class="tab-pane fade" id="trade_swing_contents" role="tabpanel">
-                <div id="gridTradeSwing" class="ag-theme-alpine-dark ag-grid-container"></div>
-            </div>
-            <div class="tab-pane fade" id="trade_timetable_contents" role="tabpanel">
-                <div id="gridTradeTimetable" class="ag-theme-alpine-dark ag-grid-container"></div>
-            </div>
+            
         </div>
     </div>
 </div>
@@ -261,8 +249,8 @@
 
 <script type="text/javascript">
     let gridApiTradeInfo;
-    let gridApiTradeToday;
-    let gridApiTradeSwing;
+    let gridApitradeBithumb;
+    let gridApitradeBitget;
     let gridApiTradeTimetable;
     let updateInterval;
 
@@ -305,8 +293,8 @@
         }
     }
 
-    // 단타 그리드 설정
-    const columnDefsTradeToday = [
+    // Bithumb 그리드 설정
+    const columnDefstradeBithumb = [
         { 
             field: 'market', 
             headerName: '종목', 
@@ -447,49 +435,77 @@
         }
     ];
 
-    // 스윙 그리드 설정
-    const columnDefsTradeSwing = [
+    // Bitget 그리드 설정
+    const columnDefstradeBitget = [
         { 
             field: 'market', 
             headerName: '종목', 
-            width: 120,
+            width: 200,
             pinned: 'left',
             cellRenderer: MarketCellRenderer,
             sortable: true,
             filter: true
         },
         { 
-            field: 'korean_name', 
-            headerName: '이름', 
+            field: 'volume', 
+            headerName: '거래대금',
+            cellRenderer: PriceCellRenderer, 
             width: 120,
-            sortable: true
-        },
-        { 
-            field: 'capitalization', 
-            headerName: '시가총액', 
-            width: 130,
-            valueFormatter: params => `${Number(params.value).toLocaleString()}억`,
             sortable: true,
             type: 'numericColumn'
         },
         { 
-            field: 'kimchi_premium', 
-            headerName: '김프', 
-            width: 100,
-            cellRenderer: PercentCellRenderer,
+            field: 'funding_rate', 
+            headerName: '펀딩비', 
+            width: 120,
+            cellRenderer: PriceCellRenderer,
+            //valueFormatter: params => `${Number(params.value).toLocaleString()}억`,
             sortable: true,
             type: 'numericColumn'
         },
         { 
-            field: 'price_1m', 
+            field: 'price', 
             headerName: '현재가', 
             width: 120,
             cellRenderer: PriceCellRenderer,
             sortable: true,
             type: 'numericColumn'
         },
+        
         { 
-            field: 'price_ratio_day', 
+            field: 'price_ratio_5m', 
+            headerName: '5분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_15m', 
+            headerName: '15분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_60m', 
+            headerName: '60분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_240m', 
+            headerName: '240분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_1d', 
             headerName: '1일', 
             width: 100,
             cellRenderer: PercentCellRenderer,
@@ -497,7 +513,7 @@
             type: 'numericColumn'
         },
         { 
-            field: 'price_ratio_3days', 
+            field: 'price_ratio_3d', 
             headerName: '3일', 
             width: 100,
             cellRenderer: PercentCellRenderer,
@@ -505,7 +521,7 @@
             type: 'numericColumn'
         },
         { 
-            field: 'price_ratio_week', 
+            field: 'price_ratio_7m', 
             headerName: '7일', 
             width: 100,
             cellRenderer: PercentCellRenderer,
@@ -513,29 +529,14 @@
             type: 'numericColumn'
         },
         { 
-            field: 'price_ratio_month', 
-            headerName: '30일', 
+            field: 'price_ratio_14d', 
+            headerName: '14일', 
             width: 100,
             cellRenderer: PercentCellRenderer,
             sortable: true,
             type: 'numericColumn'
         },
-        { 
-            field: 'rsi_240m', 
-            headerName: 'RSI 4H', 
-            width: 100,
-            valueFormatter: params => params.value.toFixed(1),
-            sortable: true,
-            type: 'numericColumn'
-        },
-        { 
-            field: 'rsi_day', 
-            headerName: 'RSI 1D', 
-            width: 100,
-            valueFormatter: params => params.value.toFixed(1),
-            sortable: true,
-            type: 'numericColumn'
-        }
+
     ];
 
     // 기본정보 그리드 설정
@@ -625,56 +626,34 @@
 
     $(document).ready(function() {
         // 단타 그리드 초기화
-        const gridDivTradeToday = document.querySelector('#gridTradeToday');
-        gridApiTradeToday = agGrid.createGrid(gridDivTradeToday, {
+        const gridDivtradeBithumb = document.querySelector('#gridtradeBithumb');
+        gridApitradeBithumb = agGrid.createGrid(gridDivtradeBithumb, {
             ...defaultGridOptions,
-            columnDefs: columnDefsTradeToday,
+            columnDefs: columnDefstradeBithumb,
             rowData: []
         });
 
-        startAutoUpdate('trade_day');
+        startAutoUpdate('trade_bithumb');
 
-        // 탭 클릭 이벤트
-        $('#trade_info_tab').on('click', function() {
-            stopAutoUpdate();
-            if (!gridApiTradeInfo) {
-                const gridDiv = document.querySelector('#gridTradeInfo');
-                gridApiTradeInfo = agGrid.createGrid(gridDiv, {
+        
+
+        $('#trade_bithumb_tab').on('click', function() {
+            startAutoUpdate('trade_bithumb');
+        });
+
+        $('#trade_bitget_tab').on('click', function() {
+            if (!gridApitradeBitget) {
+                const gridDiv = document.querySelector('#gridtradeBitget');
+                gridApitradeBitget = agGrid.createGrid(gridDiv, {
                     ...defaultGridOptions,
-                    columnDefs: columnDefsTradeInfo,
+                    columnDefs: columnDefstradeBitget,
                     rowData: []
                 });
             }
-            refreshTradeInfo();
+            startAutoUpdate('trade_bitget');
         });
 
-        $('#trade_day_tab').on('click', function() {
-            startAutoUpdate('trade_day');
-        });
-
-        $('#trade_swing_tab').on('click', function() {
-            if (!gridApiTradeSwing) {
-                const gridDiv = document.querySelector('#gridTradeSwing');
-                gridApiTradeSwing = agGrid.createGrid(gridDiv, {
-                    ...defaultGridOptions,
-                    columnDefs: columnDefsTradeSwing,
-                    rowData: []
-                });
-            }
-            startAutoUpdate('trade_swing');
-        });
-
-        $('#trade_timetable_tab').on('click', function() {
-            if (!gridApiTradeTimetable) {
-                const gridDiv = document.querySelector('#gridTradeTimetable');
-                gridApiTradeTimetable = agGrid.createGrid(gridDiv, {
-                    ...defaultGridOptions,
-                    columnDefs: [],
-                    rowData: []
-                });
-            }
-            startAutoUpdate('trade_timetable', 1);
-        });
+ 
     });
 
     function stopAutoUpdate() {
@@ -687,23 +666,23 @@
         stopAutoUpdate();
         
         function update() {
-            if (url === 'trade_day') {
-                refreshTradeToday();
-            } else if (url === 'trade_swing') {
-                refreshTradeSwing();
+            if (url === 'trade_bithumb') {
+                refreshtradeBithumb();
+            } else if (url === 'trade_bitget') {
+                refreshtradeBitget();
             } else if (url === 'trade_timetable') {
                 refreshTradeTimetable(parameter);
             }
         }
         
         // 첫 로드만 로딩 표시
-        if (url === 'trade_day' && !gridApiTradeToday.getDisplayedRowCount()) {
+        if (url === 'trade_bithumb' && !gridApitradeBithumb.getDisplayedRowCount()) {
             showLoading();
             setTimeout(() => {
                 update();
                 hideLoading();
             }, 100);
-        } else if (url === 'trade_swing' && gridApiTradeSwing && !gridApiTradeSwing.getDisplayedRowCount()) {
+        } else if (url === 'trade_bitget' && gridApitradeBitget && !gridApitradeBitget.getDisplayedRowCount()) {
             showLoading();
             setTimeout(() => {
                 update();
@@ -734,13 +713,16 @@
 
     function getPriceRatioToday(item) {
         item.price_ratio_5m = (((item.price_last - item.price_5m) / item.price_5m) * 100).toFixed(2);
+        item.price_ratio_15m = (((item.price_last - item.price_15m) / item.price_15m) * 100).toFixed(2);
         item.price_ratio_30m = (((item.price_last - item.price_30m) / item.price_30m) * 100).toFixed(2);
         item.price_ratio_60m = (((item.price_last - item.price_60m) / item.price_60m) * 100).toFixed(2);
         item.price_ratio_240m = (((item.price_last - item.price_240m) / item.price_240m) * 100).toFixed(2);
         item.price_ratio_high = (((item.price_last - item.price_today_high) / item.price_today_high) * 100).toFixed(2);
         item.price_ratio_low = (((item.price_last - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
         item.price_ratio_1d = (((item.price_last - item.price_1d) / item.price_1d) * 100).toFixed(2);
+        item.price_ratio_3d = (((item.price_last - item.price_3d) / item.price_3d) * 100).toFixed(2);
         item.price_ratio_7d = (((item.price_last - item.price_7d) / item.price_7d) * 100).toFixed(2);
+        item.price_ratio_14d = (((item.price_last - item.price_14d) / item.price_14d) * 100).toFixed(2);
 
 
 
@@ -789,10 +771,10 @@
         return item;
     }
 
-    function refreshTradeToday() {
+    function refreshtradeBithumb() {
         // 로딩 표시 제거 (업데이트 시 깜빡임 방지)
         $.ajax({
-            url: "{% url 'bithumb:trade_day' %}",
+            url: "{% url 'bithumb:trade_bithumb' %}",
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -844,11 +826,11 @@
                 };
                 
                 // 첫 로드인 경우 전체 데이터 설정
-                if (!gridApiTradeToday.getDisplayedRowCount()) {
-                    gridApiTradeToday.setGridOption('rowData', processedData);
+                if (!gridApitradeBithumb.getDisplayedRowCount()) {
+                    gridApitradeBithumb.setGridOption('rowData', processedData);
                 } else {
                     // 이후 업데이트는 트랜잭션으로 처리
-                    gridApiTradeToday.applyTransaction(updateTransaction);
+                    gridApitradeBithumb.applyTransaction(updateTransaction);
                 }
                 
                 updateLastUpdateTime();
@@ -859,35 +841,40 @@
         });
     }
 
-    function refreshTradeSwing() {
+    function refreshtradeBitget() {
         $.ajax({
-            url: "{% url 'bithumb:trade_swing' %}",
+            url: "{% url 'bithumb:trade_bitget' %}",
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             },
             success: function(response) {
                 const processedData = response['data'].map(item => {
+                    item = getPriceRatioToday(item);
                     return {
                         market: item.market,
-                        korean_name: item.korean_name,
-                        capitalization: item.capitalization / 100000000,
-                        kimchi_premium: parseFloat(item.kimchi_premium),
-                        price_1m: item.price_1m,
-                        price_ratio_day: parseFloat((((item.price_1m - item.price_day) / item.price_day) * 100).toFixed(2)),
-                        price_ratio_3days: parseFloat((((item.price_1m - item.price_3days) / item.price_3days) * 100).toFixed(2)),
-                        price_ratio_week: parseFloat((((item.price_1m - item.price_week) / item.price_week) * 100).toFixed(2)),
-                        price_ratio_month: parseFloat((((item.price_1m - item.price_month) / item.price_month) * 100).toFixed(2)),
-                        rsi_240m: item.rsi_240m,
-                        rsi_day: item.rsi_day
+                        price: item.price_last,
+                        volume: item.volume,
+                        funding_rate: item.funding_rate,
+                        price_ratio_5m: parseFloat(item.price_ratio_5m),
+                        price_ratio_15m: parseFloat(item.price_ratio_15m),
+                        price_ratio_30m: parseFloat(item.price_ratio_30m),
+                        price_ratio_60m: parseFloat(item.price_ratio_60m),
+                        price_ratio_240m: parseFloat(item.price_ratio_240m),
+                        
+
+                        price_ratio_1d: parseFloat(item.price_ratio_1d),
+                        price_ratio_3d: parseFloat(item.price_ratio_3d),
+                        price_ratio_7d: parseFloat(item.price_ratio_7d),
+                        price_ratio_14d: parseFloat(item.price_ratio_14d),
                     };
                 });
 
                 // 효율적 업데이트
-                if (!gridApiTradeSwing.getDisplayedRowCount()) {
-                    gridApiTradeSwing.setGridOption('rowData', processedData);
+                if (!gridApitradeBitget.getDisplayedRowCount()) {
+                    gridApitradeBitget.setGridOption('rowData', processedData);
                 } else {
-                    gridApiTradeSwing.applyTransaction({ update: processedData });
+                    gridApitradeBitget.applyTransaction({ update: processedData });
                 }
                 
                 updateLastUpdateTime();
@@ -898,75 +885,8 @@
         });
     }
 
-    function refreshTradeInfo() {
-        $.ajax({
-            url: "{% url 'bithumb:trade_info' %}",
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response) {
-                const processedData = response['data'].map(item => {
-                    return {
-                        market: item.market,
-                        korean_name: item.korean_name,
-                        capitalization: item.capitalization,
-                        supply_ratio: !item.max_supply ? '-' : `${((item.now_supply / item.max_supply) * 100).toFixed(1)}%`,
-                        listing_month: item.listing_month,
-                        chain: item.chain,
-                        category: item.category,
-                        description: item.description
-                    };
-                });
+    
 
-                gridApiTradeInfo.setGridOption('rowData', processedData);
-                updateLastUpdateTime();
-            },
-            error: function(err) {
-                console.error("데이터 가져오기 실패:", err);
-            }
-        });
-    }
-
-    function refreshTradeTimetable(hours) {
-        $.ajax({
-            url: "{% url 'bithumb:trade_timetable' %}",
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            data: {
-                'hours': hours
-            },
-            success: function(response) {
-                // 동적으로 컬럼 생성
-                const timeColumns = [
-                    { field: 'market', headerName: '종목', width: 120, pinned: 'left', cellRenderer: MarketCellRenderer, sortable: true, filter: true },
-                    { field: 'korean_name', headerName: '이름', width: 120, sortable: true },
-                    { field: 'price_1m', headerName: '현재가', width: 120, cellRenderer: PriceCellRenderer, sortable: true, type: 'numericColumn' }
-                ];
-                
-                // 시간대별 컬럼 추가 (d0 ~ d11)
-                for (let i = 0; i < 12; i++) {
-                    const hour = (new Date().getHours() - i + 24) % 24;
-                    timeColumns.push({
-                        field: `d${i}`,
-                        headerName: `${hour}시`,
-                        width: 90,
-                        valueFormatter: params => `${(params.value / 100000000).toFixed(1)}억`,
-                        sortable: true,
-                        type: 'numericColumn'
-                    });
-                }
-                
-                gridApiTradeTimetable.setGridOption('columnDefs', timeColumns);
-                gridApiTradeTimetable.setGridOption('rowData', response['data']);
-                updateLastUpdateTime();
-            },
-            error: function(err) {
-                console.error("데이터 가져오기 실패:", err);
-            }
-        });
-    }
+    
 </script>
 {% endblock %}
