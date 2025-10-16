@@ -739,8 +739,10 @@
         item.price_ratio_240m = (((item.price_last - item.price_240m) / item.price_240m) * 100).toFixed(2);
         item.price_ratio_high = (((item.price_last - item.price_today_high) / item.price_today_high) * 100).toFixed(2);
         item.price_ratio_low = (((item.price_last - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
-        item.price_ratio_1d = (((item.price_last - item.price_1d) / item.price_today_low) * 100).toFixed(2);
-        item.price_ratio_7d= (((item.price_last - item.price_7d) / item.price_today_low) * 100).toFixed(2);
+        item.price_ratio_1d = (((item.price_last - item.price_1d) / item.price_1d) * 100).toFixed(2);
+        item.price_ratio_7d = (((item.price_last - item.price_7d) / item.price_7d) * 100).toFixed(2);
+
+
 
         
         return item;
@@ -759,12 +761,12 @@
 
 
         // ma_ratio_day_10을 6가지 기간으로 확장 (200까지만)
-        item.ma_ratio_day_10 = (((item.price_last - item.ma_day_10) / item.day_10) * 100).toFixed(2);
-        item.ma_ratio_day_20 = (((item.price_last - item.ma_day_20) / item.day_20) * 100).toFixed(2);
-        item.ma_ratio_day_34 = (((item.price_last - item.ma_day_34) / item.day_34) * 100).toFixed(2);
-        item.ma_ratio_day_50 = (((item.price_last - item.ma_day_50) / item.day_50) * 100).toFixed(2);
-        item.ma_ratio_day_100 = (((item.price_last - item.ma_day_100) / item.day_100) * 100).toFixed(2);
-        item.ma_ratio_day_200 = (((item.price_last - item.ma_day_200) / item.day_200) * 100).toFixed(2);
+        item.ma_ratio_day_10 = (((item.price_last - item.ma_day_10) / item.ma_day_10) * 100).toFixed(2);
+        item.ma_ratio_day_20 = (((item.price_last - item.ma_day_20) / item.ma_day_20) * 100).toFixed(2);
+        item.ma_ratio_day_34 = (((item.price_last - item.ma_day_34) / item.ma_day_34) * 100).toFixed(2);
+        item.ma_ratio_day_50 = (((item.price_last - item.ma_day_50) / item.ma_day_50) * 100).toFixed(2);
+        item.ma_ratio_day_100 = (((item.price_last - item.ma_day_100) / item.ma_day_100) * 100).toFixed(2);
+        item.ma_ratio_day_200 = (((item.price_last - item.ma_day_200) / item.ma_day_200) * 100).toFixed(2);
         
 
         
@@ -812,6 +814,9 @@
                         price_ratio_240m: parseFloat(item.price_ratio_240m),
                         price_ratio_high: parseFloat(item.price_ratio_high),
                         price_ratio_low: parseFloat(item.price_ratio_low),
+
+                        price_ratio_1d: parseFloat(item.price_ratio_1d),
+                        price_ratio_7d: parseFloat(item.price_ratio_7d),
                         // ma_ratio_60_N 비율 변환
                         ma_ratio_60_10: parseFloat(item.ma_ratio_60_10),
                         ma_ratio_60_20: parseFloat(item.ma_ratio_60_20),
