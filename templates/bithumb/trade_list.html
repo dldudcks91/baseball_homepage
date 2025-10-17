@@ -471,7 +471,22 @@
             sortable: true,
             type: 'numericColumn'
         },
-        
+        { 
+            field: 'price_ratio_1m', 
+            headerName: '1분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_3m', 
+            headerName: '3분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
         { 
             field: 'price_ratio_5m', 
             headerName: '5분', 
@@ -489,16 +504,40 @@
             type: 'numericColumn'
         },
         { 
-            field: 'price_ratio_60m', 
-            headerName: '60분', 
+            field: 'price_ratio_30m', 
+            headerName: '30분', 
             width: 100,
             cellRenderer: PercentCellRenderer,
             sortable: true,
             type: 'numericColumn'
         },
         { 
-            field: 'price_ratio_240m', 
-            headerName: '240분', 
+            field: 'price_ratio_1h', 
+            headerName: '1시간', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_2h', 
+            headerName: '2시간', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_4h', 
+            headerName: '4시간', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_8h', 
+            headerName: '8시간', 
             width: 100,
             cellRenderer: PercentCellRenderer,
             sortable: true,
