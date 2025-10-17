@@ -200,12 +200,15 @@ def trade_bitget(request):
     #current_time = datetime(2025, 2, 12, 8, 1, 33, tzinfo = timezone.utc)
     last_time = get_current_time(current_time, -(TEST_SECONDS))
     last_temp_time = get_current_time(current_time, -(10 + TEST_SECONDS))
-    last_1_time = get_current_time(current_time, -(60 + TEST_SECONDS))
-    last_5_time = get_current_time(current_time, -(300 + TEST_SECONDS))
-    last_15_time = get_current_time(current_time, -(900 + TEST_SECONDS))
-    last_30_time = get_current_time(current_time, -(1800 + TEST_SECONDS))
-    last_60_time = get_current_time(current_time, -(3600 + TEST_SECONDS))
-    last_240_time = get_current_time(current_time, -(14400 + TEST_SECONDS))
+    last_1m_time = get_current_time(current_time, -(60 + TEST_SECONDS))
+    last_3m_time = get_current_time(current_time, -(60 * 3 + TEST_SECONDS))
+    last_5m_time = get_current_time(current_time, -(60 * 5 + TEST_SECONDS))
+    last_15m_time = get_current_time(current_time, -(60 * 15 + TEST_SECONDS))
+    last_30m_time = get_current_time(current_time, -(60 * 30 + TEST_SECONDS))
+    last_1h_time = get_current_time(current_time, -(60 * 60 + TEST_SECONDS))
+    last_2h_time = get_current_time(current_time, -(60 * 60 * 2+ TEST_SECONDS))
+    last_4h_time = get_current_time(current_time, -(60 * 60 * 4 + TEST_SECONDS))
+    last_8h_time = get_current_time(current_time, -(60 * 60 * 8 + TEST_SECONDS))
     
     last_1d_time = get_current_time(current_time, -(60 * 60 * 24 + TEST_SECONDS))
     last_3d_time = get_current_time(current_time, -(60 * 60 * 24 * 3+TEST_SECONDS))
@@ -218,12 +221,15 @@ def trade_bitget(request):
     last_data = MarketBitget.objects.filter(log_dt = last_time)
     if len(last_data)== 0:
         last_data = MarketBitget.objects.filter(log_dt = last_temp_time)        
-    last_1_data = MarketBitget.objects.filter(log_dt = last_1_time)
-    last_5_data = MarketBitget.objects.filter(log_dt = last_5_time)
-    last_15_data = MarketBitget.objects.filter(log_dt = last_15_time)
-    last_30_data = MarketBitget.objects.filter(log_dt = last_30_time)
-    last_60_data = MarketBitget.objects.filter(log_dt = last_60_time)
-    last_240_data = MarketBitget.objects.filter(log_dt = last_240_time)
+    last_1m_data = MarketBitget.objects.filter(log_dt = last_1m_time)
+    last_3m_data = MarketBitget.objects.filter(log_dt = last_3m_time)
+    last_5m_data = MarketBitget.objects.filter(log_dt = last_5m_time)
+    last_15m_data = MarketBitget.objects.filter(log_dt = last_15m_time)
+    last_30m_data = MarketBitget.objects.filter(log_dt = last_30m_time)
+    last_1h_data = MarketBitget.objects.filter(log_dt = last_1h_time)
+    last_2h_data = MarketBitget.objects.filter(log_dt = last_2h_time)
+    last_4h_data = MarketBitget.objects.filter(log_dt = last_4h_time)
+    last_8h_data = MarketBitget.objects.filter(log_dt = last_8h_time)
     last_1d_data = MarketBitget.objects.filter(log_dt = last_1d_time)
     last_3d_data = MarketBitget.objects.filter(log_dt = last_3d_time)
     last_7d_data = MarketBitget.objects.filter(log_dt = last_7d_time)
@@ -254,16 +260,18 @@ def trade_bitget(request):
             'volume': next((d.volume for d in last_data if d.market == item['market']), None),
             'funding_rate':next((d.funding_rate for d in last_data if d.market == item['market']), None),
             'price_last': next((d.price for d in last_data if d.market == item['market']), None),
-            'price_1m': next((d.price for d in last_1_data if d.market == item['market']), None),
-            'price_5m': next((d.price for d in last_5_data if d.market == item['market']), None),
-            'price_15m': next((d.price for d in last_15_data if d.market == item['market']), None),
-            'price_30m': next((d.price for d in last_30_data if d.market == item['market']), None),
-            'price_60m': next((d.price for d in last_60_data if d.market == item['market']), None),
-            'price_240m': next((d.price for d in last_240_data if d.market == item['market']), None),
+            'price_1m': next((d.price for d in last_1m_data if d.market == item['market']), None),
+            'price_3m': next((d.price for d in last_3m_data if d.market == item['market']), None),
+            'price_5m': next((d.price for d in last_5m_data if d.market == item['market']), None),
+            'price_15m': next((d.price for d in last_15m_data if d.market == item['market']), None),
+            'price_30m': next((d.price for d in last_30m_data if d.market == item['market']), None),
+            'price_1h': next((d.price for d in last_1h_data if d.market == item['market']), None),
+            'price_2h': next((d.price for d in last_2h_data if d.market == item['market']), None),
+            'price_4h': next((d.price for d in last_4h_data if d.market == item['market']), None),
+            'price_8h': next((d.price for d in last_8h_data if d.market == item['market']), None),
             'price_1d': next((d.price for d in last_1d_data if d.market == item['market']), None),
             'price_3d': next((d.price for d in last_3d_data if d.market == item['market']), None),
             'price_7d': next((d.price for d in last_7d_data if d.market == item['market']), None),
-            
             'price_14d': next((d.price for d in last_14d_data if d.market == item['market']), None),
 
             

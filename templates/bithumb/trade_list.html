@@ -712,6 +712,8 @@
     }
 
     function getPriceRatioToday(item) {
+        item.price_ratio_1m = (((item.price_last - item.price_1m) / item.price_1m) * 100).toFixed(2);
+        item.price_ratio_3m = (((item.price_last - item.price_3m) / item.price_3m) * 100).toFixed(2);
         item.price_ratio_5m = (((item.price_last - item.price_5m) / item.price_5m) * 100).toFixed(2);
         item.price_ratio_15m = (((item.price_last - item.price_15m) / item.price_15m) * 100).toFixed(2);
         item.price_ratio_30m = (((item.price_last - item.price_30m) / item.price_30m) * 100).toFixed(2);
@@ -724,7 +726,10 @@
         item.price_ratio_7d = (((item.price_last - item.price_7d) / item.price_7d) * 100).toFixed(2);
         item.price_ratio_14d = (((item.price_last - item.price_14d) / item.price_14d) * 100).toFixed(2);
 
-
+        item.price_ratio_1h = (((item.price_last - item.price_1h) / item.price_1h) * 100).toFixed(2);
+        item.price_ratio_2h = (((item.price_last - item.price_2h) / item.price_2h) * 100).toFixed(2);
+        item.price_ratio_4h = (((item.price_last - item.price_4h) / item.price_4h) * 100).toFixed(2);
+        item.price_ratio_8h = (((item.price_last - item.price_8h) / item.price_8h) * 100).toFixed(2);
 
         
         return item;
@@ -856,11 +861,15 @@
                         price: item.price_last,
                         volume: item.volume,
                         funding_rate: item.funding_rate,
+                        price_ratio_1m: parseFloat(item.price_ratio_1m),
+                        price_ratio_3m: parseFloat(item.price_ratio_3m),
                         price_ratio_5m: parseFloat(item.price_ratio_5m),
                         price_ratio_15m: parseFloat(item.price_ratio_15m),
                         price_ratio_30m: parseFloat(item.price_ratio_30m),
-                        price_ratio_60m: parseFloat(item.price_ratio_60m),
-                        price_ratio_240m: parseFloat(item.price_ratio_240m),
+                        price_ratio_1h: parseFloat(item.price_ratio_1h),
+                        price_ratio_2h: parseFloat(item.price_ratio_2h),
+                        price_ratio_4h: parseFloat(item.price_ratio_4h),
+                        price_ratio_8h: parseFloat(item.price_ratio_8h),
                         
 
                         price_ratio_1d: parseFloat(item.price_ratio_1d),
