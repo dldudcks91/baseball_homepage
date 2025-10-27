@@ -560,7 +560,7 @@
             type: 'numericColumn'
         },
         { 
-            field: 'price_ratio_7m', 
+            field: 'price_ratio_7d', 
             headerName: '7일', 
             width: 100,
             cellRenderer: PercentCellRenderer,
@@ -892,9 +892,12 @@
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             },
+            
             success: function(response) {
-                const processedData = response['data'].map(item => {
+                
+                const processedData = response['data'].filter(item => item.price_last).map(item => {
                     item = getPriceRatioToday(item);
+                    
                     return {
                         market: item.market,
                         price: item.price_last,
@@ -916,6 +919,7 @@
                         price_ratio_7d: parseFloat(item.price_ratio_7d),
                         price_ratio_14d: parseFloat(item.price_ratio_14d),
                     };
+                
                 });
 
                 // 효율적 업데이트
