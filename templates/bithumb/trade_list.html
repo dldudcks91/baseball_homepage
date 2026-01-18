@@ -956,7 +956,7 @@
 
     async function loadUserMemos(exchange) {
         try {
-            const response = await fetch('/api/user-memos/');
+            const response = await fetch('/bitget/user-memos/');
             const data = await response.json();
             
             // exchange별로 필터링해서 캐시에 저장
@@ -983,7 +983,7 @@
                 formData.append('memo', updates.memo);
             }
             
-            const response = await fetch('/api/user-memos/update/', {
+            const response = await fetch('/bitget/user-memos/update/', {
                 method: 'POST',
                 body: formData
             });
