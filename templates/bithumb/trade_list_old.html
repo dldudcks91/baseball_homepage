@@ -190,46 +190,6 @@
         font-weight: 600;
     }
 
-    /* 별표 아이콘 스타일 */
-    .favorite-star {
-        cursor: pointer;
-        font-size: 18px;
-        color: var(--text-secondary);
-        transition: all 0.2s;
-        user-select: none;
-    }
-    
-    .favorite-star:hover {
-        color: var(--accent);
-        transform: scale(1.2);
-    }
-    
-    .favorite-star.active {
-        color: var(--accent);
-    }
-
-    /* 메모 입력 필드 스타일 */
-    .memo-input {
-        width: 100%;
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        color: var(--text-primary);
-        padding: 6px 10px;
-        border-radius: 4px;
-        font-size: 12px;
-        transition: all 0.2s;
-    }
-    
-    .memo-input:focus {
-        outline: none;
-        border-color: var(--accent);
-        background: var(--bg-hover);
-    }
-    
-    .memo-input::placeholder {
-        color: var(--text-secondary);
-    }
-
     /* 반응형 */
     @media (max-width: 768px) {
         .ag-grid-container {
@@ -477,37 +437,6 @@
 
     // Bitget 그리드 설정
     const columnDefstradeBitget = [
-        { 
-            field: 'favorite',
-            headerName: '★',
-            width: 60,
-            pinned: 'left',
-            cellRenderer: params => {
-                const isFavorite = getFavoriteStatus('bitget', params.data.market);
-                return `<span class="favorite-star ${isFavorite ? 'active' : ''}" data-market="${params.data.market}">
-                    ${isFavorite ? '★' : '☆'}
-                </span>`;
-            },
-            sortable: false,
-            filter: false
-        },
-        { 
-            field: 'memo',
-            headerName: '메모',
-            width: 200,
-            pinned: 'left',
-            cellRenderer: params => {
-                const memo = getMemo('bitget', params.data.market);
-                return `<input type="text" 
-                    class="memo-input" 
-                    data-market="${params.data.market}" 
-                    value="${memo || ''}" 
-                    placeholder="메모 입력..."
-                    onclick="event.stopPropagation()">`;
-            },
-            sortable: false,
-            filter: false
-        },
         { 
             field: 'market', 
             headerName: '종목', 
@@ -800,37 +729,13 @@
             startAutoUpdate('trade_bithumb');
         });
 
-        $('#trade_bitget_tab').on('click', async function() {
+        $('#trade_bitget_tab').on('click', function() {
             if (!gridApitradeBitget) {
                 const gridDiv = document.querySelector('#gridtradeBitget');
                 gridApitradeBitget = agGrid.createGrid(gridDiv, {
                     ...defaultGridOptions,
                     columnDefs: columnDefstradeBitget,
                     rowData: []
-                });
-                
-                // 서버에서 사용자 메모 데이터 로드
-                await loadUserMemos('bitget');
-                
-                // 별표 클릭 이벤트 리스너 추가
-                gridDiv.addEventListener('click', async function(e) {
-                    if (e.target.classList.contains('favorite-star')) {
-                        const market = e.target.dataset.market;
-                        const isNowFavorite = await toggleFavorite('bitget', market);
-                        
-                        // UI 업데이트
-                        e.target.textContent = isNowFavorite ? '★' : '☆';
-                        e.target.classList.toggle('active', isNowFavorite);
-                    }
-                });
-
-                // 메모 입력 이벤트 리스너 추가
-                gridDiv.addEventListener('input', function(e) {
-                    if (e.target.classList.contains('memo-input')) {
-                        const market = e.target.dataset.market;
-                        const memo = e.target.value;
-                        saveMemo('bitget', market, memo);
-                    }
                 });
             }
             startAutoUpdate('trade_bitget');
@@ -948,120 +853,6 @@
 
         
         return item;
-    }
-
-    // ===== 사용자 메모 관리 함수 (통합 API) =====
-    let favoritesCache = {}; // 즐겨찾기 캐시
-    let memosCache = {}; // 메모 캐시
-
-    async function loadUserMemos(exchange) {
-        try {
-            const response = await fetch('/api/user-memos/');
-            const data = await response.json();
-            
-            // exchange별로 필터링해서 캐시에 저장
-            favoritesCache[exchange] = data.favorites || [];
-            memosCache[exchange] = data.memos || {};
-            
-            return data;
-        } catch (error) {
-            console.error('사용자 메모 로드 실패:', error);
-            return { favorites: [], memos: {} };
-        }
-    }
-
-    async function updateUserMemo(market, updates) {
-        try {
-            const formData = new FormData();
-            formData.append('market', market);
-            
-            // favorite 또는 memo 업데이트
-            if ('favorite' in updates) {
-                formData.append('favorite', updates.favorite);
-            }
-            if ('memo' in updates) {
-                formData.append('memo', updates.memo);
-            }
-            
-            const response = await fetch('/api/user-memos/update/', {
-                method: 'POST',
-                body: formData
-            });
-            
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                // 캐시 업데이트
-                const exchange = 'bitget'; // 현재는 bitget만 사용
-                
-                if (!favoritesCache[exchange]) {
-                    favoritesCache[exchange] = [];
-                }
-                if (!memosCache[exchange]) {
-                    memosCache[exchange] = {};
-                }
-                
-                // favorite 캐시 업데이트
-                if (data.favorite) {
-                    if (!favoritesCache[exchange].includes(market)) {
-                        favoritesCache[exchange].push(market);
-                    }
-                } else {
-                    const index = favoritesCache[exchange].indexOf(market);
-                    if (index > -1) {
-                        favoritesCache[exchange].splice(index, 1);
-                    }
-                }
-                
-                // memo 캐시 업데이트
-                if (data.memo) {
-                    memosCache[exchange][market] = data.memo;
-                } else {
-                    delete memosCache[exchange][market];
-                }
-            }
-            
-            return data;
-        } catch (error) {
-            console.error('사용자 메모 업데이트 실패:', error);
-            return null;
-        }
-    }
-
-    async function toggleFavorite(exchange, market) {
-        const currentStatus = getFavoriteStatus(exchange, market);
-        const result = await updateUserMemo(market, { favorite: !currentStatus });
-        return result ? result.favorite : currentStatus;
-    }
-
-    function getFavoriteStatus(exchange, market) {
-        if (!favoritesCache[exchange]) {
-            return false;
-        }
-        return favoritesCache[exchange].includes(market);
-    }
-
-    function getMemo(exchange, market) {
-        if (!memosCache[exchange]) {
-            return '';
-        }
-        return memosCache[exchange][market] || '';
-    }
-
-    let memoSaveTimeout = null;
-    async function saveMemo(exchange, market, memo) {
-        // 캐시 먼저 업데이트 (즉각 반영)
-        if (!memosCache[exchange]) {
-            memosCache[exchange] = {};
-        }
-        memosCache[exchange][market] = memo;
-
-        // 디바운싱: 입력 멈춘 후 500ms 후에 저장
-        clearTimeout(memoSaveTimeout);
-        memoSaveTimeout = setTimeout(async () => {
-            await updateUserMemo(market, { memo: memo });
-            console.log('메모 저장 완료:', market, memo);
-        }, 500);
     }
 
     function calVolumeRatio(nu_amount, nu_cnt, de_amount, de_cnt) {
