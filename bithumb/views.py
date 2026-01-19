@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import Market, MarketHour, MarketDay, MarketInfo, MADays, MA60Minutes, MarketBitget, MA60MinutesBitget, MarketHourBitget
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 from django.db.models import DateTimeField, ExpressionWrapper, IntegerField
@@ -338,6 +339,8 @@ def get_user_memos(request):
     }
     return JsonResponse(data)
 
+
+@csrf_exempt
 @require_http_methods(["POST"])
 def update_user_memo(request):
     """즐겨찾기/메모 통합 업데이트 (하나의 함수로 처리)"""
