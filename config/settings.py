@@ -231,7 +231,10 @@ LOGGING = {
 LOGIN_REDIRECT_URL = 'main:index'
 LOGOUT_REDIRECT_URL = 'main:index'
 
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://lyc-baseball.site',
+    'https://www.lyc-baseball.site', # www를 사용하는 경우 포함
+]
 
 
 
