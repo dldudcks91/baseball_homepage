@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Market, MarketHour, MarketDay, MarketInfo, MADays, MA60Minutes, MarketBitget, MA60MinutesBitget, MarketHourBitget
+from .models import Market, MarketHour, MarketDay, MarketInfo, MADays, MA60Minutes, MarketBitget, MA60MinutesBitget, MarketHourBitget, UserMemo
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
