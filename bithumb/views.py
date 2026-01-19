@@ -360,7 +360,7 @@ def update_user_memo(request):
         # favorite이 True가 되면 날짜 기록, False가 되면 날짜 삭제
         if favorite_value:
             if not memo_obj.favorite_date:  # 처음 등록하는 경우만
-                memo_obj.favorite_date = timezone.now()
+                memo_obj.favorite_date = datetime.now(tz = timezone.utc)
         else:
             memo_obj.favorite_date = None
     
