@@ -258,8 +258,8 @@ def trade_bitget(request):
     
     ma_60_data = MA60MinutesBitget.objects.filter(log_dt = last_hour).order_by('market')
 
-    today_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_day).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
-    day3_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_3_day).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
+    today_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
+    day3_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_3_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
     #today_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
     week_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_7_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
 
