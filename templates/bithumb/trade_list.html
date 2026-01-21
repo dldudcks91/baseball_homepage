@@ -532,12 +532,12 @@
             sortable: true
         },
         { 
-            field: 'memo', headerName: '메모', width: 150, pinned: 'left',
+            field: 'memo', headerName: '메모', width: 200, pinned: 'left',
             cellRenderer: params => `<input type="text" class="memo-input" data-market="${params.data.market}" value="${params.value || ''}" onclick="event.stopPropagation()">`,
             sortable: true
         },
         { 
-            field: 'last_visited_at', headerName: '마지막 방문', width: 140, pinned: 'left',
+            field: 'last_visited_at', headerName: '마지막 방문', width: 100, pinned: 'left',
             // params.value를 직접 사용
             cellRenderer: params => `<span style="color: var(--text-secondary); font-size: 11px;">${params.value || '-'}</span>`,
             sortable: true
@@ -555,7 +555,7 @@
             field: 'volume', 
             headerName: '거래대금',
             cellRenderer: PriceCellRenderer, 
-            width: 120,
+            width: 100,
             sortable: true,
             pinned:'left',
             type: 'numericColumn'
@@ -563,7 +563,7 @@
         { 
             field: 'funding_rate', 
             headerName: '펀딩비', 
-            width: 120,
+            width: 80,
             cellRenderer: PriceCellRenderer,
             sortable: true,
             pinned:'left',
@@ -572,7 +572,7 @@
         { 
             field: 'price', 
             headerName: '현재가', 
-            width: 120,
+            width: 100,
             cellRenderer: PriceCellRenderer,
             sortable: true,
             pinned:'left',
