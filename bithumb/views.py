@@ -344,7 +344,7 @@ def get_user_memos(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def update_user_memo(request):
-    """즐겨찾기/메모 통합 업데이트 (하나의 함수로 처리)"""
+    """즐겨찾기/메모/마지막 방문 시간 통합 업데이트"""
     market = request.POST.get('market')
     
     if not market:
@@ -353,7 +353,7 @@ def update_user_memo(request):
     # 레코드 가져오기 또는 생성
     memo_obj, created = UserMemo.objects.get_or_create(market=market)
     
-    # favorite 토글 또는 업데이트
+    # 1. favorite 토글 또는 업데이트
     if 'favorite' in request.POST:
         favorite_value = request.POST.get('favorite').lower() == 'true'
         memo_obj.favorite = favorite_value
@@ -361,13 +361,19 @@ def update_user_memo(request):
         # favorite이 True가 되면 날짜 기록, False가 되면 날짜 삭제
         if favorite_value:
             if not memo_obj.favorite_date:  # 처음 등록하는 경우만
-                memo_obj.favorite_date = datetime.now(tz = timezone.utc)
+                memo_obj.favorite_date = datetime.now(tz=timezone.utc)
         else:
             memo_obj.favorite_date = None
     
-    # memo 업데이트
+    # 2. memo 업데이트
     if 'memo' in request.POST:
         memo_obj.memo = request.POST.get('memo', '')
+
+    # 3. last_visited_at 업데이트 (추가된 부분)
+    # 템플릿에서 'YY.MM.DD HH:mm' 형식의 문자열을 보내므로 그대로 저장하거나 
+    # 모델 필드 타입에 따라 파싱하여 저장합니다.
+    if 'last_visited_at' in request.POST:
+        memo_obj.last_visited_at = request.POST.get('last_visited_at')
     
     memo_obj.save()
     
@@ -377,5 +383,5 @@ def update_user_memo(request):
         'favorite': memo_obj.favorite,
         'favorite_date': memo_obj.favorite_date.isoformat() if memo_obj.favorite_date else None,
         'memo': memo_obj.memo,
-        'last_visited_at': memo_obj.last_visited_at
+        'last_visited_at': memo_obj.last_visited_at  # 업데이트된 값 반환
     })
