@@ -3,5 +3,6 @@ db.sqlite3
 *.pyc
 __pycache__
 db_settings.yml
+db_settings_new.yml
 tunnel_starter.py
 /venv

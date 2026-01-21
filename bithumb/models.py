@@ -159,7 +159,7 @@ class UserMemo(models.Model):
     memo = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+    last_visited_at = models.DateTimeField(null=True, blank=True)
     class Meta:
         db_table = 'user_memo'
     

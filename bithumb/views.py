@@ -335,7 +335,8 @@ def get_user_memos(request):
     memos = UserMemo.objects.all()
     data = {
         'favorites': list(memos.filter(favorite=True).values_list('market', flat=True)),
-        'memos': {m.market: m.memo for m in memos if m.memo}
+        'memos': {m.market: m.memo for m in memos if m.memo},
+        'last_visited_at': {m.market: m.last_visited_at for m in memos if m.last_visited_at}
     }
     return JsonResponse(data)
 
@@ -375,5 +376,6 @@ def update_user_memo(request):
         'market': market,
         'favorite': memo_obj.favorite,
         'favorite_date': memo_obj.favorite_date.isoformat() if memo_obj.favorite_date else None,
-        'memo': memo_obj.memo
+        'memo': memo_obj.memo,
+        'last_visited_at': memo_obj.last_visited_at
     })
