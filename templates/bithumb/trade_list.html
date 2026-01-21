@@ -229,7 +229,291 @@
             field: 'memo', headerName: '메모', width: 180, pinned: 'left',
             cellRenderer: params => {
                 const memo = getMemo('bitget', params.data.market);
+<<<<<<< HEAD
                 return `<input type="text" class="memo-input" data-market="${params.data.market}" value="${memo || ''}" placeholder="메모...">`;
+=======
+                return `<input type="text" 
+                    class="memo-input" 
+                    data-market="${params.data.market}" 
+                    value="${memo || ''}" 
+                    placeholder="메모 입력..."
+                    onclick="event.stopPropagation()">`;
+            },
+            sortable: false,
+            filter: false
+        },
+        { 
+            field: 'market', 
+            headerName: '종목', 
+            width: 100,
+            pinned: 'left',
+            cellRenderer: MarketCellRenderer,
+            sortable: true,
+            filter: true
+        },
+        { 
+            field: 'volume', 
+            headerName: '거래대금',
+            cellRenderer: PriceCellRenderer, 
+            width: 100,
+            sortable: true,
+            pinned:'left',
+            type: 'numericColumn'
+        },
+        { 
+            field: 'funding_rate', 
+            headerName: '펀딩비', 
+            width: 100,
+            cellRenderer: PriceCellRenderer,
+            //valueFormatter: params => `${Number(params.value).toLocaleString()}억`,
+            sortable: true,
+            pinned:'left',
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price', 
+            headerName: '현재가', 
+            width: 100,
+            cellRenderer: PriceCellRenderer,
+            sortable: true,
+            pinned:'left',
+            type: 'numericColumn'
+        },
+        
+        // { 
+        //     field: 'price_ratio_5m', 
+        //     headerName: '5분', 
+        //     width: 100,
+        //     cellRenderer: PercentCellRenderer,
+        //     sortable: true,
+        //     type: 'numericColumn'
+        // },
+        { 
+            field: 'price_ratio_15m', 
+            headerName: '15분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        
+        { 
+            field: 'price_ratio_1h', 
+            headerName: '1시간', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        
+        { 
+            field: 'price_ratio_4h', 
+            headerName: '4시간', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        // { 
+        //     field: 'price_ratio_8h', 
+        //     headerName: '8시간', 
+        //     width: 100,
+        //     cellRenderer: PercentCellRenderer,
+        //     sortable: true,
+        //     type: 'numericColumn'
+        // },
+        { 
+            field: 'price_ratio_1d', 
+            headerName: '1일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        
+        { 
+            field: 'price_ratio_7d', 
+            headerName: '7일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_14d', 
+            headerName: '14일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+
+        { 
+            field: 'price_range_1d', 
+            headerName: '범위1일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_range_3d', 
+            headerName: '범위3일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_range_3d', 
+            headerName: '범위7일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_10', 
+            headerName: 'MA10', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_20', 
+            headerName: 'MA20', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        
+        { 
+            field: 'ma_ratio_60_50', 
+            headerName: 'MA50', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_100', 
+            headerName: 'MA100', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_200', 
+            headerName: 'MA200', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_400', 
+            headerName: 'MA400', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_800', 
+            headerName: 'MA800', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+
+    ];
+
+    // 기본정보 그리드 설정
+    const columnDefsTradeInfo = [
+        { 
+            field: 'market', 
+            headerName: '종목', 
+            width: 120,
+            pinned: 'left',
+            cellRenderer: MarketCellRenderer,
+            sortable: true,
+            filter: true
+        },
+        { 
+            field: 'korean_name', 
+            headerName: '이름', 
+            width: 150,
+            sortable: true
+        },
+        { 
+            field: 'capitalization', 
+            headerName: '시가총액', 
+            width: 130,
+            valueFormatter: params => `${(params.value / 100000000).toLocaleString()}억`,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'supply_ratio', 
+            headerName: '발행률', 
+            width: 100,
+            sortable: true
+        },
+        { 
+            field: 'listing_month', 
+            headerName: '상장일', 
+            width: 120,
+            sortable: true
+        },
+        { 
+            field: 'chain', 
+            headerName: '체인', 
+            width: 120,
+            sortable: true,
+            filter: true
+        },
+        { 
+            field: 'category', 
+            headerName: '카테고리', 
+            width: 130,
+            sortable: true,
+            filter: true
+        },
+        { 
+            field: 'description', 
+            headerName: '설명', 
+            flex: 1,
+            minWidth: 200,
+            wrapText: true,
+            autoHeight: true
+        }
+    ];
+
+    // Grid Options
+    const defaultGridOptions = {
+        defaultColDef: {
+            sortable: true,
+            resizable: true,
+            filter: false
+        },
+        animateRows: true,
+        rowSelection: 'single',
+        enableCellTextSelection: true,
+        suppressCellFocus: true,
+        // Row ID를 통한 효율적인 업데이트
+        getRowId: params => params.data.market,
+        // 셀 플래시 애니메이션 (변경된 셀만 강조)
+        enableCellChangeFlash: true,
+        // 부드러운 애니메이션
+        animateRows: true,
+        getRowStyle: params => {
+            if (params.node.rowIndex % 2 === 0) {
+                return { background: '#1e2329' };
+>>>>>>> 2aa5bde98d09d0ab67414aced2743b3ef5deb57c
             }
         },
         { 
@@ -290,6 +574,125 @@
         });
     });
 
+<<<<<<< HEAD
+=======
+    function stopAutoUpdate() {
+        if (updateInterval) {
+            clearInterval(updateInterval);
+        }
+    }
+
+    function startAutoUpdate(url, parameter) {
+        stopAutoUpdate();
+        
+        function update() {
+            if (url === 'trade_bithumb') {
+                refreshtradeBithumb();
+            } else if (url === 'trade_bitget') {
+                refreshtradeBitget();
+            } else if (url === 'trade_timetable') {
+                refreshTradeTimetable(parameter);
+            }
+        }
+        
+        // 첫 로드만 로딩 표시
+        if (url === 'trade_bithumb' && !gridApitradeBithumb.getDisplayedRowCount()) {
+            showLoading();
+            setTimeout(() => {
+                update();
+                hideLoading();
+            }, 100);
+        } else if (url === 'trade_bitget' && gridApitradeBitget && !gridApitradeBitget.getDisplayedRowCount()) {
+            showLoading();
+            setTimeout(() => {
+                update();
+                hideLoading();
+            }, 100);
+        } else {
+            update();
+        }
+        
+        updateInterval = setInterval(update, 10000);
+    }
+
+    function showLoading() {
+        $('.loading-container').css('display', 'flex');
+    }
+
+    function hideLoading() {
+        $('.loading-container').css('display', 'none');
+    }
+
+    function updateLastUpdateTime() {
+        const now = new Date();
+        const timeString = now.getHours().toString().padStart(2, '0') + ':' +
+                          now.getMinutes().toString().padStart(2, '0') + ':' +
+                          now.getSeconds().toString().padStart(2, '0');
+        $('#lastUpdateTime').text(timeString);
+    }
+
+    function getPriceRatioToday(item) {
+        item.price_ratio_1m = (((item.price_last - item.price_1m) / item.price_1m) * 100).toFixed(2);
+        item.price_ratio_3m = (((item.price_last - item.price_3m) / item.price_3m) * 100).toFixed(2);
+        item.price_ratio_5m = (((item.price_last - item.price_5m) / item.price_5m) * 100).toFixed(2);
+        item.price_ratio_15m = (((item.price_last - item.price_15m) / item.price_15m) * 100).toFixed(2);
+        item.price_ratio_30m = (((item.price_last - item.price_30m) / item.price_30m) * 100).toFixed(2);
+        item.price_ratio_60m = (((item.price_last - item.price_60m) / item.price_60m) * 100).toFixed(2);
+        item.price_ratio_240m = (((item.price_last - item.price_240m) / item.price_240m) * 100).toFixed(2);
+        item.price_ratio_high = (((item.price_last - item.price_today_high) / item.price_today_high) * 100).toFixed(2);
+        item.price_ratio_high_7d = (((item.price_last - item.price_week_high) / item.price_week_high) * 100).toFixed(2);
+        item.price_ratio_low = (((item.price_last - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
+        item.price_ratio_low_7d = (((item.price_last - item.price_week_low) / item.price_week_low) * 100).toFixed(2);
+        item.price_ratio_1d = (((item.price_last - item.price_1d) / item.price_1d) * 100).toFixed(2);
+        item.price_ratio_3d = (((item.price_last - item.price_3d) / item.price_3d) * 100).toFixed(2);
+        item.price_ratio_7d = (((item.price_last - item.price_7d) / item.price_7d) * 100).toFixed(2);
+        item.price_ratio_14d = (((item.price_last - item.price_14d) / item.price_14d) * 100).toFixed(2);
+
+        item.price_ratio_1h = (((item.price_last - item.price_1h) / item.price_1h) * 100).toFixed(2);
+        item.price_ratio_2h = (((item.price_last - item.price_2h) / item.price_2h) * 100).toFixed(2);
+        item.price_ratio_4h = (((item.price_last - item.price_4h) / item.price_4h) * 100).toFixed(2);
+        item.price_ratio_8h = (((item.price_last - item.price_8h) / item.price_8h) * 100).toFixed(2);
+
+        item.price_range_1d = (((item.price_today_high - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
+        item.price_range_3d = (((item.price_today_high - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
+        item.price_range_7d = (((item.price_week_high - item.price_week_low) / item.price_week_low) * 100).toFixed(2);
+
+        return item;
+    }
+
+    function getMARatioToday(item) {
+        // ma_ratio_60_10을 8가지 기간으로 확장
+        item.ma_ratio_60_10 = (((item.price_last - item.ma_60_10) / item.ma_60_10) * 100).toFixed(2);
+        item.ma_ratio_60_20 = (((item.price_last - item.ma_60_20) / item.ma_60_20) * 100).toFixed(2);
+        item.ma_ratio_60_34 = (((item.price_last - item.ma_60_34) / item.ma_60_34) * 100).toFixed(2);
+        item.ma_ratio_60_50 = (((item.price_last - item.ma_60_50) / item.ma_60_50) * 100).toFixed(2);
+        item.ma_ratio_60_100 = (((item.price_last - item.ma_60_100) / item.ma_60_100) * 100).toFixed(2);
+        item.ma_ratio_60_200 = (((item.price_last - item.ma_60_200) / item.ma_60_200) * 100).toFixed(2);
+        item.ma_ratio_60_400 = (((item.price_last - item.ma_60_400) / item.ma_60_400) * 100).toFixed(2);
+        item.ma_ratio_60_800 = (((item.price_last - item.ma_60_800) / item.ma_60_800) * 100).toFixed(2);
+
+
+        // ma_ratio_day_10을 6가지 기간으로 확장 (200까지만)
+        item.ma_ratio_day_10 = (((item.price_last - item.ma_day_10) / item.ma_day_10) * 100).toFixed(2);
+        item.ma_ratio_day_20 = (((item.price_last - item.ma_day_20) / item.ma_day_20) * 100).toFixed(2);
+        item.ma_ratio_day_34 = (((item.price_last - item.ma_day_34) / item.ma_day_34) * 100).toFixed(2);
+        item.ma_ratio_day_50 = (((item.price_last - item.ma_day_50) / item.ma_day_50) * 100).toFixed(2);
+        item.ma_ratio_day_100 = (((item.price_last - item.ma_day_100) / item.ma_day_100) * 100).toFixed(2);
+        item.ma_ratio_day_200 = (((item.price_last - item.ma_day_200) / item.ma_day_200) * 100).toFixed(2);
+        item.ma_ratio_day_400 = (((item.price_last - item.ma_day_400) / item.ma_day_400) * 100).toFixed(2);
+        item.ma_ratio_day_800 = (((item.price_last - item.ma_day_800) / item.ma_day_800) * 100).toFixed(2);
+        
+        
+
+        
+        return item;
+    }
+
+    // ===== 사용자 메모 관리 함수 (통합 API) =====
+    let favoritesCache = {}; // 즐겨찾기 캐시
+    let memosCache = {}; // 메모 캐시
+
+>>>>>>> 2aa5bde98d09d0ab67414aced2743b3ef5deb57c
     async function loadUserMemos(exchange) {
         try {
             const res = await fetch('trade_bitget/user-memos');
@@ -355,7 +758,43 @@
                         ...item,
                         market: item.market,
                         price: item.price_last,
+<<<<<<< HEAD
                         last_visited_at: getVisitDate('bitget', item.market)
+=======
+                        volume: item.volume,
+                        funding_rate: item.funding_rate,
+                        //price_ratio_1m: parseFloat(item.price_ratio_1m),
+                        //price_ratio_3m: parseFloat(item.price_ratio_3m),
+                        price_ratio_5m: parseFloat(item.price_ratio_5m),
+                        price_ratio_15m: parseFloat(item.price_ratio_15m),
+                        //price_ratio_30m: parseFloat(item.price_ratio_30m),
+                        price_ratio_1h: parseFloat(item.price_ratio_1h),
+                        //price_ratio_2h: parseFloat(item.price_ratio_2h),
+                        price_ratio_4h: parseFloat(item.price_ratio_4h),
+                        price_ratio_8h: parseFloat(item.price_ratio_8h),
+                        price_ratio_1d: parseFloat(item.price_ratio_1d),
+                        //price_ratio_3d: parseFloat(item.price_ratio_3d),
+                        price_ratio_7d: parseFloat(item.price_ratio_7d),
+                        price_ratio_14d: parseFloat(item.price_ratio_14d),
+
+                        price_range_1d: parseFloat(item.price_range_1d),
+                        price_range_3d: parseFloat(item.price_range_3d),
+                        price_range_7d: parseFloat(item.price_range_7d),
+
+                        price_ratio_high:parseFloat(item.price_ratio_high),
+                        price_ratio_high_7d:parseFloat(item.price_ratio_high_7d),
+                        price_ratio_low:parseFloat(item.price_ratio_low),
+                        price_ratio_low_7d:parseFloat(item.price_ratio_low_7d),
+                        // ma_ratio_day_N 비율 변환 (200까지만)
+                        ma_ratio_60_10: parseFloat(item.ma_ratio_60_10),
+                        ma_ratio_60_20: parseFloat(item.ma_ratio_60_20),
+                        //ma_ratio_60_34: parseFloat(item.ma_ratio_60_34),
+                        ma_ratio_60_50: parseFloat(item.ma_ratio_60_50),
+                        ma_ratio_60_100: parseFloat(item.ma_ratio_60_100),
+                        ma_ratio_60_200: parseFloat(item.ma_ratio_60_200),
+                        ma_ratio_60_400: parseFloat(item.ma_ratio_60_400),
+                        ma_ratio_60_800: parseFloat(item.ma_ratio_60_800),
+>>>>>>> 2aa5bde98d09d0ab67414aced2743b3ef5deb57c
                     };
                 });
                 gridApitradeBitget.applyTransaction({ update: processed });
