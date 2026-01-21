@@ -526,27 +526,28 @@
 
     // Bitget 그리드 설정
     const columnDefstradeBitget = [
-        { 
-            field: 'favorite',
-            headerName: '★',
-            width: 60,
+            { 
+            field: 'favorite', 
+            headerName: '★', 
+            width: 60, 
             pinned: 'left',
+            // 정렬 기준을 단순 문자열(★/☆)로 비교하도록 설정
             cellRenderer: params => {
-                const isFavorite = getFavoriteStatus('bitget', params.data.market);
+                const isFavorite = params.value; // 이제 데이터에서 직접 가져옵니다.
                 return `<span class="favorite-star ${isFavorite ? 'active' : ''}" data-market="${params.data.market}">
                     ${isFavorite ? '★' : '☆'}
                 </span>`;
             },
-            sortable: true,
+            sortable: true, // 정렬 활성화
             filter: false
         },
         { 
             field: 'memo',
             headerName: '메모',
-            width: 100,
+            width: 150,
             pinned: 'left',
             cellRenderer: params => {
-                const memo = getMemo('bitget', params.data.market);
+                const memo = params.value; // 이제 데이터에서 직접 가져옵니다.
                 return `<input type="text" 
                     class="memo-input" 
                     data-market="${params.data.market}" 
@@ -554,25 +555,24 @@
                     placeholder="메모 입력..."
                     onclick="event.stopPropagation()">`;
             },
-            sortable: true,
+            sortable: true, // 정렬 활성화
             filter: false
         },
         { 
             field: 'last_visited_at',
             headerName: '마지막 방문',
-            width: 100,
+            width: 140,
             pinned: 'left',
             cellRenderer: params => {
-                const date = getVisitDate('bitget', params.data.market);
-                return `<span style="color: var(--text-secondary); font-size: 11px;">${date || '-'}</span>`;
+                return `<span style="color: var(--text-secondary); font-size: 11px;">${params.value || '-'}</span>`;
             },
-            sortable: true,
+            sortable: true, // 정렬 활성화
             filter: false
         },
         { 
             field: 'market', 
             headerName: '종목', 
-            width: 200,
+            width: 120,
             pinned: 'left',
             cellRenderer: MarketCellRenderer,
             sortable: true,
