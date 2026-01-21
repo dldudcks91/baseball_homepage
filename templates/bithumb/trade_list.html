@@ -290,13 +290,35 @@
         });
     });
 
+    // ===== 수학 계산 함수들 (기존 로직 유지) =====
+    function getPriceRatioToday(item) {
+        item.price_ratio_5m = (((item.price_last - item.price_5m) / item.price_5m) * 100).toFixed(2);
+        item.price_ratio_15m = (((item.price_last - item.price_15m) / item.price_15m) * 100).toFixed(2);
+        item.price_ratio_1h = (((item.price_last - item.price_1h) / item.price_1h) * 100).toFixed(2);
+        item.price_ratio_4h = (((item.price_last - item.price_4h) / item.price_4h) * 100).toFixed(2);
+        item.price_ratio_1d = (((item.price_last - item.price_1d) / item.price_1d) * 100).toFixed(2);
+        item.price_ratio_7d = (((item.price_last - item.price_7d) / item.price_7d) * 100).toFixed(2);
+        item.price_range_7d = (((item.price_week_high - item.price_week_low) / item.price_week_low) * 100).toFixed(2);
+        return item;
+    }
+
+    function getMARatioToday(item) {
+        item.ma_ratio_60_10 = (((item.price_last - item.ma_60_10) / item.ma_60_10) * 100).toFixed(2);
+        item.ma_ratio_60_20 = (((item.price_last - item.ma_60_20) / item.ma_60_20) * 100).toFixed(2);
+        item.ma_ratio_60_50 = (((item.price_last - item.ma_60_50) / item.ma_60_50) * 100).toFixed(2);
+        item.ma_ratio_60_100 = (((item.price_last - item.ma_60_100) / item.ma_60_100) * 100).toFixed(2);
+        item.ma_ratio_60_200 = (((item.price_last - item.ma_60_200) / item.ma_60_200) * 100).toFixed(2);
+        return item;
+    }
+
+    // ===== 데이터 동기화 및 캐시 로직 (last_visited_at 추가) =====
     async function loadUserMemos(exchange) {
         try {
             const res = await fetch('trade_bitget/user-memos');
             const data = await res.json();
             favoritesCache[exchange] = data.favorites || [];
             memosCache[exchange] = data.memos || {};
-            visitCache[exchange] = data.visits || {}; // 서버 응답에 visits 포함 필수
+            visitCache[exchange] = data.visits || {}; 
         } catch (e) { console.error(e); }
     }
 
@@ -333,6 +355,7 @@
 
     let memoTimeout;
     function saveMemo(ex, m, memo) {
+        if(!memosCache[ex]) memosCache[ex] = {};
         memosCache[ex][m] = memo;
         clearTimeout(memoTimeout);
         memoTimeout = setTimeout(() => updateUserMemo(m, { memo }), 500);
@@ -350,7 +373,8 @@
             url: "{% url 'bithumb:trade_bitget' %}",
             success: function(res) {
                 const processed = res.data.filter(i => i.price_last).map(i => {
-                    const item = getPriceRatioToday(i);
+                    let item = getPriceRatioToday(i);
+                    item = getMARatioToday(item);
                     return {
                         ...item,
                         market: item.market,
@@ -364,11 +388,13 @@
         });
     }
 
+    function refreshtradeBithumb() {
+        // Bithumb 리프레시 로직 (필요시 추가)
+    }
+
     function updateLastUpdateTime() {
         const now = new Date();
         $('#lastUpdateTime').text(now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0'));
     }
-    
-    // getPriceRatioToday 등 기존 수학 계산 함수들은 그대로 유지하시면 됩니다.
 </script>
 {% endblock %}
