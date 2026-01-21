@@ -30,6 +30,7 @@
         background: var(--bg-primary);
     }
 
+    /* 탭 스타일 */
     .nav-tabs {
         border-bottom: 1px solid var(--border-color);
         background: var(--bg-secondary);
@@ -57,6 +58,7 @@
         border-bottom: 2px solid var(--accent);
     }
 
+    /* AG Grid 커스텀 스타일 */
     .ag-theme-alpine-dark {
         --ag-background-color: #1e2329;
         --ag-header-background-color: #0b0e11;
@@ -67,6 +69,7 @@
         --ag-row-hover-color: #2b3139;
         --ag-selected-row-background-color: #2b3139;
         --ag-font-size: 13px;
+        --ag-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     .ag-grid-container {
@@ -75,8 +78,28 @@
         margin: 20px 0;
     }
 
-    .positive { color: var(--positive) !important; font-weight: 600; }
-    .negative { color: var(--negative) !important; font-weight: 600; }
+    .ag-header-cell-text {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 12px;
+    }
+
+    .ag-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    /* 가격 변동 스타일 */
+    .positive {
+        color: var(--positive) !important;
+        font-weight: 600;
+    }
+
+    .negative {
+        color: var(--negative) !important;
+        font-weight: 600;
+    }
 
     .percent-box {
         display: inline-block;
@@ -86,8 +109,15 @@
         font-weight: 600;
     }
 
-    .percent-box.positive { background: rgba(14, 203, 129, 0.1); color: var(--positive); }
-    .percent-box.negative { background: rgba(246, 70, 93, 0.1); color: var(--negative); }
+    .percent-box.positive {
+        background: rgba(14, 203, 129, 0.1);
+        color: var(--positive);
+    }
+
+    .percent-box.negative {
+        background: rgba(246, 70, 93, 0.1);
+        color: var(--negative);
+    }
 
     .market-link {
         color: var(--text-primary);
@@ -96,12 +126,28 @@
         transition: color 0.2s;
     }
 
-    .market-link:hover { color: var(--accent); }
+    .market-link:hover {
+        color: var(--accent);
+    }
 
+    /* 셀 플래시 애니메이션 (데이터 변경 시) */
+    .ag-cell-data-changed {
+        background-color: rgba(252, 213, 53, 0.3) !important;
+    }
+    
+    .ag-cell-data-changed-animation {
+        background-color: transparent;
+        transition: background-color 1s;
+    }
+
+    /* 로딩 스피너 */
     .loading-container {
         display: none;
         position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         background: rgba(11, 14, 17, 0.95);
         z-index: 9999;
         justify-content: center;
@@ -110,40 +156,102 @@
     }
 
     .loading-spinner {
-        width: 60px; height: 60px;
+        width: 60px;
+        height: 60px;
         border: 3px solid var(--border-color);
         border-top: 3px solid var(--accent);
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
 
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-    .update-info, .timer-container {
+    .loading-text {
+        margin-top: 20px;
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+
+    /* 업데이트 정보 */
+    .update-info,
+    .timer-container {
         color: var(--text-secondary);
         font-size: 12px;
         padding: 12px 20px;
         background: var(--bg-secondary);
     }
 
-    .update-info span { color: var(--accent); font-weight: 600; }
-
-    .favorite-star { cursor: pointer; font-size: 18px; color: var(--text-secondary); transition: all 0.2s; user-select: none; }
-    .favorite-star:hover { color: var(--accent); transform: scale(1.2); }
-    .favorite-star.active { color: var(--accent); }
-
-    .memo-input {
-        width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-color);
-        color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px;
+    .update-info span {
+        color: var(--accent);
+        font-weight: 600;
     }
-    .memo-input:focus { outline: none; border-color: var(--accent); background: var(--bg-hover); }
+
+    /* 별표 아이콘 스타일 */
+    .favorite-star {
+        cursor: pointer;
+        font-size: 18px;
+        color: var(--text-secondary);
+        transition: all 0.2s;
+        user-select: none;
+    }
+    
+    .favorite-star:hover {
+        color: var(--accent);
+        transform: scale(1.2);
+    }
+    
+    .favorite-star.active {
+        color: var(--accent);
+    }
+
+    /* 메모 입력 필드 스타일 */
+    .memo-input {
+        width: 100%;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        transition: all 0.2s;
+    }
+    
+    .memo-input:focus {
+        outline: none;
+        border-color: var(--accent);
+        background: var(--bg-hover);
+    }
+    
+    .memo-input::placeholder {
+        color: var(--text-secondary);
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+        .ag-grid-container {
+            height: 500px;
+        }
+    }
 </style>
 
 <div id="bithumb-contents">
     <div id="trade_list">
         <ul class="nav nav-tabs" id="tradeTab" role="tablist">
-            <li class="nav-item"><a class="nav-link active" id="trade_bithumb_tab" data-toggle="tab" href="#trade_bithumb_contents">Bithumb</a></li>
-            <li class="nav-item"><a class="nav-link" id="trade_bitget_tab" data-toggle="tab" href="#trade_bitget_contents">Bitget</a></li>
+            
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="trade_bithumb_tab" data-toggle="tab" href="#trade_bithumb_contents" role="tab">
+                    Bithumb
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="trade_bitget_tab" data-toggle="tab" href="#trade_bitget_contents" role="tab">
+                    Bitget
+                </a>
+            </li>
+            
         </ul>
 
         <div class="loading-container">
@@ -151,16 +259,22 @@
             <div class="loading-text">데이터를 불러오는 중입니다...</div>
         </div>
 
-        <div class="timer-container">데이터는 10초에 한번씩 자동으로 업데이트됩니다.</div>
-        <div class="update-info">마지막 업데이트: <span id="lastUpdateTime">-</span></div>
+        <div class="timer-container">
+            데이터는 10초에 한번씩 자동으로 업데이트됩니다.
+        </div>
+        <div class="update-info">
+            마지막 업데이트: <span id="lastUpdateTime">-</span>
+        </div>
 
         <div class="tab-content" id="tradeTabContent">
+            
             <div class="tab-pane fade show active" id="trade_bithumb_contents" role="tabpanel">
                 <div id="gridtradeBithumb" class="ag-theme-alpine-dark ag-grid-container"></div>
             </div>
             <div class="tab-pane fade" id="trade_bitget_contents" role="tabpanel">
                 <div id="gridtradeBitget" class="ag-theme-alpine-dark ag-grid-container"></div>
             </div>
+            
         </div>
     </div>
 </div>
@@ -168,13 +282,18 @@
 <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
 
 <script type="text/javascript">
+    let gridApiTradeInfo;
     let gridApitradeBithumb;
     let gridApitradeBitget;
+    let gridApiTradeTimetable;
     let updateInterval;
+
+    // 사용자 메모/방문 캐시
     let favoritesCache = {};
     let memosCache = {};
     let visitCache = {};
 
+    // 공통 Cell Renderers
     class MarketCellRenderer {
         init(params) {
             this.eGui = document.createElement('a');
@@ -183,6 +302,7 @@
             this.eGui.className = 'market-link';
             this.eGui.textContent = params.value;
 
+            // 클릭 시 방문 날짜 기록 로직 추가
             this.eGui.addEventListener('click', () => {
                 const now = new Date();
                 const dateString = now.getFullYear().toString().substring(2) + '.' + 
@@ -194,7 +314,9 @@
                 saveVisitDate('bitget', params.value, dateString);
             });
         }
-        getGui() { return this.eGui; }
+        getGui() {
+            return this.eGui;
+        }
     }
 
     class PercentCellRenderer {
@@ -203,86 +325,437 @@
             const value = parseFloat(params.value);
             const absValue = Math.abs(value).toFixed(1);
             const displayValue = value > 0 ? `+${absValue}` : `-${absValue}`;
+            
             this.eGui.className = value > 0 ? 'percent-box positive' : 'percent-box negative';
             this.eGui.textContent = `${displayValue}%`;
         }
-        getGui() { return this.eGui; }
+        getGui() {
+            return this.eGui;
+        }
     }
 
     class PriceCellRenderer {
         init(params) {
             this.eGui = document.createElement('span');
-            this.eGui.textContent = Number(params.value).toLocaleString();
+            this.eGui.textContent = params.value ? Number(params.value).toLocaleString() : '-';
         }
-        getGui() { return this.eGui; }
+        getGui() {
+            return this.eGui;
+        }
     }
 
+    // Bithumb 그리드 설정
+    const columnDefstradeBithumb = [
+        { 
+            field: 'market', 
+            headerName: '종목', 
+            width: 120,
+            pinned: 'left',
+            cellRenderer: MarketCellRenderer,
+            sortable: true,
+            filter: true
+        },
+        { 
+            field: 'capitalization', 
+            headerName: '시가총액', 
+            width: 100,
+            cellRenderer: PriceCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price', 
+            headerName: '현재가', 
+            width: 120,
+            cellRenderer: PriceCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        
+        { 
+            field: 'price_ratio_5m', 
+            headerName: '5분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_30m', 
+            headerName: '30분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_60m', 
+            headerName: '60분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_240m', 
+            headerName: '240분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_1d', 
+            headerName: '1일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_7d', 
+            headerName: '7일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_high', 
+            headerName: '고점대비', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_low', 
+            headerName: '저점대비', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_10', 
+            headerName: 'MA_60_10', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_50', 
+            headerName: 'MA_60_50', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_200', 
+            headerName: 'MA_60_200', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_day_10', 
+            headerName: 'MA_1d_10', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_day_50', 
+            headerName: 'MA_1d_50', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_day_200', 
+            headerName: 'MA_1d_200', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        }
+    ];
+
+    // Bitget 그리드 설정
     const columnDefstradeBitget = [
         { 
-            field: 'favorite', headerName: '★', width: 60, pinned: 'left',
+            field: 'favorite',
+            headerName: '★',
+            width: 60,
+            pinned: 'left',
             cellRenderer: params => {
                 const isFavorite = getFavoriteStatus('bitget', params.data.market);
-                return `<span class="favorite-star ${isFavorite ? 'active' : ''}" data-market="${params.data.market}">${isFavorite ? '★' : '☆'}</span>`;
-            }
+                return `<span class="favorite-star ${isFavorite ? 'active' : ''}" data-market="${params.data.market}">
+                    ${isFavorite ? '★' : '☆'}
+                </span>`;
+            },
+            sortable: false,
+            filter: false
         },
         { 
-            field: 'memo', headerName: '메모장', width: 180, pinned: 'left',
+            field: 'memo',
+            headerName: '메모',
+            width: 200,
+            pinned: 'left',
             cellRenderer: params => {
                 const memo = getMemo('bitget', params.data.market);
-                return `<input type="text" class="memo-input" data-market="${params.data.market}" value="${memo || ''}" placeholder="메모...">`;
-            }
+                return `<input type="text" 
+                    class="memo-input" 
+                    data-market="${params.data.market}" 
+                    value="${memo || ''}" 
+                    placeholder="메모 입력..."
+                    onclick="event.stopPropagation()">`;
+            },
+            sortable: false,
+            filter: false
         },
         { 
-            field: 'last_visited_at', headerName: '마지막 방문', width: 140, pinned: 'left',
+            field: 'last_visited_at',
+            headerName: '마지막 방문',
+            width: 140,
+            pinned: 'left',
             cellRenderer: params => {
                 const date = getVisitDate('bitget', params.data.market);
                 return `<span style="color: var(--text-secondary); font-size: 11px;">${date || '-'}</span>`;
-            }
+            },
+            sortable: true,
+            filter: false
         },
-        { field: 'market', headerName: '종목', width: 120, pinned: 'left', cellRenderer: MarketCellRenderer, filter: true },
-        { field: 'volume', headerName: '거래대금', cellRenderer: PriceCellRenderer, width: 120, type: 'numericColumn' },
-        { field: 'funding_rate', headerName: '펀딩비', width: 100, cellRenderer: PriceCellRenderer, type: 'numericColumn' },
-        { field: 'price', headerName: '현재가', width: 120, cellRenderer: PriceCellRenderer, type: 'numericColumn' },
-        { field: 'price_ratio_15m', headerName: '15분', width: 90, cellRenderer: PercentCellRenderer, type: 'numericColumn' },
-        { field: 'price_ratio_1h', headerName: '1시간', width: 90, cellRenderer: PercentCellRenderer, type: 'numericColumn' },
-        { field: 'price_ratio_4h', headerName: '4시간', width: 90, cellRenderer: PercentCellRenderer, type: 'numericColumn' },
-        { field: 'price_ratio_1d', headerName: '1일', width: 90, cellRenderer: PercentCellRenderer, type: 'numericColumn' },
-        { field: 'price_ratio_7d', headerName: '7일', width: 90, cellRenderer: PercentCellRenderer, type: 'numericColumn' },
-        { field: 'price_range_7d', headerName: '범위7일', width: 90, cellRenderer: PercentCellRenderer, type: 'numericColumn' }
+        { 
+            field: 'market', 
+            headerName: '종목', 
+            width: 200,
+            pinned: 'left',
+            cellRenderer: MarketCellRenderer,
+            sortable: true,
+            filter: true
+        },
+        { 
+            field: 'volume', 
+            headerName: '거래대금',
+            cellRenderer: PriceCellRenderer, 
+            width: 120,
+            sortable: true,
+            pinned:'left',
+            type: 'numericColumn'
+        },
+        { 
+            field: 'funding_rate', 
+            headerName: '펀딩비', 
+            width: 120,
+            cellRenderer: PriceCellRenderer,
+            sortable: true,
+            pinned:'left',
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price', 
+            headerName: '현재가', 
+            width: 120,
+            cellRenderer: PriceCellRenderer,
+            sortable: true,
+            pinned:'left',
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_15m', 
+            headerName: '15분', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_1h', 
+            headerName: '1시간', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_4h', 
+            headerName: '4시간', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_1d', 
+            headerName: '1일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_7d', 
+            headerName: '7일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_14d', 
+            headerName: '14일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_high', 
+            headerName: '고점1일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_ratio_high_7d', 
+            headerName: '고점7일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_range_7d', 
+            headerName: '범위7일', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_10', 
+            headerName: 'MA10', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_20', 
+            headerName: 'MA20', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_50', 
+            headerName: 'MA50', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_100', 
+            headerName: 'MA100', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_200', 
+            headerName: 'MA200', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_400', 
+            headerName: 'MA400', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'ma_ratio_60_800', 
+            headerName: 'MA800', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
     ];
 
+    // Grid Options
     const defaultGridOptions = {
-        defaultColDef: { sortable: true, resizable: true },
+        defaultColDef: {
+            sortable: true,
+            resizable: true,
+            filter: false
+        },
+        animateRows: true,
+        rowSelection: 'single',
+        enableCellTextSelection: true,
+        suppressCellFocus: true,
         getRowId: params => params.data.market,
         enableCellChangeFlash: true,
-        animateRows: true
+        getRowStyle: params => {
+            if (params.node.rowIndex % 2 === 0) {
+                return { background: '#1e2329' };
+            }
+        }
     };
 
     $(document).ready(function() {
-        const gridDivBithumb = document.querySelector('#gridtradeBithumb');
-        gridApitradeBithumb = agGrid.createGrid(gridDivBithumb, { ...defaultGridOptions, columnDefs: [], rowData: [] });
+        const gridDivtradeBithumb = document.querySelector('#gridtradeBithumb');
+        gridApitradeBithumb = agGrid.createGrid(gridDivtradeBithumb, {
+            ...defaultGridOptions,
+            columnDefs: columnDefstradeBithumb,
+            rowData: []
+        });
 
         startAutoUpdate('trade_bithumb');
+
+        $('#trade_bithumb_tab').on('click', function() {
+            startAutoUpdate('trade_bithumb');
+        });
 
         $('#trade_bitget_tab').on('click', async function() {
             if (!gridApitradeBitget) {
                 const gridDiv = document.querySelector('#gridtradeBitget');
-                gridApitradeBitget = agGrid.createGrid(gridDiv, { ...defaultGridOptions, columnDefs: columnDefstradeBitget, rowData: [] });
+                gridApitradeBitget = agGrid.createGrid(gridDiv, {
+                    ...defaultGridOptions,
+                    columnDefs: columnDefstradeBitget,
+                    rowData: []
+                });
                 
                 await loadUserMemos('bitget');
                 
-                gridDiv.addEventListener('click', async e => {
+                gridDiv.addEventListener('click', async function(e) {
                     if (e.target.classList.contains('favorite-star')) {
                         const market = e.target.dataset.market;
-                        const isFav = await toggleFavorite('bitget', market);
-                        e.target.textContent = isFav ? '★' : '☆';
-                        e.target.classList.toggle('active', isFav);
+                        const isNowFavorite = await toggleFavorite('bitget', market);
+                        e.target.textContent = isNowFavorite ? '★' : '☆';
+                        e.target.classList.toggle('active', isNowFavorite);
                     }
                 });
 
-                gridDiv.addEventListener('input', e => {
+                gridDiv.addEventListener('input', function(e) {
                     if (e.target.classList.contains('memo-input')) {
-                        saveMemo('bitget', e.target.dataset.market, e.target.value);
+                        const market = e.target.dataset.market;
+                        const memo = e.target.value;
+                        saveMemo('bitget', market, memo);
                     }
                 });
             }
@@ -290,44 +763,196 @@
         });
     });
 
-    // ===== 수학 계산 함수들 (기존 로직 유지) =====
+    function stopAutoUpdate() {
+        if (updateInterval) {
+            clearInterval(updateInterval);
+        }
+    }
+
+    function startAutoUpdate(url, parameter) {
+        stopAutoUpdate();
+        
+        function update() {
+            if (url === 'trade_bithumb') {
+                refreshtradeBithumb();
+            } else if (url === 'trade_bitget') {
+                refreshtradeBitget();
+            }
+        }
+        
+        if (url === 'trade_bithumb' && !gridApitradeBithumb.getDisplayedRowCount()) {
+            showLoading();
+            setTimeout(() => {
+                update();
+                hideLoading();
+            }, 100);
+        } else if (url === 'trade_bitget' && gridApitradeBitget && !gridApitradeBitget.getDisplayedRowCount()) {
+            showLoading();
+            setTimeout(() => {
+                update();
+                hideLoading();
+            }, 100);
+        } else {
+            update();
+        }
+        
+        updateInterval = setInterval(update, 10000);
+    }
+
+    function showLoading() {
+        $('.loading-container').css('display', 'flex');
+    }
+
+    function hideLoading() {
+        $('.loading-container').css('display', 'none');
+    }
+
+    function updateLastUpdateTime() {
+        const now = new Date();
+        const timeString = now.getHours().toString().padStart(2, '0') + ':' +
+                          now.getMinutes().toString().padStart(2, '0') + ':' +
+                          now.getSeconds().toString().padStart(2, '0');
+        $('#lastUpdateTime').text(timeString);
+    }
+
+    // ===== 수학 계산 함수들 =====
     function getPriceRatioToday(item) {
+        if(!item.price_1m) return item;
+        item.price_ratio_1m = (((item.price_last - item.price_1m) / item.price_1m) * 100).toFixed(2);
+        item.price_ratio_3m = (((item.price_last - item.price_3m) / item.price_3m) * 100).toFixed(2);
         item.price_ratio_5m = (((item.price_last - item.price_5m) / item.price_5m) * 100).toFixed(2);
         item.price_ratio_15m = (((item.price_last - item.price_15m) / item.price_15m) * 100).toFixed(2);
-        item.price_ratio_1h = (((item.price_last - item.price_1h) / item.price_1h) * 100).toFixed(2);
-        item.price_ratio_4h = (((item.price_last - item.price_4h) / item.price_4h) * 100).toFixed(2);
+        item.price_ratio_30m = (((item.price_last - item.price_30m) / item.price_30m) * 100).toFixed(2);
+        item.price_ratio_60m = (((item.price_last - item.price_60m) / item.price_60m) * 100).toFixed(2);
+        item.price_ratio_240m = (((item.price_last - item.price_240m) / item.price_240m) * 100).toFixed(2);
+        item.price_ratio_high = (((item.price_last - item.price_today_high) / item.price_today_high) * 100).toFixed(2);
+        item.price_ratio_high_7d = (((item.price_last - item.price_week_high) / item.price_week_high) * 100).toFixed(2);
+        item.price_ratio_low = (((item.price_last - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
+        item.price_ratio_low_7d = (((item.price_last - item.price_week_low) / item.price_week_low) * 100).toFixed(2);
         item.price_ratio_1d = (((item.price_last - item.price_1d) / item.price_1d) * 100).toFixed(2);
+        item.price_ratio_3d = (((item.price_last - item.price_3d) / item.price_3d) * 100).toFixed(2);
         item.price_ratio_7d = (((item.price_last - item.price_7d) / item.price_7d) * 100).toFixed(2);
+        item.price_ratio_14d = (((item.price_last - item.price_14d) / item.price_14d) * 100).toFixed(2);
+
+        item.price_ratio_1h = (((item.price_last - item.price_1h) / item.price_1h) * 100).toFixed(2);
+        item.price_ratio_2h = (((item.price_last - item.price_2h) / item.price_2h) * 100).toFixed(2);
+        item.price_ratio_4h = (((item.price_last - item.price_4h) / item.price_4h) * 100).toFixed(2);
+        item.price_ratio_8h = (((item.price_last - item.price_8h) / item.price_8h) * 100).toFixed(2);
+
+        item.price_range_1d = (((item.price_today_high - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
         item.price_range_7d = (((item.price_week_high - item.price_week_low) / item.price_week_low) * 100).toFixed(2);
+
         return item;
     }
 
     function getMARatioToday(item) {
+        if(!item.ma_60_10) return item;
         item.ma_ratio_60_10 = (((item.price_last - item.ma_60_10) / item.ma_60_10) * 100).toFixed(2);
         item.ma_ratio_60_20 = (((item.price_last - item.ma_60_20) / item.ma_60_20) * 100).toFixed(2);
+        item.ma_ratio_60_34 = (((item.price_last - item.ma_60_34) / item.ma_60_34) * 100).toFixed(2);
         item.ma_ratio_60_50 = (((item.price_last - item.ma_60_50) / item.ma_60_50) * 100).toFixed(2);
         item.ma_ratio_60_100 = (((item.price_last - item.ma_60_100) / item.ma_60_100) * 100).toFixed(2);
         item.ma_ratio_60_200 = (((item.price_last - item.ma_60_200) / item.ma_60_200) * 100).toFixed(2);
+        item.ma_ratio_60_400 = (((item.price_last - item.ma_60_400) / item.ma_60_400) * 100).toFixed(2);
+        item.ma_ratio_60_800 = (((item.price_last - item.ma_60_800) / item.ma_60_800) * 100).toFixed(2);
+
+        item.ma_ratio_day_10 = (((item.price_last - item.ma_day_10) / item.ma_day_10) * 100).toFixed(2);
+        item.ma_ratio_day_20 = (((item.price_last - item.ma_day_20) / item.ma_day_20) * 100).toFixed(2);
+        item.ma_ratio_day_34 = (((item.price_last - item.ma_day_34) / item.ma_day_34) * 100).toFixed(2);
+        item.ma_ratio_day_50 = (((item.price_last - item.ma_day_50) / item.ma_day_50) * 100).toFixed(2);
+        item.ma_ratio_day_100 = (((item.price_last - item.ma_day_100) / item.ma_day_100) * 100).toFixed(2);
+        item.ma_ratio_day_200 = (((item.price_last - item.ma_day_200) / item.ma_day_200) * 100).toFixed(2);
+        item.ma_ratio_day_400 = (((item.price_last - item.ma_day_400) / item.ma_day_400) * 100).toFixed(2);
+        item.ma_ratio_day_800 = (((item.price_last - item.ma_day_800) / item.ma_day_800) * 100).toFixed(2);
+        
         return item;
     }
 
-    // ===== 데이터 동기화 및 캐시 로직 (last_visited_at 추가) =====
+    function calVolumeRatio(nu_amount, nu_cnt, de_amount, de_cnt) {
+        let nu_mean = 0;
+        let de_mean = 0;
+        if (nu_cnt !== 0) { nu_mean = nu_amount / nu_cnt; }
+        if (de_cnt !== 0) { de_mean = de_amount / de_cnt; }
+        if (de_mean === 0) { return 0; }
+        return (nu_mean / de_mean) - 1;
+    }
+
+    function getVolumeRatioToday(item) {
+        item.volume_ratio_1m_60m = (calVolumeRatio(item.amount_1m, item.count_1m, item.amount_60m, item.count_60m) * 100).toFixed(1);
+        item.volume_ratio_5m_60m = (calVolumeRatio(item.amount_5m, item.count_5m, item.amount_60m, item.count_60m) * 100).toFixed(1);
+        item.volume_ratio_10m_60m = (calVolumeRatio(item.amount_10m, item.count_10m, item.amount_60m, item.count_60m) * 100).toFixed(1);
+        return item;
+    }
+
+    // ===== 사용자 데이터 관리 기능 =====
     async function loadUserMemos(exchange) {
         try {
-            const res = await fetch('trade_bitget/user-memos');
-            const data = await res.json();
+            const response = await fetch('trade_bitget/user-memos');
+            const data = await response.json();
             favoritesCache[exchange] = data.favorites || [];
             memosCache[exchange] = data.memos || {};
-            visitCache[exchange] = data.visits || {}; 
-        } catch (e) { console.error(e); }
+            visitCache[exchange] = data.visits || {}; // 서버에서 visits 객체 수신
+            return data;
+        } catch (error) {
+            console.error('사용자 데이터 로드 실패:', error);
+            return { favorites: [], memos: {}, visits: {} };
+        }
     }
 
     async function updateUserMemo(market, updates) {
-        const formData = new FormData();
-        formData.append('market', market);
-        Object.keys(updates).forEach(key => formData.append(key, updates[key]));
-        const res = await fetch('trade_bitget/user-memos/update', { method: 'POST', body: formData });
-        return await res.json();
+        try {
+            const formData = new FormData();
+            formData.append('market', market);
+            if ('favorite' in updates) formData.append('favorite', updates.favorite);
+            if ('memo' in updates) formData.append('memo', updates.memo);
+            if ('last_visited_at' in updates) formData.append('last_visited_at', updates.last_visited_at);
+            
+            const response = await fetch('trade_bitget/user-memos/update', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                const exchange = 'bitget';
+                if (!favoritesCache[exchange]) favoritesCache[exchange] = [];
+                if (!memosCache[exchange]) memosCache[exchange] = {};
+                if (!visitCache[exchange]) visitCache[exchange] = {};
+
+                if ('favorite' in data) {
+                    if (data.favorite) {
+                        if (!favoritesCache[exchange].includes(market)) favoritesCache[exchange].push(market);
+                    } else {
+                        const index = favoritesCache[exchange].indexOf(market);
+                        if (index > -1) favoritesCache[exchange].splice(index, 1);
+                    }
+                }
+                if ('memo' in data) memosCache[exchange][market] = data.memo;
+                if ('last_visited_at' in data) visitCache[exchange][market] = data.last_visited_at;
+            }
+            return data;
+        } catch (error) {
+            console.error('사용자 데이터 업데이트 실패:', error);
+            return null;
+        }
+    }
+
+    async function toggleFavorite(exchange, market) {
+        const currentStatus = getFavoriteStatus(exchange, market);
+        const result = await updateUserMemo(market, { favorite: !currentStatus });
+        return result ? result.favorite : currentStatus;
+    }
+
+    function getFavoriteStatus(exchange, market) {
+        return (favoritesCache[exchange] || []).includes(market);
+    }
+
+    function getMemo(exchange, market) {
+        return (memosCache[exchange] || {})[market] || '';
+    }
+
+    function getVisitDate(exchange, market) {
+        return (visitCache[exchange] || {})[market] || '';
     }
 
     async function saveVisitDate(exchange, market, dateString) {
@@ -336,65 +961,119 @@
         
         await updateUserMemo(market, { last_visited_at: dateString });
         
-        const rowNode = gridApitradeBitget.getRowNode(market);
-        if (rowNode) rowNode.setDataValue('last_visited_at', dateString);
-    }
-
-    function getVisitDate(ex, m) { return visitCache[ex] ? visitCache[ex][m] : ''; }
-    function getFavoriteStatus(ex, m) { return favoritesCache[ex] ? favoritesCache[ex].includes(m) : false; }
-    function getMemo(ex, m) { return memosCache[ex] ? memosCache[ex][m] : ''; }
-
-    async function toggleFavorite(ex, m) {
-        const res = await updateUserMemo(m, { favorite: !getFavoriteStatus(ex, m) });
-        if(res.status === 'success') {
-            if(res.favorite) favoritesCache[ex].push(m);
-            else favoritesCache[ex] = favoritesCache[ex].filter(f => f !== m);
-            return res.favorite;
+        if (gridApitradeBitget) {
+            const rowNode = gridApitradeBitget.getRowNode(market);
+            if (rowNode) rowNode.setDataValue('last_visited_at', dateString);
         }
     }
 
-    let memoTimeout;
-    function saveMemo(ex, m, memo) {
-        if(!memosCache[ex]) memosCache[ex] = {};
-        memosCache[ex][m] = memo;
-        clearTimeout(memoTimeout);
-        memoTimeout = setTimeout(() => updateUserMemo(m, { memo }), 500);
+    let memoSaveTimeout = null;
+    async function saveMemo(exchange, market, memo) {
+        if (!memosCache[exchange]) memosCache[exchange] = {};
+        memosCache[exchange][market] = memo;
+        clearTimeout(memoSaveTimeout);
+        memoSaveTimeout = setTimeout(async () => {
+            await updateUserMemo(market, { memo: memo });
+        }, 500);
     }
 
-    function startAutoUpdate(url) {
-        if (updateInterval) clearInterval(updateInterval);
-        const update = () => url === 'trade_bithumb' ? refreshtradeBithumb() : refreshtradeBitget();
-        update();
-        updateInterval = setInterval(update, 10000);
-    }
-
-    function refreshtradeBitget() {
+    // ===== 데이터 리프레시 함수 =====
+    function refreshtradeBithumb() {
         $.ajax({
-            url: "{% url 'bithumb:trade_bitget' %}",
-            success: function(res) {
-                const processed = res.data.filter(i => i.price_last).map(i => {
-                    let item = getPriceRatioToday(i);
+            url: "{% url 'bithumb:trade_bithumb' %}",
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            success: function(response) {
+                const processedData = (response['data'] || []).map(item => {
+                    item = getPriceRatioToday(item);
                     item = getMARatioToday(item);
+                    item = getVolumeRatioToday(item);
                     return {
-                        ...item,
                         market: item.market,
                         price: item.price_last,
-                        last_visited_at: getVisitDate('bitget', item.market)
+                        capitalization: item.capitalization,
+                        price_ratio_5m: parseFloat(item.price_ratio_5m),
+                        price_ratio_30m: parseFloat(item.price_ratio_30m),
+                        price_ratio_60m: parseFloat(item.price_ratio_60m),
+                        price_ratio_240m: parseFloat(item.price_ratio_240m),
+                        price_ratio_high: parseFloat(item.price_ratio_high),
+                        price_ratio_low: parseFloat(item.price_ratio_low),
+                        price_ratio_1d: parseFloat(item.price_ratio_1d),
+                        price_ratio_7d: parseFloat(item.price_ratio_7d),
+                        ma_ratio_60_10: parseFloat(item.ma_ratio_60_10),
+                        ma_ratio_60_20: parseFloat(item.ma_ratio_60_20),
+                        ma_ratio_60_34: parseFloat(item.ma_ratio_60_34),
+                        ma_ratio_60_50: parseFloat(item.ma_ratio_60_50),
+                        ma_ratio_60_100: parseFloat(item.ma_ratio_60_100),
+                        ma_ratio_60_200: parseFloat(item.ma_ratio_60_200),
+                        ma_ratio_60_400: parseFloat(item.ma_ratio_60_400),
+                        ma_ratio_60_800: parseFloat(item.ma_ratio_60_800),
+                        ma_ratio_day_10: parseFloat(item.ma_ratio_day_10),
+                        ma_ratio_day_20: parseFloat(item.ma_ratio_day_20),
+                        ma_ratio_day_34: parseFloat(item.ma_ratio_day_34),
+                        ma_ratio_day_50: parseFloat(item.ma_ratio_day_50),
+                        ma_ratio_day_100: parseFloat(item.ma_ratio_day_100),
+                        ma_ratio_day_200: parseFloat(item.ma_ratio_day_200),
+                        ma_ratio_day_400: parseFloat(item.ma_ratio_day_400),
+                        ma_ratio_day_800: parseFloat(item.ma_ratio_day_800),
                     };
                 });
-                gridApitradeBitget.applyTransaction({ update: processed });
+                if (!gridApitradeBithumb.getDisplayedRowCount()) {
+                    gridApitradeBithumb.setGridOption('rowData', processedData);
+                } else {
+                    gridApitradeBithumb.applyTransaction({ update: processedData });
+                }
                 updateLastUpdateTime();
             }
         });
     }
 
-    function refreshtradeBithumb() {
-        // Bithumb 리프레시 로직 (필요시 추가)
-    }
-
-    function updateLastUpdateTime() {
-        const now = new Date();
-        $('#lastUpdateTime').text(now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0'));
+    function refreshtradeBitget() {
+        $.ajax({
+            url: "{% url 'bithumb:trade_bitget' %}",
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            success: function(response) {
+                const processedData = (response['data'] || []).filter(item => item.price_last).map(item => {
+                    item = getPriceRatioToday(item);
+                    item = getMARatioToday(item);
+                    return {
+                        market: item.market,
+                        price: item.price_last,
+                        volume: item.volume,
+                        funding_rate: item.funding_rate,
+                        price_ratio_5m: parseFloat(item.price_ratio_5m),
+                        price_ratio_15m: parseFloat(item.price_ratio_15m),
+                        price_ratio_1h: parseFloat(item.price_ratio_1h),
+                        price_ratio_4h: parseFloat(item.price_ratio_4h),
+                        price_ratio_8h: parseFloat(item.price_ratio_8h),
+                        price_ratio_1d: parseFloat(item.price_ratio_1d),
+                        price_ratio_7d: parseFloat(item.price_ratio_7d),
+                        price_ratio_14d: parseFloat(item.price_ratio_14d),
+                        price_range_1d: parseFloat(item.price_range_1d),
+                        price_range_7d: parseFloat(item.price_range_7d),
+                        price_ratio_high: parseFloat(item.price_ratio_high),
+                        price_ratio_high_7d: parseFloat(item.price_ratio_high_7d),
+                        price_ratio_low: parseFloat(item.price_ratio_low),
+                        price_ratio_low_7d: parseFloat(item.price_ratio_low_7d),
+                        ma_ratio_60_10: parseFloat(item.ma_ratio_60_10),
+                        ma_ratio_60_20: parseFloat(item.ma_ratio_60_20),
+                        ma_ratio_60_50: parseFloat(item.ma_ratio_60_50),
+                        ma_ratio_60_100: parseFloat(item.ma_ratio_60_100),
+                        ma_ratio_60_200: parseFloat(item.ma_ratio_60_200),
+                        ma_ratio_60_400: parseFloat(item.ma_ratio_60_400),
+                        ma_ratio_60_800: parseFloat(item.ma_ratio_60_800),
+                        last_visited_at: getVisitDate('bitget', item.market)
+                    };
+                });
+                if (!gridApitradeBitget.getDisplayedRowCount()) {
+                    gridApitradeBitget.setGridOption('rowData', processedData);
+                } else {
+                    gridApitradeBitget.applyTransaction({ update: processedData });
+                }
+                updateLastUpdateTime();
+            }
+        });
     }
 </script>
 {% endblock %}
