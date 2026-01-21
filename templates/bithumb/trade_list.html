@@ -526,48 +526,21 @@
 
     // Bitget 그리드 설정
     const columnDefstradeBitget = [
-            { 
-            field: 'favorite', 
-            headerName: '★', 
-            width: 60, 
-            pinned: 'left',
-            // 정렬 기준을 단순 문자열(★/☆)로 비교하도록 설정
-            cellRenderer: params => {
-                const isFavorite = params.value; // 이제 데이터에서 직접 가져옵니다.
-                return `<span class="favorite-star ${isFavorite ? 'active' : ''}" data-market="${params.data.market}">
-                    ${isFavorite ? '★' : '☆'}
-                </span>`;
-            },
-            sortable: true, // 정렬 활성화
-            filter: false
+        { 
+            field: 'favorite', headerName: '★', width: 60, pinned: 'left',
+            cellRenderer: params => `<span class="favorite-star ${params.value ? 'active' : ''}" data-market="${params.data.market}">${params.value ? '★' : '☆'}</span>`,
+            sortable: true
         },
         { 
-            field: 'memo',
-            headerName: '메모',
-            width: 150,
-            pinned: 'left',
-            cellRenderer: params => {
-                const memo = params.value; // 이제 데이터에서 직접 가져옵니다.
-                return `<input type="text" 
-                    class="memo-input" 
-                    data-market="${params.data.market}" 
-                    value="${memo || ''}" 
-                    placeholder="메모 입력..."
-                    onclick="event.stopPropagation()">`;
-            },
-            sortable: true, // 정렬 활성화
-            filter: false
+            field: 'memo', headerName: '메모', width: 150, pinned: 'left',
+            cellRenderer: params => `<input type="text" class="memo-input" data-market="${params.data.market}" value="${params.value || ''}" onclick="event.stopPropagation()">`,
+            sortable: true
         },
         { 
-            field: 'last_visited_at',
-            headerName: '마지막 방문',
-            width: 140,
-            pinned: 'left',
-            cellRenderer: params => {
-                return `<span style="color: var(--text-secondary); font-size: 11px;">${params.value || '-'}</span>`;
-            },
-            sortable: true, // 정렬 활성화
-            filter: false
+            field: 'last_visited_at', headerName: '마지막 방문', width: 140, pinned: 'left',
+            // params.value를 직접 사용
+            cellRenderer: params => `<span style="color: var(--text-secondary); font-size: 11px;">${params.value || '-'}</span>`,
+            sortable: true
         },
         { 
             field: 'market', 
@@ -929,11 +902,11 @@
             const data = await response.json();
             favoritesCache[exchange] = data.favorites || [];
             memosCache[exchange] = data.memos || {};
-            visitCache[exchange] = data.visits || {}; // 서버에서 visits 객체 수신
+            visitCache[exchange] = data.last_visited_at || {}; // 서버에서 visits 객체 수신
             return data;
         } catch (error) {
             console.error('사용자 데이터 로드 실패:', error);
-            return { favorites: [], memos: {}, visits: {} };
+            return { favorites: [], memos: {}, last_visited_at: {} };
         }
     }
 
@@ -1076,6 +1049,9 @@
                     item = getPriceRatioToday(item);
                     item = getMARatioToday(item);
                     return {
+                        favorite: getFavoriteStatus('bitget', item.market),
+                        memo: getMemo('bitget', item.market),
+                        last_visited_at: getVisitDate('bitget', item.market),
                         market: item.market,
                         price: item.price_last,
                         volume: item.volume,
