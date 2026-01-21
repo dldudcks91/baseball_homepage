@@ -338,6 +338,7 @@ def get_user_memos(request):
         'memos': {m.market: m.memo for m in memos if m.memo},
         'last_visited_at': {m.market: m.last_visited_at for m in memos if m.last_visited_at}
     }
+    print("get_user_memos: ", data)
     return JsonResponse(data)
 
 
