@@ -226,7 +226,7 @@
             }
         },
         { 
-            field: 'memo', headerName: '메모', width: 180, pinned: 'left',
+            field: 'memo', headerName: '메모장', width: 180, pinned: 'left',
             cellRenderer: params => {
                 const memo = getMemo('bitget', params.data.market);
                 return `<input type="text" class="memo-input" data-market="${params.data.market}" value="${memo || ''}" placeholder="메모...">`;
