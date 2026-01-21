@@ -627,16 +627,16 @@
             type: 'numericColumn'
         },
         { 
-            field: 'price_ratio_high', 
-            headerName: '고점1일', 
+            field: 'price_range_1d', 
+            headerName: '범위1일', 
             width: 100,
             cellRenderer: PercentCellRenderer,
             sortable: true,
             type: 'numericColumn'
         },
         { 
-            field: 'price_ratio_high_7d', 
-            headerName: '고점7일', 
+            field: 'price_range_3d', 
+            headerName: '범위3일', 
             width: 100,
             cellRenderer: PercentCellRenderer,
             sortable: true,
@@ -851,6 +851,7 @@
         item.price_ratio_8h = (((item.price_last - item.price_8h) / item.price_8h) * 100).toFixed(2);
 
         item.price_range_1d = (((item.price_today_high - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
+        item.price_range_3d = (((item.price_3d_high - item.price_3d_low) / item.price_3d_low) * 100).toFixed(2);
         item.price_range_7d = (((item.price_week_high - item.price_week_low) / item.price_week_low) * 100).toFixed(2);
 
         return item;
@@ -1065,6 +1066,7 @@
                         price_ratio_7d: parseFloat(item.price_ratio_7d),
                         price_ratio_14d: parseFloat(item.price_ratio_14d),
                         price_range_1d: parseFloat(item.price_range_1d),
+                        price_range_3d: parseFloat(item.price_range_3d),
                         price_range_7d: parseFloat(item.price_range_7d),
                         price_ratio_high: parseFloat(item.price_ratio_high),
                         price_ratio_high_7d: parseFloat(item.price_ratio_high_7d),
