@@ -371,11 +371,10 @@ def update_user_memo(request):
     if 'memo' in request.POST:
         memo_obj.memo = request.POST.get('memo', '')
 
-    # 3. last_visited_at 업데이트 (추가된 부분)
-    # 템플릿에서 'YY.MM.DD HH:mm' 형식의 문자열을 보내므로 그대로 저장하거나 
-    # 모델 필드 타입에 따라 파싱하여 저장합니다.
+    # 3. last_visited_at 업데이트 (서버 시간 저장으로 수정됨)
     if 'last_visited_at' in request.POST:
-        memo_obj.last_visited_at = request.POST.get('last_visited_at')
+        # 클라이언트에서 보낸 문자열 값은 무시하고, 서버의 현재 시간(UTC)을 저장
+        memo_obj.last_visited_at = datetime.now(tz=timezone.utc)
     
     memo_obj.save()
     
@@ -385,5 +384,6 @@ def update_user_memo(request):
         'favorite': memo_obj.favorite,
         'favorite_date': memo_obj.favorite_date.isoformat() if memo_obj.favorite_date else None,
         'memo': memo_obj.memo,
-        'last_visited_at': memo_obj.last_visited_at  # 업데이트된 값 반환
+        # 프론트엔드 표시 형식에 맞춰 문자열로 포맷팅하여 반환 ('25.02.12 14:30')
+        'last_visited_at': memo_obj.last_visited_at.strftime('%y.%m.%d %H:%M') if memo_obj.last_visited_at else None
     })
