@@ -363,7 +363,7 @@ def update_user_memo(request):
         # favorite이 True가 되면 날짜 기록, False가 되면 날짜 삭제
         if favorite_value:
             if not memo_obj.favorite_date:  # 처음 등록하는 경우만
-                memo_obj.favorite_date = datetime.now(tz=timezone.utc)
+                memo_obj.favorite_date = datetime.now(tz=timezone.utc) + timedelta(hours=9)
         else:
             memo_obj.favorite_date = None
     
@@ -374,7 +374,7 @@ def update_user_memo(request):
     # 3. last_visited_at 업데이트 (서버 시간 저장으로 수정됨)
     if 'last_visited_at' in request.POST:
         # 클라이언트에서 보낸 문자열 값은 무시하고, 서버의 현재 시간(UTC)을 저장
-        memo_obj.last_visited_at = datetime.now(tz=timezone.utc)
+        memo_obj.last_visited_at = datetime.now(tz=timezone.utc) + timedelta(hours=9)
     
     memo_obj.save()
     
