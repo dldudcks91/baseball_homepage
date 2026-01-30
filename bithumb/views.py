@@ -266,7 +266,7 @@ def trade_bitget(request):
     #today_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
     week_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_7_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
 
-    
+    print("hour1_high_low_data:", hour1_high_low_data)
     market_list = [
         {
             'market': item['market'][:-4],
