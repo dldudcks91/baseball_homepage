@@ -627,6 +627,22 @@
             type: 'numericColumn'
         },
         { 
+            field: 'price_range_1h', 
+            headerName: '범위1시간', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
+            field: 'price_range_4h', 
+            headerName: '범위4시간', 
+            width: 100,
+            cellRenderer: PercentCellRenderer,
+            sortable: true,
+            type: 'numericColumn'
+        },
+        { 
             field: 'price_range_1d', 
             headerName: '범위1일', 
             width: 100,
@@ -849,6 +865,10 @@
         item.price_ratio_2h = (((item.price_last - item.price_2h) / item.price_2h) * 100).toFixed(2);
         item.price_ratio_4h = (((item.price_last - item.price_4h) / item.price_4h) * 100).toFixed(2);
         item.price_ratio_8h = (((item.price_last - item.price_8h) / item.price_8h) * 100).toFixed(2);
+        
+        item.price_range_1h = (((item.price_hour1_high - item.price_hour1_low) / item.price_hour1_low) * 100).toFixed(2);
+        item.price_range_4h = (((item.price_hour4_high - item.price_hour4_low) / item.price_hour4_low) * 100).toFixed(2);
+
 
         item.price_range_1d = (((item.price_today_high - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
         item.price_range_3d = (((item.price_3d_high - item.price_3d_low) / item.price_3d_low) * 100).toFixed(2);
@@ -1065,9 +1085,17 @@
                         price_ratio_1d: parseFloat(item.price_ratio_1d),
                         price_ratio_7d: parseFloat(item.price_ratio_7d),
                         price_ratio_14d: parseFloat(item.price_ratio_14d),
+
+                        price_range_1h: parseFloat(item.price_range_1h),
+                        price_range_4h: parseFloat(item.price_range_4h),
+
                         price_range_1d: parseFloat(item.price_range_1d),
                         price_range_3d: parseFloat(item.price_range_3d),
                         price_range_7d: parseFloat(item.price_range_7d),
+
+
+                        
+
                         price_ratio_high: parseFloat(item.price_ratio_high),
                         price_ratio_high_7d: parseFloat(item.price_ratio_high_7d),
                         price_ratio_low: parseFloat(item.price_ratio_low),

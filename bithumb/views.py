@@ -258,6 +258,9 @@ def trade_bitget(request):
     
     ma_60_data = MA60MinutesBitget.objects.filter(log_dt = last_hour).order_by('market')
 
+    hour1_high_low_data = MarketBitget.objects.filter(log_dt__gte= last_1h_data).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
+    hour4_high_low_data = MarketBitget.objects.filter(log_dt__gte= last_4h_data).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
+
     today_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
     day3_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_3_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
     #today_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
@@ -292,6 +295,15 @@ def trade_bitget(request):
             'ma_60_200': next((d.ma_200 for d in ma_60_data if d.market == item['market']), None),
             'ma_60_400': next((d.ma_400 for d in ma_60_data if d.market == item['market']), None),
             'ma_60_800': next((d.ma_800 for d in ma_60_data if d.market == item['market']), None),
+            
+
+
+
+            'price_1h_high': next((d['max_price'] for d in hour1_high_low_data if d['market'] == item['market']), None),
+            'price_1h_low': next((d['min_price'] for d in hour1_high_low_data if d['market'] == item['market']), None),
+            'price_4h_high': next((d['max_price'] for d in hour4_high_low_data if d['market'] == item['market']), None),
+            'price_4h_low': next((d['min_price'] for d in hour4_high_low_data if d['market'] == item['market']), None),
+
 
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item['market']), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item['market']), None),
