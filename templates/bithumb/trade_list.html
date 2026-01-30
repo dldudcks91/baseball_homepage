@@ -866,8 +866,8 @@
         item.price_ratio_4h = (((item.price_last - item.price_4h) / item.price_4h) * 100).toFixed(2);
         item.price_ratio_8h = (((item.price_last - item.price_8h) / item.price_8h) * 100).toFixed(2);
         
-        item.price_range_1h = (((item.price_hour1_high - item.price_hour1_low) / item.price_hour1_low) * 100).toFixed(2);
-        item.price_range_4h = (((item.price_hour4_high - item.price_hour4_low) / item.price_hour4_low) * 100).toFixed(2);
+        item.price_range_1h = (((item.price_1h_high - item.price_1h_low) / item.price_1h_low) * 100).toFixed(2);
+        item.price_range_4h = (((item.price_4h_high - item.price_4h_low) / item.price_4h_low) * 100).toFixed(2);
 
 
         item.price_range_1d = (((item.price_today_high - item.price_today_low) / item.price_today_low) * 100).toFixed(2);
