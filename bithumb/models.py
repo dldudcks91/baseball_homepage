@@ -69,6 +69,39 @@ class MarketHourBitget(models.Model):
         managed = False
         db_table = 'tb_market_hour_bitget'
         unique_together = (('log_dt','market'),)
+
+class Market4HourBitget(models.Model):
+    
+    log_dt = models.DateTimeField(primary_key = True)
+    market = models.CharField(max_length = 45)
+    opening_price = models.FloatField()
+    trade_price = models.FloatField()
+    high_price = models.FloatField()
+    low_price = models.FloatField()
+    volume = models.FloatField()
+    amount = models.FloatField()
+    
+    class Meta:
+        managed = False
+        db_table = 'tb_market_hour_bitget'
+        unique_together = (('log_dt','market'),)
+
+class MarketDayBitget(models.Model):
+    
+    log_dt = models.DateTimeField(primary_key = True)
+    market = models.CharField(max_length = 45)
+    opening_price = models.FloatField()
+    trade_price = models.FloatField()
+    high_price = models.FloatField()
+    low_price = models.FloatField()
+    volume = models.FloatField()
+    amount = models.FloatField()
+    
+    class Meta:
+        managed = False
+        db_table = 'tb_market_hour_bitget'
+        unique_together = (('log_dt','market'),)
+
 class MarketDay(models.Model):
     
     date = models.DateField(primary_key = True)
@@ -129,7 +162,49 @@ class MA60MinutesBitget(models.Model):
         db_table = 'tb_ma_60_minutes_bitget'
         unique_together = (('log_dt','market'),)
 
+class MA4HourBitget(models.Model):
+    
+    log_dt = models.DateTimeField(primary_key = True)
+    market = models.CharField(max_length = 45)
+    ma_10 = models.FloatField()
+    ma_20 = models.FloatField()
+    ma_34 = models.FloatField()
+    ma_50 = models.FloatField()
+    ma_100 = models.FloatField()
+    ma_200 = models.FloatField()
+    ma_400 = models.FloatField()
+    ma_800 = models.FloatField()
+    golden_cross_10_34 = models.IntegerField()
+    dead_cross_10_34 = models.IntegerField()
+    created_at = models.TimeField()
+    
+    
+    class Meta:
+        managed = False
+        db_table = 'tb_ma_60_minutes_bitget'
+        unique_together = (('log_dt','market'),)
 
+class MADayBitget(models.Model):
+    
+    log_dt = models.DateTimeField(primary_key = True)
+    market = models.CharField(max_length = 45)
+    ma_10 = models.FloatField()
+    ma_20 = models.FloatField()
+    ma_34 = models.FloatField()
+    ma_50 = models.FloatField()
+    ma_100 = models.FloatField()
+    ma_200 = models.FloatField()
+    ma_400 = models.FloatField()
+    ma_800 = models.FloatField()
+    golden_cross_10_34 = models.IntegerField()
+    dead_cross_10_34 = models.IntegerField()
+    created_at = models.TimeField()
+    
+    
+    class Meta:
+        managed = False
+        db_table = 'tb_ma_60_minutes_bitget'
+        unique_together = (('log_dt','market'),)
 class MADays(models.Model):
     
     date = models.DateField(primary_key = True)
