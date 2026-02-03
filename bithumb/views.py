@@ -195,12 +195,8 @@ def trade_bithumb(request):
     return render(request,'bithumb/trade_list.html', context)
 
 def trade_bitget(request):
-    
-    
     TEST_SECONDS= 0
-    #current_time = datetime(2025, 2, 11, 23, 14, 41, tzinfo = timezone.utc)#datetime.now(tzinfo = timezone.utc) #- timedelta(minutes = TEST_SECONDS)
     current_time = datetime.now(tz = timezone.utc) - timedelta(seconds = 10)
-    #current_time = datetime(2025, 2, 12, 8, 1, 33, tzinfo = timezone.utc)
     last_time = get_current_time(current_time, -(TEST_SECONDS))
     last_temp_time = get_current_time(current_time, -(10 + TEST_SECONDS))
     last_1m_time = get_current_time(current_time, -(60 + TEST_SECONDS))
@@ -220,17 +216,13 @@ def trade_bitget(request):
     
     utc_00_time = get_current_time(current_time.replace(hour= 0, minute = 0, second = 0 ,microsecond = 0),0)
     
-    #시점데이터
+    # 시점데이터 (기존 유지)
     last_data = MarketBitget.objects.filter(log_dt = last_time)
     if len(last_data)== 0:
         last_data = MarketBitget.objects.filter(log_dt = last_temp_time)        
-    #last_1m_data = MarketBitget.objects.filter(log_dt = last_1m_time)
-    #last_3m_data = MarketBitget.objects.filter(log_dt = last_3m_time)
     last_5m_data = MarketBitget.objects.filter(log_dt = last_5m_time)
     last_15m_data = MarketBitget.objects.filter(log_dt = last_15m_time)
-    #last_30m_data = MarketBitget.objects.filter(log_dt = last_30m_time)
     last_1h_data = MarketBitget.objects.filter(log_dt = last_1h_time)
-    #last_2h_data = MarketBitget.objects.filter(log_dt = last_2h_time)
     last_4h_data = MarketBitget.objects.filter(log_dt = last_4h_time)
     last_8h_data = MarketBitget.objects.filter(log_dt = last_8h_time)
     last_1d_data = MarketBitget.objects.filter(log_dt = last_1d_time)
@@ -239,104 +231,77 @@ def trade_bitget(request):
     last_14d_data = MarketBitget.objects.filter(log_dt = last_14d_time)
 
     market_info_data = MarketBitget.objects.values('market').distinct()
-    
-    
-    #고점데이터
-    #today_high_low_data = Market.objects.filter(log_dt__gte= last_1d_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
-    
-    #print(last_3_sum_data)
-    # 직전 n~60분 데이터 -> 나중에 수정해보자 좋은값찾아서
-    # last_1_60_sum_data = Market.objects.filter(log_dt__lt= last_1_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
-    # last_3_60_sum_data = Market.objects.filter(log_dt__lt= last_3_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
-    # last_5_60_sum_data = Market.objects.filter(log_dt__lt= last_5_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
-    # last_10_60_sum_data = Market.objects.filter(log_dt__lt= last_10_time, log_dt__gte= last_60_time, volume__gt = 0).values('market').annotate(total_volume=Sum('volume'), total_amount = Sum('amount'), cnt = Count('volume')).order_by('market')
-    
+
+    # --- [수정 구간: MA 데이터 수집] ---
+    # 1시간봉: 직전 정시
     last_hour = (last_time.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1))
+    # 4시간봉: 직전 4시간 단위 정시
+    last_4hour_dt = last_time.replace(minute=0, second=0, microsecond=0) - timedelta(hours=last_time.hour % 4)
+    # 일봉: 당일 오전 09시 (KST 기준, UTC 00시)
+    last_day_dt = last_time.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # 각 시간대별 MA 20 데이터 조회
+    ma_1h_data = MA60MinutesBitget.objects.filter(log_dt = last_hour).order_by('market')
+    ma_4h_data = MA4HourBitget.objects.filter(log_dt = last_4hour_dt).order_by('market')
+    ma_day_data = MADayBitget.objects.filter(log_dt = last_day_dt).order_by('market')
+    # --------------------------------
+
+    # 고점데이터 (기존 유지)
     last_day = (last_time- timedelta(days=1)).date()
     last_3_day = (last_time- timedelta(days=3)).date()
     last_7_day = (last_time- timedelta(days=7)).date()
-    
-    ma_60_data = MA60MinutesBitget.objects.filter(log_dt = last_hour).order_by('market')
 
     hour1_high_low_data = MarketBitget.objects.filter(log_dt__gte= last_1h_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
     hour4_high_low_data = MarketBitget.objects.filter(log_dt__gte= last_4h_time).values('market').annotate(max_price = Max('price'), min_price = Min('price'))
 
     today_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
     day3_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_3_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
-    #today_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
     week_high_low_data = MarketHourBitget.objects.filter(log_dt__gte= last_7_day).values('market').annotate(max_price = Max('high_price'), min_price = Min('low_price'))
 
-    print("hour1_high_low_data:", hour1_high_low_data)
     market_list = [
         {
             'market': item['market'][:-4],
-            
             'volume': next((d.volume for d in last_data if d.market == item['market']), None),
             'funding_rate':next((d.funding_rate for d in last_data if d.market == item['market']), None),
             'price_last': next((d.price for d in last_data if d.market == item['market']), None),
-            #'price_1m': next((d.price for d in last_1m_data if d.market == item['market']), None),
-            #'price_3m': next((d.price for d in last_3m_data if d.market == item['market']), None),
             'price_5m': next((d.price for d in last_5m_data if d.market == item['market']), None),
             'price_15m': next((d.price for d in last_15m_data if d.market == item['market']), None),
-            #'price_30m': next((d.price for d in last_30m_data if d.market == item['market']), None),
             'price_1h': next((d.price for d in last_1h_data if d.market == item['market']), None),
-            #'price_2h': next((d.price for d in last_2h_data if d.market == item['market']), None),
             'price_4h': next((d.price for d in last_4h_data if d.market == item['market']), None),
             'price_8h': next((d.price for d in last_8h_data if d.market == item['market']), None),
             'price_1d': next((d.price for d in last_1d_data if d.market == item['market']), None),
             'price_3d': next((d.price for d in last_3d_data if d.market == item['market']), None),
             'price_7d': next((d.price for d in last_7d_data if d.market == item['market']), None),
             'price_14d': next((d.price for d in last_14d_data if d.market == item['market']), None),
-            'ma_60_10': next((d.ma_10 for d in ma_60_data if d.market == item['market']), None),
-            'ma_60_20': next((d.ma_20 for d in ma_60_data if d.market == item['market']), None),
-            'ma_60_34': next((d.ma_34 for d in ma_60_data if d.market == item['market']), None),
-            'ma_60_50': next((d.ma_50 for d in ma_60_data if d.market == item['market']), None),
-            'ma_60_100': next((d.ma_100 for d in ma_60_data if d.market == item['market']), None),
-            'ma_60_200': next((d.ma_200 for d in ma_60_data if d.market == item['market']), None),
-            'ma_60_400': next((d.ma_400 for d in ma_60_data if d.market == item['market']), None),
-            'ma_60_800': next((d.ma_800 for d in ma_60_data if d.market == item['market']), None),
-            
 
-
+            # --- [수정 구간: MA 20선 값만 할당] ---
+            'ma_1h_20': next((d.ma_20 for d in ma_1h_data if d.market == item['market']), None),
+            'ma_4h_20': next((d.ma_20 for d in ma_4h_data if d.market == item['market']), None),
+            'ma_day_20': next((d.ma_20 for d in ma_day_data if d.market == item['market']), None),
+            # ------------------------------------
 
             'price_1h_high': next((d['max_price'] for d in hour1_high_low_data if d['market'] == item['market']), None),
             'price_1h_low': next((d['min_price'] for d in hour1_high_low_data if d['market'] == item['market']), None),
             'price_4h_high': next((d['max_price'] for d in hour4_high_low_data if d['market'] == item['market']), None),
             'price_4h_low': next((d['min_price'] for d in hour4_high_low_data if d['market'] == item['market']), None),
-
-
             'price_today_high': next((d['max_price'] for d in today_high_low_data if d['market'] == item['market']), None),
             'price_today_low': next((d['min_price'] for d in today_high_low_data if d['market'] == item['market']), None),
-
             'price_3d_high': next((d['max_price'] for d in day3_high_low_data if d['market'] == item['market']), None),
             'price_3d_low': next((d['min_price'] for d in day3_high_low_data if d['market'] == item['market']), None),
-
             'price_week_high': next((d['max_price'] for d in week_high_low_data if d['market'] == item['market']), None),
             'price_week_low': next((d['min_price'] for d in week_high_low_data if d['market'] == item['market']), None),
-            
-       
         }
         for item in market_info_data
-        ]
+    ]
 
-    print(market_list[0])
     context = {'trade_day_data': market_list}
     
-
-    #추가로 요청받았을때
     try:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             html = render(request, 'bithumb/trade_list.html', context).content
-            return JsonResponse({
-                'html': html.decode('utf-8'),
-                'data': market_list
-        })
-        
+            return JsonResponse({'html': html.decode('utf-8'), 'data': market_list})
     except Exception as e:
-        print(f"Error: {e}")
         return JsonResponse({'error': str(e)}, status=500)
-    
-
     
     return render(request,'bithumb/trade_list.html', context)
 
